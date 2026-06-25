@@ -107,6 +107,7 @@
     </div>
     <div class="header-right">
       <button class="btn-save" id="save-btn" onclick="saveMenu()">💾 Save Menu</button>
+      <button class="btn-save" style="background:#1a1208;color:#f0d080;" onclick="exportMenu()">⬇️ Export JSON</button>
       <button class="btn-logout" onclick="logout()">Sign Out</button>
     </div>
   </header>
@@ -357,6 +358,18 @@
       container.appendChild(card);
     });
   }
+  window.exportMenu = function() {
+    const date = document.getElementById("menu-date").value;
+    const cutoff = document.getElementById("cutoff-time").value;
+    const payload = JSON.stringify({ date, cutoff, categories: menuData }, null, 2);
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "menu.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 </script>
 </body>
 </html>
