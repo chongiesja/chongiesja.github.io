@@ -1,0 +1,72 @@
+{
+  "date": "",
+  "cutoff": "10:00",
+  "categories": [
+    { "category": "Rice & Peas Meals", "items": [
+      { "id": "m1", "name": "Brown Stew Chicken", "desc": "Slow-cooked with herbs & Scotch bonnet", "price": 1500, "on": true },
+      { "id": "m2", "name": "Jerk Chicken", "desc": "Authentic pit-style, smoky & bold", "price": 1500, "on": true },
+      { "id": "m3", "name": "Curry Chicken", "desc": "Rich Jamaican-style curry sauce", "price": 1500, "on": true },
+      { "id": "m4", "name": "Oxtail", "desc": "Tender, slow-braised with butter beans", "price": 2000, "on": true },
+      { "id": "m5", "name": "Curry Goat", "desc": "Classic Jamaican curry, fall-off-the-bone", "price": 2000, "on": true }
+    ]},
+    { "category": "Sides & Extras", "items": [
+      { "id": "s1", "name": "Festival", "desc": "Sweet fried dumplings", "price": 200, "on": true },
+      { "id": "s2", "name": "Fried Plantain", "desc": "Ripe, golden-fried", "price": 200, "on": true },
+      { "id": "s3", "name": "Steamed Vegetables", "desc": "Seasoned medley", "price": 300, "on": true },
+      { "id": "s4", "name": "Extra Rice & Peas", "desc": "Full portion", "price": 400, "on": true }
+    ]},
+    { "category": "Daily Specials", "items": [
+      { "id": "sp1", "name": "Jerk Chicken Alfredo", "desc": "Creamy alfredo pasta with smoky jerk chicken", "price": 1800, "on": true },
+      { "id": "sp2", "name": "Vegetarian Pasta", "desc": "Fresh vegetables in a seasoned sauce", "price": 1500, "on": true },
+      { "id": "sp3", "name": "Chicken Salad", "desc": "Fresh garden salad with grilled chicken", "price": 1500, "on": true },
+      { "id": "sp4", "name": "Fish Salad", "desc": "Fresh garden salad with seasoned fish", "price": 1600, "on": true },
+      { "id": "sp5", "name": "Shrimp Salad", "desc": "Fresh garden salad with seasoned shrimp", "price": 1800, "on": true },
+      { "id": "sp6", "name": "Soup of the Day (32 oz)", "desc": "Ask us what's cooking today", "price": 1200, "on": true, "soupSpecial": true }
+    ]},
+    { "category": "Chongie's Noodle Bowls", "items": [
+      { "id": "nb1", "name": "Teriyaki Chicken Noodle Bowl", "desc": "Grilled chicken breast, ramen noodles, teriyaki glaze, shredded cabbage, sesame seeds, scallions. Served with steamed veggies.", "price": 1200, "on": true, "hasBase": true },
+      { "id": "nb2", "name": "Coconut Curry Chicken Noodle", "desc": "Chicken breast in coconut-ginger curry broth, rice noodles, pak choi. Served with steamed veggies.", "price": 1200, "on": true, "hasBase": true },
+      { "id": "nb3", "name": "Cold Sesame Chicken Noodle", "desc": "Chilled egg noodles, shredded poached chicken, sesame-peanut-soy dressing, cucumber, chili oil. Served with steamed veggies.", "price": 1200, "on": true, "hasBase": true },
+      { "id": "nb4", "name": "Sweet Chili Fish Noodle Bowl", "desc": "Pan-seared fish fillet, vermicelli noodles, sweet chili glaze, pickled cucumber, fresh herbs. Served with steamed veggies.", "price": 1350, "on": true, "hasBase": true },
+      { "id": "nb5", "name": "Miso Ginger Fish & Soba", "desc": "Miso-ginger marinated fish fillet, soba noodles, light ginger broth, scallions. Served with steamed veggies.", "price": 1350, "on": true, "hasBase": true },
+      { "id": "nb6", "name": "Asian Fish Stir-Fry Noodle Box", "desc": "Fish fillet wok-tossed in oyster sauce, garlic, bell peppers, lo mein noodles. Served with steamed veggies.", "price": 1350, "on": true, "hasBase": true },
+      { "id": "nb7", "name": "Coconut Curry Shrimp Noodle", "desc": "Shrimp in coconut-ginger curry broth, rice noodles, pak choi. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true },
+      { "id": "nb8", "name": "Cold Sesame Shrimp Noodle", "desc": "Chilled egg noodles, seasoned shrimp, sesame-peanut-soy dressing, cucumber, chili oil. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true },
+      { "id": "nb9", "name": "Sweet Chili Shrimp Noodle Bowl", "desc": "Pan-seared shrimp, vermicelli noodles, sweet chili glaze, pickled cucumber, fresh herbs. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true },
+      { "id": "nb10", "name": "Miso Ginger Shrimp & Soba", "desc": "Miso-ginger marinated shrimp, soba noodles, light ginger broth, scallions. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true },
+      { "id": "nb11", "name": "Asian Shrimp Stir-Fry Noodle Box", "desc": "Shrimp wok-tossed in oyster sauce, garlic, bell peppers, lo mein noodles. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true },
+      { "id": "nb12", "name": "Garlic Butter Shrimp Noodle", "desc": "Jumbo shrimp in rich garlic butter sauce, egg noodles, fresh herbs, lemon. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true },
+      { "id": "nb13", "name": "Spicy Szechuan Shrimp Noodle", "desc": "Shrimp tossed in bold Szechuan chili sauce, rice noodles, bok choy, crushed peanuts. Served with steamed veggies.", "price": 1800, "on": true, "hasBase": true }
+    ]},
+    { "category": "Wings", "items": [
+      { "id": "w1", "name": "Jerk BBQ Wings", "desc": "Crispy wings tossed in smoky jerk-BBQ sauce, served with coleslaw", "price": 950, "on": true, "hasSide": true },
+      { "id": "w2", "name": "Honey Garlic Wings", "desc": "Golden fried wings glazed in sweet honey garlic sauce", "price": 1400, "on": true, "hasSide": true },
+      { "id": "w3", "name": "Sweet Chili Wings", "desc": "Crispy wings coated in Asian-style sweet chili sauce, sesame seeds, scallions", "price": 1400, "on": true, "hasSide": true },
+      { "id": "w4", "name": "Lemon Pepper Wings", "desc": "Seasoned wings tossed in zesty lemon pepper butter", "price": 1400, "on": true, "hasSide": true },
+      { "id": "w5", "name": "Teriyaki Wings", "desc": "Wings glazed in teriyaki sauce", "price": 1400, "on": true, "hasSide": true },
+      { "id": "w6", "name": "Buffalo Wings", "desc": "Classic hot buffalo sauce wings", "price": 1400, "on": true, "hasSide": true },
+      { "id": "w7", "name": "Coconut Curry Wings", "desc": "Wings simmered in rich coconut curry sauce", "price": 1400, "on": true, "hasSide": true },
+      { "id": "w8", "name": "Garlic Parmesan Wings", "desc": "Crispy wings tossed in garlic butter and parmesan", "price": 1400, "on": true, "hasSide": true }
+    ]},
+    { "category": "Jamaican Classics", "items": [
+      { "id": "jc1", "name": "Ackee & Saltfish with Tostones", "desc": "Traditional Jamaican ackee and saltfish served with crispy tostones", "price": 1350, "on": true }
+    ]},
+    { "category": "Wraps", "items": [
+      { "id": "wr1", "name": "Build Your Own Wrap", "desc": "Choose your wrap type, protein, fillings and sauce — J$1,200 flat", "price": 1200, "on": true, "isWrap": true }
+    ]},
+    { "category": "Friday Take Home Specials", "items": [
+      { "id": "fs1", "name": "Seafood Boil (2 lbs)", "desc": "Fresh seafood boil — ask us what's in the pot today!", "price": 4000, "on": false },
+      { "id": "fs2", "name": "Ribs, Potato, Corn & Coleslaw Platter", "desc": "Slow-cooked ribs with potato, corn and house coleslaw", "price": 5000, "on": false },
+      { "id": "fs3", "name": "Garlic Crab Platter (2 lbs)", "desc": "Fresh crab in rich garlic butter sauce", "price": 3000, "on": false },
+      { "id": "fs4", "name": "Escallion Ginger Crab (2 lbs)", "desc": "Fresh crab in fragrant escallion and ginger sauce", "price": 3000, "on": false }
+    ]},
+    { "category": "Drinks", "items": [
+      { "id": "d1", "name": "Mango Juice", "desc": "100% natural MCCM juice", "price": 500, "on": true },
+      { "id": "d2", "name": "June Plum Juice", "desc": "100% natural MCCM juice", "price": 500, "on": true },
+      { "id": "d3", "name": "Lemonade", "desc": "100% natural MCCM juice", "price": 500, "on": true },
+      { "id": "d4", "name": "Beet Root Juice", "desc": "100% natural MCCM juice", "price": 500, "on": true },
+      { "id": "d5", "name": "Carrot Juice", "desc": "100% natural MCCM juice", "price": 500, "on": true },
+      { "id": "d6", "name": "Bottled Water", "desc": "500ml", "price": 150, "on": true }
+    ]}
+  ]
+}
