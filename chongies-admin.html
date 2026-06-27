@@ -171,6 +171,7 @@ footer { text-align: center; padding: 14px; font-size: 11px; color: var(--muted)
     <div class="tab" onclick="switchTab('weekly')">📅 Weekly Planner</div>
     <div class="tab" onclick="switchTab('broadcast')">📢 Broadcast</div>
     <div class="tab" onclick="switchTab('orders')">📝 Order Log</div>
+    <div class="tab" onclick="switchTab('customers')">👥 Customers</div>
   </div>
 
   <main>
@@ -263,6 +264,20 @@ footer { text-align: center; padding: 14px; font-size: 11px; color: var(--muted)
         <div class="order-total" id="order-log-total"></div>
         <button class="btn btn-wa" style="margin-top:14px;width:100%;padding:12px;font-size:14px;" onclick="openModal('summary')">📊 Generate End of Day Summary</button>
         <button class="btn" style="margin-top:8px;width:100%;padding:10px;background:var(--red);color:#fff;font-size:13px;" onclick="clearOrderLog()">🗑️ Clear Log</button>
+      </div>
+    </div>
+
+    <!-- ── CUSTOMERS TAB ── -->
+    <div id="tab-customers" class="tab-content">
+      <div class="section-label">Customer Database</div>
+      <div class="card">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <input type="text" id="customer-search" placeholder="Search by name or phone…" style="flex:1;" oninput="searchCustomers()">
+          <button class="btn btn-save" onclick="loadCustomers()">🔄 Refresh</button>
+          <button class="btn btn-wa" onclick="exportCustomers()">⬇️ Export</button>
+        </div>
+        <div id="customer-stats" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;"></div>
+        <div id="customer-list"><p style="font-size:13px;color:var(--muted);">Click Refresh to load customers.</p></div>
       </div>
     </div>
 
@@ -758,6 +773,78 @@ function saveWeeklyPlan() {
   DAYS.forEach(function(_, i) { plan[i] = document.getElementById("week-" + i).value; });
   localStorage.setItem('chongies_weekly', JSON.stringify(plan));
   alert("Weekly plan saved!");
+}
+// ── CUSTOMERS ──
+var allCustomers = [];
+
+function loadCustomers() {
+  const el = document.getElementById("customer-list");
+  const stats = document.getElementById("customer-stats");
+  el.innerHTML = '<p style="font-size:13px;color:var(--muted);">Loading…</p>';
+  db.collection("customers").get().then(function(snap) {
+    allCustomers = [];
+    snap.forEach(function(doc) { allCustomers.push(doc.data()); });
+    allCustomers.sort(function(a, b) { return (b.lastOrder || "").localeCompare(a.lastOrder || ""); });
+    renderCustomers(allCustomers);
+
+    // Stats
+    var totalSpend = allCustomers.reduce(function(s, c) { return s + (c.totalSpend || 0); }, 0);
+    var totalOrders = allCustomers.reduce(function(s, c) { return s + (c.totalOrders || 0); }, 0);
+    stats.innerHTML =
+      '<div style="background:var(--warm);border-radius:8px;padding:10px 14px;flex:1;min-width:100px;">' +
+      '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Customers</div>' +
+      '<div style="font-size:22px;font-weight:700;color:var(--green);">' + allCustomers.length + '</div></div>' +
+      '<div style="background:var(--warm);border-radius:8px;padding:10px 14px;flex:1;min-width:100px;">' +
+      '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Total Orders</div>' +
+      '<div style="font-size:22px;font-weight:700;color:var(--green);">' + totalOrders + '</div></div>' +
+      '<div style="background:var(--warm);border-radius:8px;padding:10px 14px;flex:1;min-width:100px;">' +
+      '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Total Revenue</div>' +
+      '<div style="font-size:22px;font-weight:700;color:var(--green);">J$' + totalSpend.toLocaleString() + '</div></div>';
+  }).catch(function(e) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--red);">Failed to load. Check connection.</p>';
+  });
+}
+
+function renderCustomers(customers) {
+  const el = document.getElementById("customer-list");
+  if (!customers.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);">No customers found.</p>'; return; }
+  el.innerHTML = customers.map(function(c) {
+    var lastDate = c.lastOrder ? new Date(c.lastOrder).toLocaleDateString("en-JM", {day:"numeric",month:"short",year:"numeric"}) : "—";
+    var phone = c.phone || "";
+    var waNum = "1876" + phone.replace(/\D/g,"").replace(/^876/,"");
+    return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;background:#fff;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">' +
+      '<div><div style="font-size:14px;font-weight:700;">' + (c.name || "Unknown") + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);">' + phone + ' · ' + (c.address || "No address") + '</div></div>' +
+      '<a href="https://wa.me/' + waNum + '" target="_blank" style="background:#25D366;color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">💬 WhatsApp</a>' +
+      '</div>' +
+      '<div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;">' +
+      '<span style="font-size:12px;color:var(--muted);">📦 ' + (c.totalOrders || 0) + ' orders</span>' +
+      '<span style="font-size:12px;color:var(--muted);">💰 J$' + ((c.totalSpend || 0)).toLocaleString() + ' spent</span>' +
+      '<span style="font-size:12px;color:var(--muted);">🕐 Last: ' + lastDate + '</span>' +
+      '</div></div>';
+  }).join("");
+}
+
+function searchCustomers() {
+  var q = document.getElementById("customer-search").value.toLowerCase();
+  var filtered = allCustomers.filter(function(c) {
+    return (c.name || "").toLowerCase().includes(q) || (c.phone || "").includes(q);
+  });
+  renderCustomers(filtered);
+}
+
+function exportCustomers() {
+  if (!allCustomers.length) { alert("No customers to export. Click Refresh first."); return; }
+  var csv = "Name,Phone,Address,Total Orders,Total Spend,Last Order\n";
+  allCustomers.forEach(function(c) {
+    csv += [c.name, c.phone, c.address, c.totalOrders, c.totalSpend, c.lastOrder ? new Date(c.lastOrder).toLocaleDateString() : ""].join(",") + "\n";
+  });
+  var blob = new Blob([csv], {type:"text/csv"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = "chongies-customers.csv"; a.click();
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
