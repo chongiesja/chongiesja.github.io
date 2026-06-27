@@ -78,6 +78,78 @@ input:checked + .slider::before { transform: translateX(18px); }
 .del-btn:hover { color: var(--red); }
 
 footer { text-align: center; padding: 16px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
+
+/* WhatsApp Menu Modal */
+#wa-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#wa-modal-overlay.show { display: flex; }
+#wa-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+#wa-modal h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  color: var(--green);
+  margin-bottom: 16px;
+}
+#wa-preview {
+  background: #f0f7f0;
+  border: 1.5px solid #25D366;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.wa-send-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #25D366;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+.wa-close-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--warm);
+  color: var(--muted);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -100,6 +172,7 @@ footer { text-align: center; padding: 16px; font-size: 12px; color: var(--muted)
     </div>
     <div class="header-right">
       <button class="btn-save" id="save-btn" onclick="saveMenu()">💾 Save Menu</button>
+      <button class="btn-save" style="background:#25D366;color:#fff;" onclick="generateWhatsAppMenu()">📋 WhatsApp Menu</button>
       <button class="btn-logout" onclick="logout()">Sign Out</button>
     </div>
   </header>
@@ -122,6 +195,16 @@ footer { text-align: center; padding: 16px; font-size: 12px; color: var(--muted)
     <div id="categories-container"></div>
   </main>
   <footer>Chongie's Admin · Mark Chong's Cooking Mastery · 9 Bloomsbury Road, Kingston 10</footer>
+</div>
+
+<!-- WhatsApp Menu Modal -->
+<div id="wa-modal-overlay">
+  <div id="wa-modal">
+    <h3>📋 Today's WhatsApp Menu</h3>
+    <div id="wa-preview"></div>
+    <a id="wa-send-btn" class="wa-send-btn" href="#" target="_blank">📲 Send via WhatsApp</a>
+    <button class="wa-close-btn" onclick="closeWaModal()">Close</button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -346,6 +429,42 @@ function renderCategories() {
     container.appendChild(card);
   });
 }
+function generateWhatsAppMenu() {
+  const date = document.getElementById("menu-date").value;
+  const d = date ? new Date(date + "T12:00:00") : new Date();
+  const dateStr = d.toLocaleDateString("en-JM", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+
+  let msg = "🍽️ *CHONGIE'S DAILY MENU*\n";
+  msg += "📅 " + dateStr + "\n";
+  msg += "⏰ Order by 10:00 AM · Kingston\n\n";
+
+  menuData.forEach(function(cat) {
+    const activeItems = cat.items.filter(function(i) { return i.on !== false; });
+    if (!activeItems.length) return;
+    msg += "*" + cat.category + "*\n";
+    activeItems.forEach(function(item) {
+      const name = (item.soupSpecial && item.soupName) ? "Soup of the Day: " + item.soupName + " (32 oz)" : item.name;
+      msg += "• " + name + " — J$" + item.price.toLocaleString() + "\n";
+    });
+    msg += "\n";
+  });
+
+  msg += "📲 *Order here:*\nhttps://chongiesja.github.io/chongies-lunch-order.html\n\n";
+  msg += "🚗 Delivery · 🏃 Pick Up · 🍽️ Dine In";
+
+  document.getElementById("wa-preview").textContent = msg;
+  document.getElementById("wa-send-btn").href = "https://wa.me/?text=" + encodeURIComponent(msg);
+  document.getElementById("wa-modal-overlay").classList.add("show");
+}
+
+function closeWaModal() {
+  document.getElementById("wa-modal-overlay").classList.remove("show");
+}
+
+// Close modal on overlay click
+document.getElementById("wa-modal-overlay").addEventListener("click", function(e) {
+  if (e.target === this) closeWaModal();
+});
 </script>
 </body>
 </html>
