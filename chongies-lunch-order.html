@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chongie's — Lunch Orders</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XCBJ8RB9TB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XCBJ8RB9TB');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -126,6 +134,9 @@ footer { text-align: center; padding: 18px; font-size: 12px; color: var(--muted)
 </header>
 
 <div class="notice">⏰ Order by 10:00 AM for same-day delivery · Kingston</div>
+<div style="background:#f0f7f0;border-bottom:1.5px solid #2e4a2e;text-align:center;padding:8px 16px;font-size:12.5px;color:#2e4a2e;font-weight:600;">
+  📍 We deliver to businesses along <strong>Hagley Park Road</strong> and surrounding areas within 1 mile
+</div>
 <div class="date-bar">📋 Today's Menu: <span id="menu-date">—</span></div>
 
 <main>
@@ -137,8 +148,12 @@ footer { text-align: center; padding: 18px; font-size: 12px; color: var(--muted)
         <div class="form-group"><label>First Name</label><input type="text" id="fname" placeholder="e.g. Keisha"></div>
         <div class="form-group"><label>Last Name</label><input type="text" id="lname" placeholder="e.g. Brown"></div>
         <div class="form-group"><label>WhatsApp / Phone</label><input type="tel" id="phone" placeholder="876-XXX-XXXX"></div>
-        <div class="form-group"><label>Delivery Date</label><input type="date" id="delivery-date"></div>
-        <div class="form-group full" id="address-group"><label>Delivery Address <span id="address-optional" style="color:var(--muted);font-weight:400;">(required for delivery)</span></label><input type="text" id="address" placeholder="Street, Community, Parish"></div>
+        <div class="form-group"><label>Delivery Date</label><input type="text" id="delivery-date" readonly style="background:var(--warm);color:var(--muted);cursor:default;"></div>
+        <div class="form-group full" id="address-group">
+          <label>Delivery Address <span id="address-optional" style="color:var(--muted);font-weight:400;">(required for delivery)</span></label>
+          <input type="text" id="address" placeholder="Street, Community, Parish" oninput="checkZone()">
+          <div id="zone-result" style="display:none;margin-top:6px;padding:8px 12px;border-radius:7px;font-size:12.5px;font-weight:600;"></div>
+        </div>
         <div class="form-group full"><label>Preferred Delivery Time <span style="color:var(--muted);font-weight:400;">(we start at 11:30 AM)</span></label><input type="text" id="delivery-time" placeholder="e.g. 11:30 AM, 12:00 PM, 1:00 PM"></div>
         <div class="form-group full"><label>Special Instructions (optional)</label><textarea id="notes" placeholder="e.g. No pepper, extra gravy, leave at gate…"></textarea></div>
         <div class="form-group full">
@@ -476,7 +491,7 @@ document.getElementById("submit-btn").addEventListener("click", function() {
   var ordered = getOrdered();
 
   var orderType = document.getElementById("order-type").value;
-  if (!fname || !phone || !date || !payment || !orderType) {
+  if (!fname || !phone || !payment || !orderType) {
     alert("Please fill in your name, phone, date, payment method and order type.");
     return;
   }
@@ -489,7 +504,7 @@ document.getElementById("submit-btn").addEventListener("click", function() {
     return;
   }
 
-  var d = new Date(date + "T12:00:00");
+  var d = new Date();
   var dateStr = d.toLocaleDateString("en-JM", {weekday:"long",day:"numeric",month:"long",year:"numeric"});
 
   var deliveryFee = orderType === "Delivery" ? 300 : 0;
@@ -523,7 +538,75 @@ document.getElementById("submit-btn").addEventListener("click", function() {
   document.getElementById("submit-btn").style.display = "none";
   document.getElementById("wa-link-box").style.display = "block";
   document.getElementById("wa-link-box").scrollIntoView({behavior:"smooth"});
+
+  // Save customer to Firebase
+  saveCustomer({
+    name: fname + " " + lname,
+    phone: phone,
+    address: address,
+    orderType: orderType,
+    payment: payment,
+    total: total + deliveryFee,
+    items: ordered.map(function(i) { return i.name + " x" + i.qty; }).join(", "),
+    date: new Date().toISOString()
+  });
 });
+
+// ── FIREBASE — AUTO SAVE CUSTOMER ──
+var _fbApp, _fbDb;
+function getDb() {
+  if (_fbDb) return _fbDb;
+  try {
+    _fbApp = firebase.initializeApp({
+      apiKey: "AIzaSyDLpvVNdEGMlpJ1FWTJ4O4MSDhXoZsxnVE",
+      authDomain: "chongie-s-lunch-orders.firebaseapp.com",
+      projectId: "chongie-s-lunch-orders",
+      storageBucket: "chongie-s-lunch-orders.firebasestorage.app",
+      messagingSenderId: "434473785339",
+      appId: "1:434473785339:web:c5bcc037c91c0f67efdd5e"
+    }, "order-app");
+    _fbDb = firebase.firestore(_fbApp);
+  } catch(e) {
+    try { _fbDb = firebase.firestore(firebase.app("order-app")); } catch(e2) {}
+  }
+  return _fbDb;
+}
+
+function saveCustomer(data) {
+  try {
+    var db = getDb();
+    if (!db) return;
+    // Use phone as document ID so repeat customers update their record
+    var phone = data.phone.replace(/\D/g, "");
+    db.collection("customers").doc(phone).get().then(function(snap) {
+      if (snap.exists) {
+        // Update existing customer
+        var existing = snap.data();
+        var orders = existing.orders || [];
+        orders.push({ items: data.items, total: data.total, date: data.date, type: data.orderType });
+        db.collection("customers").doc(phone).update({
+          lastOrder: data.date,
+          totalOrders: orders.length,
+          totalSpend: (existing.totalSpend || 0) + data.total,
+          orders: orders,
+          address: data.address
+        });
+      } else {
+        // New customer
+        db.collection("customers").doc(phone).set({
+          name: data.name,
+          phone: data.phone,
+          address: data.address,
+          firstOrder: data.date,
+          lastOrder: data.date,
+          totalOrders: 1,
+          totalSpend: data.total,
+          orders: [{ items: data.items, total: data.total, date: data.date, type: data.orderType }]
+        });
+      }
+    });
+  } catch(e) { console.warn("Customer save failed", e); }
+}
 
 // ── QTY EVENT DELEGATION ──
 document.getElementById("menu-container").addEventListener("click", function(e) {
@@ -537,13 +620,84 @@ document.getElementById("payment").addEventListener("change", function() {
   document.getElementById("transfer-box").style.display = this.value === "Bank Transfer" ? "block" : "none";
 });
 
+// ── DELIVERY ZONE CHECKER ──
+// Chongie's coordinates: 9 Bloomsbury Road, Kingston 10
+var CHONGIES_LAT = 17.9987;
+var CHONGIES_LNG = -76.7842;
+var ZONE_MILES = 1;
+
+// Known areas within 1 mile of Hagley Park Road / Bloomsbury Road
+var IN_ZONE_KEYWORDS = [
+  "hagley park", "bloomsbury", "new kingston", "halfway tree", "half way tree",
+  "shortwood", "maxfield", "washington gardens", "kgn 10", "kingston 10",
+  "kgn 5", "kingston 5", "trafalgar", "oxford", "norbrook", "barbican",
+  "liguanea", "mona", "papine", "hope road", "constant spring"
+];
+
+var OUT_ZONE_KEYWORDS = [
+  "portmore", "spanish town", "old harbour", "mandeville", "montego bay",
+  "ocho rios", "negril", "may pen", "linstead", "bog walk"
+];
+
+function checkZone() {
+  var orderType = document.getElementById("order-type") ? document.getElementById("order-type").value : "";
+  if (orderType !== "Delivery") return;
+
+  var address = document.getElementById("address").value.trim().toLowerCase();
+  var result = document.getElementById("zone-result");
+
+  if (address.length < 5) { result.style.display = "none"; return; }
+
+  // Check out-of-zone first
+  var outMatch = OUT_ZONE_KEYWORDS.some(function(k) { return address.includes(k); });
+  if (outMatch) {
+    result.style.display = "block";
+    result.style.background = "#fdf0f0";
+    result.style.border = "1.5px solid #b03a2e";
+    result.style.color = "#b03a2e";
+    result.textContent = "⚠️ This address appears to be outside our delivery zone. We'll confirm via WhatsApp if we can deliver to you.";
+    return;
+  }
+
+  // Check in-zone
+  var inMatch = IN_ZONE_KEYWORDS.some(function(k) { return address.includes(k); });
+  if (inMatch) {
+    result.style.display = "block";
+    result.style.background = "#f0f7f0";
+    result.style.border = "1.5px solid #2e4a2e";
+    result.style.color = "#2e4a2e";
+    result.textContent = "✅ Great! You're within our delivery zone.";
+  } else {
+    result.style.display = "block";
+    result.style.background = "#fdf6e9";
+    result.style.border = "1.5px solid #c8922a";
+    result.style.color = "#7a6a52";
+    result.textContent = "📍 We deliver within 1 mile of Hagley Park Road. We'll confirm your delivery via WhatsApp.";
+  }
+}
+
+// Also trigger zone check when order type changes
+document.getElementById("order-type").addEventListener("change", function() {
+  var result = document.getElementById("zone-result");
+  if (this.value !== "Delivery") {
+    result.style.display = "none";
+  } else {
+    checkZone();
+  }
+  updateSummary();
+});
+
 // ── DATE MIN ──
-document.getElementById("delivery-date").min = new Date().toISOString().split("T")[0];
+// Set today's date automatically
+var todayD = new Date();
+document.getElementById("delivery-date").value = todayD.toLocaleDateString("en-JM", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
 
 // ── INIT ──
 setDate();
 initApp();
 
 </script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </body>
 </html>
