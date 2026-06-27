@@ -139,6 +139,7 @@ footer { text-align: center; padding: 18px; font-size: 12px; color: var(--muted)
         <div class="form-group"><label>WhatsApp / Phone</label><input type="tel" id="phone" placeholder="876-XXX-XXXX"></div>
         <div class="form-group"><label>Delivery Date</label><input type="date" id="delivery-date"></div>
         <div class="form-group full" id="address-group"><label>Delivery Address <span id="address-optional" style="color:var(--muted);font-weight:400;">(required for delivery)</span></label><input type="text" id="address" placeholder="Street, Community, Parish"></div>
+        <div class="form-group full"><label>Preferred Delivery Time <span style="color:var(--muted);font-weight:400;">(we start at 11:30 AM)</span></label><input type="text" id="delivery-time" placeholder="e.g. 11:30 AM, 12:00 PM, 1:00 PM"></div>
         <div class="form-group full"><label>Special Instructions (optional)</label><textarea id="notes" placeholder="e.g. No pepper, extra gravy, leave at gate…"></textarea></div>
         <div class="form-group full">
           <label>Payment Method</label>
@@ -498,7 +499,9 @@ document.getElementById("submit-btn").addEventListener("click", function() {
   msg += "📞 *Phone:* " + phone + "\n";
   msg += "📅 *Date:* " + dateStr + "\n";
   msg += "🚗 *Order Type:* " + orderType + "\n";
+  var delivTime = document.getElementById("delivery-time").value.trim();
   if (orderType === "Delivery") msg += "📍 *Address:* " + address + "\n";
+  if (delivTime) msg += "🕐 *Preferred Time:* " + delivTime + "\n";
   msg += "💰 *Payment:* " + payment + "\n\n";
   msg += "*ORDER:*\n";
 
