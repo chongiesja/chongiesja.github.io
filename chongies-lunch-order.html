@@ -138,7 +138,7 @@ footer { text-align: center; padding: 18px; font-size: 12px; color: var(--muted)
         <div class="form-group"><label>Last Name</label><input type="text" id="lname" placeholder="e.g. Brown"></div>
         <div class="form-group"><label>WhatsApp / Phone</label><input type="tel" id="phone" placeholder="876-XXX-XXXX"></div>
         <div class="form-group"><label>Delivery Date</label><input type="date" id="delivery-date"></div>
-        <div class="form-group full"><label>Delivery Address</label><input type="text" id="address" placeholder="Street, Community, Parish"></div>
+        <div class="form-group full" id="address-group"><label>Delivery Address <span id="address-optional" style="color:var(--muted);font-weight:400;">(required for delivery)</span></label><input type="text" id="address" placeholder="Street, Community, Parish"></div>
         <div class="form-group full"><label>Special Instructions (optional)</label><textarea id="notes" placeholder="e.g. No pepper, extra gravy, leave at gate…"></textarea></div>
         <div class="form-group full">
           <label>Payment Method</label>
@@ -147,6 +147,15 @@ footer { text-align: center; padding: 18px; font-size: 12px; color: var(--muted)
             <option value="Cash on Delivery">💵 Cash on Delivery</option>
             <option value="Card on Delivery">💳 Card on Delivery</option>
             <option value="Bank Transfer">🏦 Bank Transfer</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Order Type</label>
+          <select id="order-type">
+            <option value="" disabled selected>Select order type…</option>
+            <option value="Delivery">🚗 Delivery (+J$300)</option>
+            <option value="Pick Up">🏃 Pick Up (free)</option>
+            <option value="Dine In">🍽️ Dine In (free)</option>
           </select>
         </div>
         <div class="form-group full" id="transfer-box" style="display:none;">
@@ -446,7 +455,12 @@ function updateSummary() {
     return "<div class=\"summary-line\"><span>" + item.name + extra + " × " + item.qty + "</span><span>J$" + sub.toLocaleString() + "</span></div>";
   }).join("");
   document.getElementById("summary-lines").innerHTML = lines;
-  document.getElementById("total-amt").textContent = "J$" + total.toLocaleString();
+  var orderTypeVal = document.getElementById("order-type") ? document.getElementById("order-type").value : "";
+  var delFee = orderTypeVal === "Delivery" ? 300 : 0;
+  var grandTotal = total + delFee;
+  var totalText = "J$" + grandTotal.toLocaleString();
+  if (delFee > 0) totalText += " (incl. J$300 delivery)";
+  document.getElementById("total-amt").textContent = totalText;
 }
 
 // ── SUBMIT ──
@@ -460,8 +474,13 @@ document.getElementById("submit-btn").addEventListener("click", function() {
   var payment = document.getElementById("payment").value;
   var ordered = getOrdered();
 
-  if (!fname || !phone || !date || !address || !payment) {
-    alert("Please fill in your name, phone, delivery date, address and payment method.");
+  var orderType = document.getElementById("order-type").value;
+  if (!fname || !phone || !date || !payment || !orderType) {
+    alert("Please fill in your name, phone, date, payment method and order type.");
+    return;
+  }
+  if (orderType === "Delivery" && !address) {
+    alert("Please enter your delivery address.");
     return;
   }
   if (!ordered.length) {
@@ -472,11 +491,14 @@ document.getElementById("submit-btn").addEventListener("click", function() {
   var d = new Date(date + "T12:00:00");
   var dateStr = d.toLocaleDateString("en-JM", {weekday:"long",day:"numeric",month:"long",year:"numeric"});
 
+  var deliveryFee = orderType === "Delivery" ? 300 : 0;
+
   var msg = "🍽️ *CHONGIE'S LUNCH ORDER*\n\n";
   msg += "👤 *Name:* " + fname + " " + lname + "\n";
   msg += "📞 *Phone:* " + phone + "\n";
-  msg += "📅 *Delivery:* " + dateStr + "\n";
-  msg += "📍 *Address:* " + address + "\n";
+  msg += "📅 *Date:* " + dateStr + "\n";
+  msg += "🚗 *Order Type:* " + orderType + "\n";
+  if (orderType === "Delivery") msg += "📍 *Address:* " + address + "\n";
   msg += "💰 *Payment:* " + payment + "\n\n";
   msg += "*ORDER:*\n";
 
@@ -489,7 +511,8 @@ document.getElementById("submit-btn").addEventListener("click", function() {
     if (item.extras.wrapType) extra += " [" + item.extras.wrapType + " wrap | " + item.extras.protein + " | " + item.extras.fillings + " | " + item.extras.sauce + "]";
     msg += "• " + item.name + extra + " × " + item.qty + " — J$" + sub.toLocaleString() + "\n";
   });
-  msg += "\n💰 *Subtotal: J$" + total.toLocaleString() + "*\n_(Delivery fee TBC)_";
+  if (deliveryFee > 0) msg += "• Delivery Fee — J$300\n";
+  msg += "\n💰 *Total: J$" + (total + deliveryFee).toLocaleString() + "*";
   if (notes) msg += "\n\n📝 *Notes:* " + notes;
 
   var waURL = "https://wa.me/18768947767?text=" + encodeURIComponent(msg);
