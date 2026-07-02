@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCCM Admin — JSE Lunch</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0a1628; --navy-mid: #162440; --gold: #c9a84c; --gold-lt: #e8cc7e;
+  --cream: #f8f5ef; --warm: #f0ebe0; --border: #ddd5c0; --muted: #7a6e5f;
+  --green: #1a5c3a; --red: #a03030; --white: #ffffff; --radius: 8px;
+}
+body { font-family: "DM Sans", sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+/* LOCK */
+#lock-screen { min-height:100vh; background:var(--navy); display:flex; align-items:center; justify-content:center; padding:24px; }
+.lock-card { background:var(--navy-mid); border:1px solid rgba(201,168,76,0.3); border-radius:16px; padding:48px 40px; max-width:400px; width:100%; text-align:center; }
+.lock-logo { width:64px; height:64px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-family:"DM Serif Display",serif; font-size:22px; color:var(--navy); }
+.lock-card h1 { font-family:"DM Serif Display",serif; color:var(--white); font-size:24px; margin-bottom:6px; }
+.lock-card p { color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:32px; }
+.lock-card label { display:block; text-align:left; color:rgba(255,255,255,0.7); font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+.lock-card input { width:100%; padding:14px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:var(--radius); color:var(--white); font-size:16px; font-family:inherit; letter-spacing:0.1em; margin-bottom:16px; }
+.lock-card input:focus { outline:none; border-color:var(--gold); }
+.btn-gold { width:100%; padding:14px; background:var(--gold); color:var(--navy); border:none; border-radius:var(--radius); font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; }
+.btn-gold:hover { background:var(--gold-lt); }
+.lock-error { color:#ff7070; font-size:13px; margin-top:12px; display:none; }
+
+/* APP */
+#admin-app { display:none; }
+
+/* HEADER */
+header { background:var(--navy); border-bottom:2px solid var(--gold); padding:0 24px; }
+.header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; }
+.header-brand { display:flex; align-items:center; gap:12px; }
+.header-logo { width:36px; height:36px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"DM Serif Display",serif; font-size:14px; color:var(--navy); }
+.header-brand span { color:var(--white); font-size:15px; font-weight:600; }
+.header-right { color:rgba(255,255,255,0.5); font-size:13px; }
+
+/* TABS */
+.tab-bar { background:var(--navy-mid); border-bottom:1px solid rgba(255,255,255,0.1); padding:0 24px; }
+.tab-bar-inner { max-width:1200px; margin:0 auto; display:flex; gap:4px; }
+.tab-btn { padding:14px 20px; color:rgba(255,255,255,0.5); font-size:13px; font-weight:600; border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; font-family:inherit; }
+.tab-btn:hover { color:rgba(255,255,255,0.8); }
+.tab-btn.active { color:var(--gold-lt); border-bottom-color:var(--gold); }
+
+/* PAGE */
+.page { max-width:1200px; margin:0 auto; padding:32px 24px 80px; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* CARDS */
+.card { background:var(--white); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:24px; }
+.card-header { background:var(--navy); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; }
+.card-header h3 { color:var(--white); font-size:15px; font-weight:600; }
+.card-header span { color:rgba(255,255,255,0.5); font-size:12px; }
+.card-body { padding:24px; }
+
+/* DAY TABS inside menu */
+.day-tabs { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:24px; overflow-x:auto; }
+.day-tab { padding:12px 20px; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; white-space:nowrap; transition:all 0.15s; user-select:none; }
+.day-tab:hover { color:var(--navy); }
+.day-tab.active { color:var(--navy); border-bottom-color:var(--gold); }
+.day-tab.today-tab { color:var(--gold); }
+.day-tab.today-tab.active { color:var(--navy); background:rgba(201,168,76,0.1); }
+.day-panel { display:none; }
+.day-panel.active { display:block; }
+
+/* MENU FIELD with combobox */
+.menu-section-title { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin:20px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.menu-fields-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.menu-field { margin-bottom:0; }
+.menu-field label { display:block; font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+.combo-wrap { position:relative; }
+.combo-wrap select {
+  width:100%; padding:9px 32px 9px 10px; border:1.5px solid var(--border); border-radius:6px;
+  font-family:inherit; font-size:13px; color:var(--navy); background:var(--cream);
+  appearance:none; cursor:pointer;
+}
+.combo-wrap select:focus { outline:none; border-color:var(--gold); background:var(--white); }
+.combo-wrap::after { content:"▾"; position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--muted); font-size:12px; }
+.custom-input { display:none; width:100%; padding:9px 10px; border:1.5px solid var(--gold); border-radius:6px; font-family:inherit; font-size:13px; color:var(--navy); background:var(--white); margin-top:4px; }
+.custom-input:focus { outline:none; }
+.custom-toggle { font-size:11px; color:var(--gold); cursor:pointer; margin-top:4px; display:inline-block; }
+.custom-toggle:hover { text-decoration:underline; }
+
+/* DAILY STAPLES SECTION */
+.staples-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px; }
+.staple-toggle {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border:1.5px solid var(--border); border-radius:8px;
+  cursor:pointer; transition:all 0.15s; background:var(--cream); user-select:none;
+}
+.staple-toggle.active { border-color:var(--green); background:rgba(26,92,58,0.07); }
+.staple-toggle.inactive { border-color:var(--border); background:var(--warm); opacity:0.6; }
+.staple-dot { width:10px; height:10px; border-radius:50%; background:var(--border); flex-shrink:0; transition:background 0.15s; }
+.staple-toggle.active .staple-dot { background:var(--green); }
+.staple-name { font-size:13px; font-weight:500; color:var(--navy); }
+.staple-toggle.inactive .staple-name { color:var(--muted); }
+
+/* SETTINGS */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.field input, .field select { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius); font-family:inherit; font-size:14px; color:var(--navy); background:var(--cream); }
+.field input:focus, .field select:focus { outline:none; border-color:var(--gold); background:var(--white); }
+.field .hint { font-size:12px; color:var(--muted); margin-top:6px; }
+
+/* BUTTONS */
+.btn { padding:12px 24px; border:none; border-radius:var(--radius); font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+.btn-navy { background:var(--navy); color:var(--white); }
+.btn-navy:hover { background:var(--navy-mid); }
+.btn-green { background:var(--green); color:var(--white); }
+.btn-green:hover { opacity:0.9; }
+.btn-red { background:var(--red); color:var(--white); }
+.btn-sm { padding:8px 16px; font-size:13px; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--green); color:var(--white); padding:14px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; transform:translateY(80px); opacity:0; transition:all 0.3s; z-index:999; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* ORDERS */
+.orders-table { width:100%; border-collapse:collapse; font-size:13px; }
+.orders-table th { background:var(--navy-mid); color:var(--gold-lt); padding:10px 14px; text-align:left; font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; }
+.orders-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+.orders-table tr:last-child td { border-bottom:none; }
+.orders-table tr:nth-child(even) td { background:var(--warm); }
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.stat-card { background:var(--white); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center; }
+.stat-card .stat-num { font-family:"DM Serif Display",serif; font-size:36px; color:var(--navy); }
+.stat-card .stat-label { font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+.code-display { background:var(--navy); color:var(--gold-lt); padding:16px 20px; border-radius:var(--radius); font-family:monospace; font-size:24px; letter-spacing:0.2em; text-align:center; margin-bottom:16px; }
+
+@media(max-width:900px) { .menu-fields-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:600px) { .menu-fields-grid { grid-template-columns:1fr; } .settings-grid { grid-template-columns:1fr; } .stats-row { grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">MC</div>
+    <h1>MCCM Admin</h1>
+    <p>JSE Lunch Management Portal</p>
+    <label for="admin-pin">Admin PIN</label>
+    <input type="password" id="admin-pin" placeholder="Enter PIN" maxlength="10" autocomplete="off">
+    <button class="btn-gold" onclick="checkPin()">Sign In</button>
+    <div class="lock-error" id="admin-error">Incorrect PIN.</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="header-logo">MC</div>
+        <span>MCCM Admin — JSE Lunch Portal</span>
+      </div>
+      <div class="header-right" id="admin-date"></div>
+    </div>
+  </header>
+
+  <div class="tab-bar">
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" onclick="switchTab('menu',this)">📋 Weekly Menu</button>
+      <button class="tab-btn" onclick="switchTab('orders',this)">📦 Orders</button>
+      <button class="tab-btn" onclick="switchTab('settings',this)">⚙️ Settings</button>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- ── TAB: WEEKLY MENU ── -->
+    <div class="tab-content active" id="tab-menu">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Weekly Menu</div>
+          <h2 style="font-family:'DM Serif Display',serif;font-size:26px;">Set This Week's Menu</h2>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-navy" onclick="loadSampleMenu()">Load Sample Menu</button>
+          <button class="btn btn-green" onclick="saveMenu()">💾 Save & Publish</button>
+        </div>
+      </div>
+
+      <!-- DAILY STAPLES -->
+      <div class="card">
+        <div class="card-header">
+          <h3>⭐ Daily Staples — Always Available</h3>
+          <span>Toggle off to remove from a week's offering</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">These items are available every day by default. Click to deselect any that won't be available this week.</p>
+          <div class="staples-grid" id="staples-grid"></div>
+        </div>
+      </div>
+
+      <!-- DAY-BY-DAY MENU -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📅 Rotating Daily Menu</h3>
+          <span>Select each day's items — type a custom item if not in list</span>
+        </div>
+        <div class="card-body">
+          <div class="day-tabs" id="day-tabs"></div>
+          <div id="day-panels"></div>
+        </div>
+      </div>
+
+      <div style="background:rgba(201,168,76,0.1);border:1px solid var(--gold);border-radius:var(--radius);padding:14px 18px;font-size:13px;color:var(--navy);">
+        💡 <strong>Tip:</strong> Use "Load Sample Menu" to pre-fill from your proposal, then adjust as needed. Click "Save & Publish" and staff will immediately see the updated menu on their order form.
+      </div>
+    </div>
+
+    <!-- ── TAB: ORDERS ── -->
+    <div class="tab-content" id="tab-orders">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Order Log</div>
+          <h2 style="font-family:'DM Serif Display',serif;font-size:26px;">Today's Orders</h2>
+        </div>
+        <button class="btn btn-green btn-sm" onclick="window.open('https://docs.google.com/spreadsheets/','_blank')">Open Google Sheets ↗</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total Orders</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-standard">—</div><div class="stat-label">Standard</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-premium">—</div><div class="stat-label">Premium</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-revenue">—</div><div class="stat-label">Est. Revenue</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Live Orders</h3><span>Stored in Google Sheets by day</span></div>
+        <div style="padding:40px;text-align:center;color:var(--muted);">
+          <div style="font-size:40px;margin-bottom:16px;">📊</div>
+          <p style="font-size:15px;margin-bottom:8px;">Orders go directly to your <strong style="color:var(--navy);">JSE Lunch Orders</strong> Google Sheet.</p>
+          <p style="font-size:13px;margin-bottom:20px;">Each day gets its own tab — e.g. <em>Orders — July 2, 2026</em></p>
+          <button class="btn btn-navy" onclick="window.open('https://docs.google.com/spreadsheets/','_blank')">Open Google Sheets ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: SETTINGS ── -->
+    <div class="tab-content" id="tab-settings">
+      <div style="margin-bottom:24px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Settings</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;">Portal Configuration</h2>
+      </div>
+      <div class="settings-grid">
+        <div class="card">
+          <div class="card-header"><h3>🔐 Weekly Access Code</h3></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Change every Monday morning. Share with JSE coordinator to distribute to staff.</p>
+            <div class="code-display" id="current-code-display">JSE2026</div>
+            <div class="field">
+              <label>New Access Code</label>
+              <input type="text" id="new-code" placeholder="e.g. JSE-JUL07" maxlength="20">
+              <div class="hint">Alphanumeric, easy to share via WhatsApp or email</div>
+            </div>
+            <button class="btn btn-navy" onclick="updateCode()">Update Code</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⏰ Order Cutoff</h3></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Staff cannot place orders after this time each day.</p>
+            <div style="background:var(--warm);border-radius:var(--radius);padding:20px;text-align:center;">
+              <div style="font-size:40px;font-weight:700;color:var(--navy);">10:00 AM</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:6px;">Jamaica Standard Time (JST)</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>🔑 Admin PIN</h3></div>
+          <div class="card-body">
+            <div class="field"><label>Current PIN</label><input type="password" id="current-pin-check" placeholder="Current PIN"></div>
+            <div class="field"><label>New PIN</label><input type="password" id="new-pin" placeholder="Min 4 digits"></div>
+            <div class="field"><label>Confirm PIN</label><input type="password" id="confirm-pin" placeholder="Repeat new PIN"></div>
+            <button class="btn btn-navy" onclick="updatePin()">Update PIN</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>📊 Google Sheet</h3></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">All orders are routed here automatically. Bookmark it for quick daily access.</p>
+            <button class="btn btn-green" onclick="window.open('https://docs.google.com/spreadsheets/','_blank')">Open Google Sheets ↗</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MENU_KEY = "jse_weekly_menu";
+const STAPLES_KEY = "jse_staples";
+const PIN_KEY = "jse_admin_pin";
+const CODE_KEY = "jse_access_code";
+
+// ── MENU OPTIONS PER CATEGORY ──
+const MENU_OPTIONS = {
+  protein1: ["Brown Stew Chicken","Jerk Chicken","Curry Chicken","Roast Chicken","Sweet & Sour Chicken","Stewed Chicken","Escovitch Chicken","BBQ Chicken","Honey Garlic Chicken","Custom..."],
+  protein2: ["Stewed Beef","Braised Beef","Stew Peas with Pigtail","Brown Stew Chicken","Stewed Pork","Curry Beef","Oxtail","Stewed Mutton","Corned Beef","Custom..."],
+  protein3: ["Grilled Pork Chop","BBQ Beef","Curry Chicken","Curry Goat","Braised Beef","Stewed Pork","Jerk Pork","Brown Stew Pork","Sweet & Sour Pork","Custom..."],
+  fish: ["Escovitch Fish","Baked Fish","Steamed Fish","Sweet & Sour Fish","Fried Fish","Brown Stew Fish","Curry Fish","Garlic Butter Fish","Custom..."],
+  veg: ["Vegetable Curry & Chickpeas","Callaloo & Tofu Stir-fry","Callaloo & Lentils","Ital Stew Vegetables","Chickpea & Vegetable Curry","Tofu Stir-fry","Lentil Soup (Main)","Stuffed Cho Cho","Custom..."],
+  provisions: ["Yam, Sweet Potato & Dumplings","Green Banana, Irish Potato & Yam","Yam & Sweet Potato","Dumplings, Yam & Green Banana","Irish Potato, Sweet Potato & Yam","Boiled Green Banana & Yam","Roast Breadfruit","Custom..."],
+  soup: ["Chicken Soup","Pepperpot Soup","Chicken Foot Soup","Beef Soup","Fish / Seafood Soup","Red Peas Soup","Mannish Water","Cow Foot Soup","Custom..."],
+  vegsoup: ["Pumpkin Soup","Red Peas Soup","Vegetable Soup","Callaloo Soup","Corn Soup","Gungo Peas Soup","Custom..."],
+  rice1: ["White Rice","Seasoned Rice","Dirty Rice","Custom..."],
+  rice2: ["Rice & Peas","Coconut Rice","Callaloo Rice","Gungo Rice","Pelau Rice","Custom..."],
+  veg_side: ["Callaloo & Carrots","Mixed Vegetables","String Beans & Carrots","Callaloo","Carrots & Cabbage","Steamed Bok Choy","Broccoli & Carrots","Custom..."],
+  potato: ["Herb Mashed Potato","Garlic Mashed Potato","Herb Roasted Potatoes","Butter Mashed Potato","Seasoned Wedges","Custom..."],
+  sides: ["Fried Plantain","Coleslaw","Steamed Cabbage","Fried Dumplings","Macaroni Salad","Steamed Veg Medley","Bammy","Breadfruit","Festival","Cornmeal Porridge","Custom..."],
+};
+
+const CATEGORY_LABELS = {
+  protein1:"Meat Protein 1", protein2:"Meat Protein 2", protein3:"Meat Protein 3",
+  fish:"Fish Option", veg:"Vegetarian Main", provisions:"Boiled Provisions",
+  soup:"Regular Soup", vegsoup:"Vegetarian Soup",
+  rice1:"Rice Option 1", rice2:"Rice Option 2",
+  veg_side:"Steamed Vegetables", potato:"Potato", sides:"Additional Side",
+};
+
+const CATEGORY_SECTIONS = [
+  { title:"Proteins & Mains", keys:["protein1","protein2","protein3","fish","veg"] },
+  { title:"Starches & Provisions", keys:["provisions","rice1","rice2","potato"] },
+  { title:"Soups", keys:["soup","vegsoup"] },
+  { title:"Vegetables & Sides", keys:["veg_side","sides"] },
+];
+
+// ── DAILY STAPLES ──
+const ALL_STAPLES = [
+  {key:"noodle_chicken", label:"🍜 Chicken Noodle Bowl"},
+  {key:"noodle_pork",    label:"🍜 Pork Noodle Bowl"},
+  {key:"noodle_veg",     label:"🍜 Vegetarian Noodle Bowl"},
+  {key:"wings_jerk",     label:"🍗 Jerk Wings & Wedges"},
+  {key:"wings_bbq",      label:"🍗 BBQ Wings & Wedges"},
+  {key:"wings_buffalo",  label:"🍗 Buffalo Wings & Wedges"},
+  {key:"wings_lemon",    label:"🍗 Lemon Pepper Wings & Wedges"},
+  {key:"alfredo_chicken",label:"🍝 Chicken Alfredo"},
+  {key:"alfredo_veg",    label:"🍝 Vegetarian Alfredo"},
+  {key:"salad_chicken",  label:"🥗 Chicken Salad"},
+  {key:"salad_garden",   label:"🥗 Garden Salad"},
+  {key:"salad_fish",     label:"🥗 Fish Salad"},
+];
+
+const DAYS = [
+  {key:"mon",label:"Monday"},
+  {key:"tue",label:"Tuesday"},
+  {key:"wed",label:"Wednesday"},
+  {key:"thu",label:"Thursday"},
+  {key:"fri",label:"Friday"},
+];
+
+const SAMPLE_MENU = {
+  mon:{protein1:"Brown Stew Chicken",protein2:"Stewed Beef",protein3:"Grilled Pork Chop",fish:"Escovitch Fish",veg:"Vegetable Curry & Chickpeas",provisions:"Yam, Sweet Potato & Dumplings",soup:"Chicken Soup",vegsoup:"Pumpkin Soup",rice1:"White Rice",rice2:"Rice & Peas",veg_side:"Callaloo & Carrots",potato:"Herb Mashed Potato",sides:"Fried Plantain"},
+  tue:{protein1:"Jerk Chicken",protein2:"Braised Beef",protein3:"BBQ Beef",fish:"Baked Fish",veg:"Callaloo & Tofu Stir-fry",provisions:"Green Banana, Irish Potato & Yam",soup:"Pepperpot Soup",vegsoup:"Red Peas Soup",rice1:"White Rice",rice2:"Coconut Rice",veg_side:"Mixed Vegetables",potato:"Garlic Mashed Potato",sides:"Steamed Cabbage"},
+  wed:{protein1:"Curry Chicken",protein2:"Stew Peas with Pigtail",protein3:"Curry Goat",fish:"Steamed Fish",veg:"Callaloo & Lentils",provisions:"Yam & Sweet Potato",soup:"Chicken Foot Soup",vegsoup:"Vegetable Soup",rice1:"White Rice",rice2:"Callaloo Rice",veg_side:"String Beans & Carrots",potato:"Herb Roasted Potatoes",sides:"Fried Plantain"},
+  thu:{protein1:"Roast Chicken",protein2:"Brown Stew Chicken",protein3:"Curry Goat",fish:"Sweet & Sour Fish",veg:"Ital Stew Vegetables",provisions:"Dumplings, Yam & Green Banana",soup:"Beef Soup",vegsoup:"Pumpkin Soup",rice1:"White Rice",rice2:"Rice & Peas",veg_side:"Callaloo",potato:"Herb Mashed Potato",sides:"Coleslaw"},
+  fri:{protein1:"Sweet & Sour Chicken",protein2:"Stewed Pork",protein3:"Braised Beef",fish:"Fried Fish",veg:"Chickpea & Vegetable Curry",provisions:"Irish Potato, Sweet Potato & Yam",soup:"Fish / Seafood Soup",vegsoup:"Vegetable Soup",rice1:"White Rice",rice2:"Coconut Rice",veg_side:"Carrots & Cabbage",potato:"Herb Roasted Potatoes",sides:"Bammy"},
+};
+
+let ADMIN_PIN = localStorage.getItem(PIN_KEY) || "2024";
+let activeDay = "mon";
+
+// ── HELPERS ──
+function getJamaicaNow() {
+  return new Date(new Date().toLocaleString("en-US",{timeZone:"America/Jamaica"}));
+}
+function getMenu() {
+  try { return JSON.parse(localStorage.getItem(MENU_KEY)) || {}; } catch(e) { return {}; }
+}
+function getStaples() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STAPLES_KEY));
+    if (saved) return saved;
+  } catch(e) {}
+  // Default all ON
+  const def = {};
+  ALL_STAPLES.forEach(s => def[s.key] = true);
+  return def;
+}
+
+// ── AUTH ──
+function checkPin() {
+  const pin = document.getElementById("admin-pin").value;
+  if (pin === ADMIN_PIN) {
+    document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("admin-app").style.display = "block";
+    initAdmin();
+  } else {
+    document.getElementById("admin-error").style.display = "block";
+    document.getElementById("admin-pin").value = "";
+  }
+}
+document.getElementById("admin-pin").addEventListener("keydown", e => { if(e.key==="Enter") checkPin(); });
+
+// ── INIT ──
+function initAdmin() {
+  const now = getJamaicaNow();
+  document.getElementById("admin-date").textContent = now.toLocaleDateString("en-JM",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  const todayDow = now.getDay(); // 1=Mon
+  const todayKey = ["sun","mon","tue","wed","thu","fri","sat"][todayDow];
+
+  buildStaples();
+  buildDayTabs(todayKey);
+  buildDayPanels();
+  loadMenuValues();
+  updateCodeDisplay();
+}
+
+// ── STAPLES ──
+function buildStaples() {
+  const staples = getStaples();
+  const grid = document.getElementById("staples-grid");
+  grid.innerHTML = "";
+  ALL_STAPLES.forEach(s => {
+    const on = staples[s.key] !== false;
+    const div = document.createElement("div");
+    div.className = "staple-toggle " + (on ? "active" : "inactive");
+    div.id = "staple_" + s.key;
+    div.innerHTML = `<div class="staple-dot"></div><span class="staple-name">${s.label}</span>`;
+    div.onclick = () => toggleStaple(s.key, div);
+    grid.appendChild(div);
+  });
+}
+function toggleStaple(key, el) {
+  const isActive = el.classList.contains("active");
+  el.classList.toggle("active", !isActive);
+  el.classList.toggle("inactive", isActive);
+}
+function getActiveStaples() {
+  const result = {};
+  ALL_STAPLES.forEach(s => {
+    const el = document.getElementById("staple_" + s.key);
+    result[s.key] = el ? el.classList.contains("active") : true;
+  });
+  return result;
+}
+
+// ── DAY TABS ──
+function buildDayTabs(todayKey) {
+  const tabBar = document.getElementById("day-tabs");
+  tabBar.innerHTML = "";
+  DAYS.forEach((day, i) => {
+    const btn = document.createElement("div");
+    btn.className = "day-tab" + (day.key === activeDay ? " active" : "") + (day.key === todayKey ? " today-tab" : "");
+    btn.textContent = day.label + (day.key === todayKey ? " ★" : "");
+    btn.id = "daytab_" + day.key;
+    btn.onclick = () => switchDay(day.key);
+    tabBar.appendChild(btn);
+  });
+}
+
+function switchDay(key) {
+  activeDay = key;
+  document.querySelectorAll(".day-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("daytab_" + key).classList.add("active");
+  document.querySelectorAll(".day-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel_" + key).classList.add("active");
+}
+
+// ── DAY PANELS ──
+function buildDayPanels() {
+  const container = document.getElementById("day-panels");
+  container.innerHTML = "";
+  DAYS.forEach(day => {
+    const panel = document.createElement("div");
+    panel.className = "day-panel" + (day.key === activeDay ? " active" : "");
+    panel.id = "panel_" + day.key;
+
+    let html = "";
+    CATEGORY_SECTIONS.forEach(section => {
+      html += `<div class="menu-section-title">${section.title}</div><div class="menu-fields-grid">`;
+      section.keys.forEach(catKey => {
+        const opts = MENU_OPTIONS[catKey] || [];
+        const optionsHtml = opts.map(o => `<option value="${o === "Custom..." ? "" : o}"${o==="Custom..."?` data-custom="1"`:""} >${o}</option>`).join("");
+        html += `
+          <div class="menu-field">
+            <label>${CATEGORY_LABELS[catKey]}</label>
+            <div class="combo-wrap">
+              <select id="m_${day.key}_${catKey}" onchange="handleSelect(this,'${day.key}','${catKey}')">
+                <option value="">— Select —</option>
+                ${optionsHtml}
+              </select>
+            </div>
+            <input class="custom-input" id="custom_${day.key}_${catKey}" type="text" placeholder="Type custom item...">
+            <span class="custom-toggle" onclick="showCustom('${day.key}','${catKey}')">+ Enter custom item</span>
+          </div>`;
+      });
+      html += `</div>`;
+    });
+
+    panel.innerHTML = html;
+    container.appendChild(panel);
+  });
+}
+
+function handleSelect(sel, day, cat) {
+  const customInput = document.getElementById(`custom_${day}_${cat}`);
+  if (sel.value === "" && sel.options[sel.selectedIndex]?.dataset?.custom === "1") {
+    customInput.style.display = "block";
+    customInput.focus();
+  } else {
+    customInput.style.display = "none";
+    customInput.value = "";
+  }
+}
+
+function showCustom(day, cat) {
+  const customInput = document.getElementById(`custom_${day}_${cat}`);
+  const sel = document.getElementById(`m_${day}_${cat}`);
+  customInput.style.display = "block";
+  sel.value = "";
+  customInput.focus();
+}
+
+// ── LOAD / SAVE MENU ──
+function loadMenuValues() {
+  const menu = getMenu();
+  DAYS.forEach(day => {
+    Object.keys(CATEGORY_LABELS).forEach(catKey => {
+      const val = menu[day.key]?.[catKey] || "";
+      const sel = document.getElementById(`m_${day.key}_${catKey}`);
+      const customInput = document.getElementById(`custom_${day.key}_${catKey}`);
+      if (!sel) return;
+      // Try to find value in options
+      const exists = [...sel.options].some(o => o.value === val);
+      if (exists && val) {
+        sel.value = val;
+      } else if (val) {
+        // custom value
+        sel.value = "";
+        customInput.style.display = "block";
+        customInput.value = val;
+      }
+    });
+  });
+}
+
+function getFieldValue(day, cat) {
+  const sel = document.getElementById(`m_${day}_${cat}`);
+  const customInput = document.getElementById(`custom_${day}_${cat}`);
+  if (customInput && customInput.style.display === "block" && customInput.value.trim()) {
+    return customInput.value.trim();
+  }
+  return sel ? sel.value : "";
+}
+
+function saveMenu() {
+  const menu = {};
+  DAYS.forEach(day => {
+    menu[day.key] = {};
+    Object.keys(CATEGORY_LABELS).forEach(catKey => {
+      menu[day.key][catKey] = getFieldValue(day.key, catKey);
+    });
+  });
+  const staples = getActiveStaples();
+  localStorage.setItem(MENU_KEY, JSON.stringify(menu));
+  localStorage.setItem(STAPLES_KEY, JSON.stringify(staples));
+  showToast("✅ Menu saved and published to order form!");
+}
+
+function loadSampleMenu() {
+  if (!confirm("Load the sample menu from your proposal? This will overwrite current entries.")) return;
+  DAYS.forEach(day => {
+    Object.keys(CATEGORY_LABELS).forEach(catKey => {
+      const val = SAMPLE_MENU[day.key]?.[catKey] || "";
+      const sel = document.getElementById(`m_${day.key}_${catKey}`);
+      const customInput = document.getElementById(`custom_${day.key}_${catKey}`);
+      if (!sel) return;
+      const exists = [...sel.options].some(o => o.value === val);
+      if (exists && val) {
+        sel.value = val;
+        if (customInput) { customInput.style.display = "none"; customInput.value = ""; }
+      } else if (val) {
+        sel.value = "";
+        if (customInput) { customInput.style.display = "block"; customInput.value = val; }
+      }
+    });
+  });
+  showToast("Sample menu loaded — review and click Save & Publish");
+}
+
+// ── TABS ──
+function switchTab(tab, btn) {
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  btn.classList.add("active");
+}
+
+// ── SETTINGS ──
+function updateCode() {
+  const newCode = document.getElementById("new-code").value.trim();
+  if (!newCode) { alert("Please enter a new access code."); return; }
+  localStorage.setItem(CODE_KEY, newCode);
+  updateCodeDisplay();
+  document.getElementById("new-code").value = "";
+  showToast(`✅ Access code updated to: ${newCode}`);
+}
+function updateCodeDisplay() {
+  const code = localStorage.getItem(CODE_KEY) || "JSE2026";
+  document.getElementById("current-code-display").textContent = code;
+}
+function updatePin() {
+  const current = document.getElementById("current-pin-check").value;
+  const newPin = document.getElementById("new-pin").value;
+  const conf = document.getElementById("confirm-pin").value;
+  if (current !== ADMIN_PIN) { alert("Current PIN is incorrect."); return; }
+  if (newPin.length < 4) { alert("PIN must be at least 4 characters."); return; }
+  if (newPin !== conf) { alert("PINs do not match."); return; }
+  ADMIN_PIN = newPin;
+  localStorage.setItem(PIN_KEY, newPin);
+  ["current-pin-check","new-pin","confirm-pin"].forEach(id => document.getElementById(id).value = "");
+  showToast("✅ Admin PIN updated");
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+</script>
+</body>
+</html>
