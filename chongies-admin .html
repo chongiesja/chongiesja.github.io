@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chongie's Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #1a1208; --gold: #c8922a; --gold-lt: #f0d080;
+  --cream: #fdf6e9; --warm: #f5ede0; --green: #2e4a2e;
+  --red: #b03a2e; --border: #e0d4be; --muted: #7a6a52; --radius: 10px;
+  --navy: #0a1628;
+}
+body { font-family: "Inter", sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+/* LOCK */
+#lock-screen { min-height:100vh; background:var(--ink); display:flex; align-items:center; justify-content:center; padding:24px; }
+.lock-card { background:rgba(255,255,255,0.05); border:1px solid rgba(200,146,42,0.3); border-radius:16px; padding:48px 40px; max-width:400px; width:100%; text-align:center; }
+.lock-logo { font-family:"Playfair Display",serif; color:var(--gold); font-size:36px; font-weight:900; margin-bottom:8px; }
+.lock-card h2 { color:rgba(255,255,255,0.8); font-size:16px; font-weight:400; margin-bottom:32px; }
+.lock-card label { display:block; text-align:left; color:rgba(255,255,255,0.6); font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+.lock-card input { width:100%; padding:14px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:var(--radius); color:#fff; font-size:16px; font-family:inherit; letter-spacing:0.15em; margin-bottom:16px; }
+.lock-card input:focus { outline:none; border-color:var(--gold); }
+.btn-gold { width:100%; padding:14px; background:var(--gold); color:var(--ink); border:none; border-radius:var(--radius); font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; }
+.btn-gold:hover { background:var(--gold-lt); }
+.lock-error { color:#ff7070; font-size:13px; margin-top:10px; display:none; }
+
+/* APP */
+#admin-app { display:none; }
+header { background:var(--ink); border-bottom:3px solid var(--gold); padding:0 20px; }
+.header-inner { max-width:1000px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
+.brand { font-family:"Playfair Display",serif; color:var(--gold); font-size:20px; font-weight:900; }
+.header-right { color:rgba(255,255,255,0.5); font-size:13px; }
+
+/* TABS */
+.tab-bar { background:rgba(0,0,0,0.8); border-bottom:1px solid rgba(255,255,255,0.1); padding:0 20px; }
+.tab-bar-inner { max-width:1000px; margin:0 auto; display:flex; gap:4px; }
+.tab-btn { padding:13px 18px; color:rgba(255,255,255,0.5); font-size:13px; font-weight:600; border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; font-family:inherit; transition:all 0.15s; }
+.tab-btn.active { color:var(--gold-lt); border-bottom-color:var(--gold); }
+.tab-btn:hover { color:rgba(255,255,255,0.8); }
+
+.page { max-width:1000px; margin:0 auto; padding:28px 20px 80px; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* CARDS */
+.card { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.card-header { background:var(--ink); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
+.card-header h3 { color:#fff; font-size:14px; font-weight:700; }
+.card-header span { color:rgba(255,255,255,0.5); font-size:12px; }
+.card-body { padding:20px; }
+
+/* DAY TABS */
+.day-tabs { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:20px; overflow-x:auto; }
+.day-tab { padding:11px 18px; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; white-space:nowrap; transition:all 0.15s; font-family:inherit; }
+.day-tab.active { color:var(--ink); border-bottom-color:var(--gold); }
+.day-tab.today-tab { color:var(--gold); }
+.day-panel { display:none; }
+.day-panel.active { display:block; }
+
+/* MENU FIELDS */
+.menu-section-title { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin:18px 0 10px; padding-bottom:5px; border-bottom:1px solid var(--border); }
+.fields-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.menu-field label { display:block; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+.combo-wrap { position:relative; }
+.combo-wrap select { width:100%; padding:8px 28px 8px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:inherit; font-size:12px; color:var(--ink); background:var(--cream); appearance:none; cursor:pointer; }
+.combo-wrap select:focus { outline:none; border-color:var(--gold); background:#fff; }
+.combo-wrap::after { content:"▾"; position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--muted); font-size:11px; }
+.custom-input { display:none; width:100%; padding:8px 10px; border:1.5px solid var(--gold); border-radius:6px; font-family:inherit; font-size:12px; color:var(--ink); background:#fff; margin-top:4px; }
+.custom-toggle { font-size:11px; color:var(--gold); cursor:pointer; margin-top:3px; display:inline-block; }
+
+/* STAPLES TOGGLES */
+.staples-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+.staple-toggle { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s; background:var(--warm); user-select:none; }
+.staple-toggle.active { border-color:var(--green); background:rgba(46,74,46,0.07); }
+.staple-toggle.inactive { opacity:0.55; }
+.staple-dot { width:10px; height:10px; border-radius:50%; background:var(--border); flex-shrink:0; }
+.staple-toggle.active .staple-dot { background:var(--green); }
+.staple-name { font-size:13px; font-weight:500; }
+
+/* ANCHOR INFO */
+.anchor-info { background:rgba(200,146,42,0.1); border:1px solid var(--gold); border-radius:var(--radius); padding:12px 16px; font-size:13px; margin-bottom:16px; }
+.anchor-info strong { color:var(--gold); }
+
+/* BUTTONS */
+.btn { padding:11px 22px; border:none; border-radius:var(--radius); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.btn-ink { background:var(--ink); color:#fff; }
+.btn-ink:hover { opacity:0.85; }
+.btn-green { background:var(--green); color:#fff; }
+.btn-sm { padding:8px 16px; font-size:12px; }
+
+/* SETTINGS */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+.field input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius); font-family:inherit; font-size:14px; color:var(--ink); background:var(--warm); }
+.field input:focus { outline:none; border-color:var(--gold); background:#fff; }
+.pin-display { background:var(--ink); color:var(--gold-lt); padding:14px 18px; border-radius:var(--radius); font-family:monospace; font-size:22px; letter-spacing:0.2em; text-align:center; margin-bottom:14px; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--green); color:#fff; padding:13px 20px; border-radius:var(--radius); font-size:14px; font-weight:700; transform:translateY(80px); opacity:0; transition:all 0.3s; z-index:999; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+@media(max-width:700px) { .fields-grid { grid-template-columns:1fr 1fr; } .settings-grid { grid-template-columns:1fr; } }
+@media(max-width:480px) { .fields-grid { grid-template-columns:1fr; } .tab-btn { padding:11px 12px; font-size:12px; } }
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">Chongie's</div>
+    <h2>Admin Panel</h2>
+    <label>Admin PIN</label>
+    <input type="password" id="admin-pin" placeholder="Enter PIN" maxlength="10" autocomplete="off">
+    <button class="btn-gold" onclick="checkPin()">Sign In</button>
+    <div class="lock-error" id="admin-error">Incorrect PIN.</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <header>
+    <div class="header-inner">
+      <div class="brand">Chongie's Admin</div>
+      <div class="header-right" id="admin-date"></div>
+    </div>
+  </header>
+  <div class="tab-bar">
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" onclick="switchTab('menu',this)">📋 Weekly Menu</button>
+      <button class="tab-btn" onclick="switchTab('staples',this)">⭐ Daily Staples</button>
+      <button class="tab-btn" onclick="switchTab('settings',this)">⚙️ Settings</button>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- WEEKLY MENU TAB -->
+    <div class="tab-content active" id="tab-menu">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Weekly Menu</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;">Set This Week's Jamaican Rotation</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ink btn-sm" onclick="forceReload()">🔄 Reload Week's Menu</button>
+          <button class="btn btn-green" onclick="saveMenu()">💾 Save & Publish</button>
+        </div>
+      </div>
+
+      <div class="anchor-info">
+        ⭐ <strong>Anchor dishes are automatic:</strong> Wednesday → Stew Peas with Pigtail &nbsp;|&nbsp; Thursday → Curry Goat &nbsp;|&nbsp; Friday → Jerk Pork. These always appear on the customer menu on those days.
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>📅 Daily Rotating Items</h3><span>Set Mon–Fri — anchors auto on Wed/Thu/Fri</span></div>
+        <div class="card-body">
+          <div class="day-tabs" id="day-tabs"></div>
+          <div id="day-panels"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAPLES TAB -->
+    <div class="tab-content" id="tab-staples">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Daily Staples</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:24px;">Toggle Menu Sections</h2>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>⭐ Always Available Items</h3><span>Toggle off to hide from customer menu this week</span></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">All items are ON by default every week. Toggle any off if unavailable.</p>
+          <div class="staples-grid" id="staples-grid"></div>
+          <div style="margin-top:20px;">
+            <button class="btn btn-green" onclick="saveStaples()">💾 Save Staples</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-content" id="tab-settings">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Settings</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:24px;">Admin Settings</h2>
+      </div>
+      <div class="settings-grid">
+        <div class="card">
+          <div class="card-header"><h3>🔑 Admin PIN</h3></div>
+          <div class="card-body">
+            <div class="field"><label>Current PIN</label><input type="password" id="cur-pin" placeholder="Current PIN"></div>
+            <div class="field"><label>New PIN</label><input type="password" id="new-pin" placeholder="Min 4 digits"></div>
+            <div class="field"><label>Confirm PIN</label><input type="password" id="con-pin" placeholder="Repeat new PIN"></div>
+            <button class="btn btn-ink" onclick="updatePin()">Update PIN</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⏰ Order Cutoff</h3></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">After this time, the customer menu switches to show the next day's menu.</p>
+            <div style="background:var(--warm);border-radius:var(--radius);padding:20px;text-align:center;">
+              <div style="font-size:36px;font-weight:700;color:var(--ink);">10:00 AM</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">Jamaica Standard Time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MENU_KEY = "jse_weekly_menu";
+const STAPLES_KEY = "jse_staples";
+const PIN_KEY = "chongies_admin_pin";
+
+// ── DISH OPTIONS ──
+const MENU_OPTIONS = {
+  protein1: ["Brown Stew Chicken","Jerk Chicken","Curry Chicken","Roast Chicken","Sweet & Sour Chicken","BBQ Chicken","Honey Garlic Chicken","Escovitch Chicken","Stewed Chicken","Fricassee Chicken","Lemon Herb Chicken","Garlic Butter Chicken","Teriyaki Chicken","Custom..."],
+  protein2: ["Stewed Beef","Braised Beef","Brown Stew Beef","Curry Beef","BBQ Beef","Oxtail","Corned Beef & Cabbage","Beef Stir-fry","Minced Beef","Pot Roast Beef","Custom..."],
+  protein3: ["Grilled Pork Chop","Stewed Pork","BBQ Pork Ribs","Roast Pork","Honey Garlic Pork","Sweet & Sour Pork","Curry Pork","Brown Stew Pork","Jerk Pork Chop","Custom..."],
+  fish: ["Baked Fish","Steamed Fish","Sweet & Sour Fish","Brown Stew Fish","Garlic Butter Fish","Curry Fish","Fried Fish","Jerk Fish","Escovitch Fish Fillet","Lemon Herb Baked Fish","Fish Rundown","Custom..."],
+  veg: ["Vegetable Curry & Chickpeas","Callaloo & Tofu Stir-fry","Callaloo & Lentils","Ital Stew Vegetables","Chickpea & Vegetable Curry","Lentil & Vegetable Stew","Stuffed Cho Cho","Tofu Stir-fry","Callaloo & Chickpeas","Mixed Bean Stew","Custom..."],
+  soup: ["Chicken Soup","Pepperpot Soup","Chicken Foot Soup","Beef Soup","Fish & Seafood Soup","Red Peas Soup","Mannish Water","Cow Foot Soup","Oxtail Soup","Gungo Peas Soup","Corn Soup","Custom..."],
+  vegsoup: ["Pumpkin Soup","Vegetable Soup","Callaloo Soup","Corn Soup","Gungo Peas Soup","Lentil Soup","Cho Cho Soup","Sweet Potato Soup","Custom..."],
+};
+
+const CAT_LABELS = {
+  protein1:"Protein 1 (Chicken)", protein2:"Protein 2 (Beef)", protein3:"Protein 3 (Pork)",
+  fish:"Fish", veg:"Vegetarian Main",
+  soup:"Regular Soup", vegsoup:"Vegetarian Soup",
+};
+
+const DAYS = [{key:"mon",label:"Monday"},{key:"tue",label:"Tuesday"},{key:"wed",label:"Wednesday"},{key:"thu",label:"Thursday"},{key:"fri",label:"Friday"}];
+
+const STAPLES = [
+  {key:"noodles", label:"🍜 Noodle Bowls"},
+  {key:"wings",   label:"🍗 Wings"},
+  {key:"wraps",   label:"🌯 Wraps"},
+  {key:"pasta",   label:"🍝 Alfredo Pasta"},
+  {key:"salads",  label:"🥗 Salads"},
+];
+
+
+let ADMIN_PIN = localStorage.getItem(PIN_KEY) || "2024";
+let activeDay = "mon";
+
+function getJamaicaNow() { return new Date(new Date().toLocaleString("en-US",{timeZone:"America/Jamaica"})); }
+function getMenu() { try { return JSON.parse(localStorage.getItem(MENU_KEY)) || {}; } catch(e) { return {}; } }
+function getStaples() {
+  try { const s = JSON.parse(localStorage.getItem(STAPLES_KEY)); if(s) return s; } catch(e) {}
+  const d = {}; STAPLES.forEach(s => d[s.key] = true); return d;
+}
+
+function checkPin() {
+  const pin = document.getElementById("admin-pin").value;
+  if (pin === ADMIN_PIN) {
+    document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("admin-app").style.display = "block";
+    initAdmin();
+  } else {
+    document.getElementById("admin-error").style.display = "block";
+    document.getElementById("admin-pin").value = "";
+  }
+}
+document.getElementById("admin-pin").addEventListener("keydown", e => { if(e.key==="Enter") checkPin(); });
+
+// ── 4-WEEK ROTATION (same as JSE) ──
+const FOUR_WEEK_MENU = {
+  1: {
+    mon:{protein1:"Brown Stew Chicken",protein2:"Stewed Beef",protein3:"Grilled Pork Chop",fish:"Baked Fish",veg:"Vegetable Curry & Chickpeas",soup:"Chicken Soup",vegsoup:"Pumpkin Soup"},
+    tue:{protein1:"Jerk Chicken",protein2:"Braised Beef",protein3:"Stewed Pork",fish:"Steamed Fish",veg:"Callaloo & Tofu Stir-fry",soup:"Pepperpot Soup",vegsoup:"Vegetable Soup"},
+    wed:{protein1:"Curry Chicken",protein2:"Stew Peas with Pigtail",protein3:"BBQ Pork Ribs",fish:"Sweet & Sour Fish",veg:"Callaloo & Lentils",soup:"Chicken Foot Soup",vegsoup:"Callaloo Soup"},
+    thu:{protein1:"Roast Chicken",protein2:"Curry Goat",protein3:"Brown Stew Beef",fish:"Brown Stew Fish",veg:"Ital Stew Vegetables",soup:"Beef Soup",vegsoup:"Corn Soup"},
+    fri:{protein1:"Sweet & Sour Chicken",protein2:"Jerk Pork",protein3:"Curry Beef",fish:"Escovitch Whole Fish",veg:"Chickpea & Vegetable Curry",soup:"Fish & Seafood Soup",vegsoup:"Gungo Peas Soup"},
+  },
+  2: {
+    mon:{protein1:"BBQ Chicken",protein2:"Oxtail",protein3:"Sweet & Sour Pork",fish:"Curry Fish",veg:"Lentil & Vegetable Stew",soup:"Red Peas Soup",vegsoup:"Lentil Soup"},
+    tue:{protein1:"Honey Garlic Chicken",protein2:"Corned Beef & Cabbage",protein3:"Curry Pork",fish:"Fried Fish",veg:"Stuffed Cho Cho",soup:"Mannish Water",vegsoup:"Cho Cho Soup"},
+    wed:{protein1:"Escovitch Chicken",protein2:"Stew Peas with Pigtail",protein3:"Brown Stew Pork",fish:"Jerk Fish",veg:"Tofu Stir-fry",soup:"Cow Foot Soup",vegsoup:"Sweet Potato Soup"},
+    thu:{protein1:"Stewed Chicken",protein2:"Curry Goat",protein3:"Beef Stir-fry",fish:"Escovitch Fish Fillet",veg:"Callaloo & Chickpeas",soup:"Oxtail Soup",vegsoup:"Pumpkin Soup"},
+    fri:{protein1:"Fricassee Chicken",protein2:"Jerk Pork",protein3:"Minced Beef",fish:"Escovitch Whole Fish",veg:"Vegetable Stir-fry",soup:"Gungo Peas Soup",vegsoup:"Vegetable Soup"},
+  },
+  3: {
+    mon:{protein1:"Lemon Herb Chicken",protein2:"Stewed Beef",protein3:"Stewed Pork",fish:"Fish Rundown",veg:"Gungo Peas Stew",soup:"Corn Soup",vegsoup:"Callaloo Soup"},
+    tue:{protein1:"Garlic Butter Chicken",protein2:"Braised Beef",protein3:"BBQ Pork Ribs",fish:"Baked Fish",veg:"Ackee & Saltfish (Veg Option)",soup:"Chicken Soup",vegsoup:"Corn Soup"},
+    wed:{protein1:"Teriyaki Chicken",protein2:"Stew Peas with Pigtail",protein3:"Roast Pork",fish:"Steamed Fish",veg:"Mixed Bean Stew",soup:"Pepperpot Soup",vegsoup:"Gungo Peas Soup"},
+    thu:{protein1:"Brown Stew Chicken",protein2:"Curry Goat",protein3:"Brown Stew Beef",fish:"Sweet & Sour Fish",veg:"Vegetable Curry & Chickpeas",soup:"Chicken Foot Soup",vegsoup:"Lentil Soup"},
+    fri:{protein1:"Jerk Chicken",protein2:"Jerk Pork",protein3:"Curry Beef",fish:"Escovitch Whole Fish",veg:"Callaloo & Tofu Stir-fry",soup:"Beef Soup",vegsoup:"Cho Cho Soup"},
+  },
+  4: {
+    mon:{protein1:"Curry Chicken",protein2:"Oxtail",protein3:"Curry Pork",fish:"Garlic Butter Fish",veg:"Callaloo & Lentils",soup:"Fish & Seafood Soup",vegsoup:"Sweet Potato Soup"},
+    tue:{protein1:"Roast Chicken",protein2:"Corned Beef & Cabbage",protein3:"Brown Stew Pork",fish:"Curry Fish",veg:"Ital Stew Vegetables",soup:"Red Peas Soup",vegsoup:"Pumpkin Soup"},
+    wed:{protein1:"Sweet & Sour Chicken",protein2:"Stew Peas with Pigtail",protein3:"Jerk Pork Chop",fish:"Fried Fish",veg:"Chickpea & Vegetable Curry",soup:"Mannish Water",vegsoup:"Vegetable Soup"},
+    thu:{protein1:"BBQ Chicken",protein2:"Curry Goat",protein3:"Beef Stir-fry",fish:"Jerk Fish",veg:"Lentil & Vegetable Stew",soup:"Cow Foot Soup",vegsoup:"Callaloo Soup"},
+    fri:{protein1:"Honey Garlic Chicken",protein2:"Jerk Pork",protein3:"Minced Beef",fish:"Escovitch Whole Fish",veg:"Stuffed Cho Cho",soup:"Oxtail Soup",vegsoup:"Corn Soup"},
+  }
+};
+
+function getRotationWeek() {
+  const anchor = new Date("2026-07-06");
+  const now = getJamaicaNow();
+  const d = new Date(now);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  const diffMs = d - anchor;
+  const diffWeeks = Math.floor(diffMs / (7*24*60*60*1000));
+  return ((diffWeeks % 4) + 4) % 4 + 1;
+}
+
+function getCurrentWeekId() {
+  const now = getJamaicaNow();
+  const d = new Date(now);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().split("T")[0];
+}
+
+function autoLoadWeeklyMenu() {
+  // Only auto-load once per week
+  const savedWeek = localStorage.getItem("chongies_loaded_week");
+  const currentWeek = getCurrentWeekId();
+  if (savedWeek === currentWeek) return;
+
+  const weekNum = getRotationWeek();
+  const menu = FOUR_WEEK_MENU[weekNum];
+  if (!menu) return;
+
+  // Save to localStorage so order page can read it
+  localStorage.setItem(MENU_KEY, JSON.stringify(menu));
+  localStorage.setItem("chongies_loaded_week", currentWeek);
+  localStorage.setItem("chongies_week_num", weekNum);
+
+  // Show week badge
+  updateWeekBadge(weekNum);
+  showToast(`✅ Week ${weekNum} menu auto-loaded — review and publish!`);
+}
+
+function updateWeekBadge(weekNum) {
+  const existing = document.getElementById("week-badge");
+  if (existing) existing.remove();
+  const badge = document.createElement("div");
+  badge.id = "week-badge";
+  badge.style.cssText = "display:inline-block;background:var(--gold);color:var(--ink);font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-left:12px;";
+  badge.textContent = `Week ${weekNum} of 4 — auto-loaded`;
+  const title = document.querySelector("#tab-menu h2");
+  if (title) title.appendChild(badge);
+}
+
+function initAdmin() {
+  const now = getJamaicaNow();
+  document.getElementById("admin-date").textContent = now.toLocaleDateString("en-JM",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  const todayKey = ["sun","mon","tue","wed","thu","fri","sat"][now.getDay()];
+  buildDayTabs(todayKey);
+  buildDayPanels();
+  autoLoadWeeklyMenu(); // ← auto-populate from rotation
+  loadMenuValues();     // ← then load into dropdowns
+  buildStaples();
+}
+
+function buildDayTabs(todayKey) {
+  const bar = document.getElementById("day-tabs");
+  bar.innerHTML = "";
+  DAYS.forEach(day => {
+    const isToday = day.key === todayKey;
+    const isAnchor = ["wed","thu","fri"].includes(day.key);
+    const btn = document.createElement("div");
+    btn.className = "day-tab" + (day.key === activeDay ? " active" : "") + (isToday ? " today-tab" : "");
+    btn.textContent = day.label + (isToday ? " ★" : "") + (isAnchor ? " ⭐" : "");
+    btn.id = "daytab_" + day.key;
+    btn.onclick = () => switchDay(day.key);
+    bar.appendChild(btn);
+  });
+}
+
+function switchDay(key) {
+  activeDay = key;
+  document.querySelectorAll(".day-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("daytab_" + key).classList.add("active");
+  document.querySelectorAll(".day-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel_" + key).classList.add("active");
+}
+
+function buildDayPanels() {
+  const container = document.getElementById("day-panels");
+  container.innerHTML = "";
+  DAYS.forEach(day => {
+    const panel = document.createElement("div");
+    panel.className = "day-panel" + (day.key === activeDay ? " active" : "");
+    panel.id = "panel_" + day.key;
+
+    // Anchor note
+    let anchorNote = "";
+    if (day.key === "wed") anchorNote = `<div class="anchor-info" style="margin-bottom:14px;">⭐ <strong>Wednesday:</strong> Stew Peas with Pigtail auto-appears on customer menu as today's special.</div>`;
+    if (day.key === "thu") anchorNote = `<div class="anchor-info" style="margin-bottom:14px;">⭐ <strong>Thursday:</strong> Curry Goat auto-appears on customer menu as today's special.</div>`;
+    if (day.key === "fri") anchorNote = `<div class="anchor-info" style="margin-bottom:14px;">⭐ <strong>Friday:</strong> Jerk Pork auto-appears on customer menu as today's special.</div>`;
+
+    let html = anchorNote;
+    html += `<div class="menu-section-title">Proteins & Mains</div><div class="fields-grid">`;
+    ["protein1","protein2","protein3","fish","veg"].forEach(catKey => {
+      const opts = MENU_OPTIONS[catKey] || [];
+      html += `<div class="menu-field">
+        <label>${CAT_LABELS[catKey]}</label>
+        <div class="combo-wrap">
+          <select id="m_${day.key}_${catKey}" onchange="handleSelect(this,'${day.key}','${catKey}')">
+            <option value="">— Select —</option>
+            ${opts.map(o => `<option value="${o==="Custom..."?"":o}"${o==="Custom..."?' data-custom="1"':''}>${o}</option>`).join("")}
+          </select>
+        </div>
+        <input class="custom-input" id="custom_${day.key}_${catKey}" type="text" placeholder="Type custom...">
+        <span class="custom-toggle" onclick="showCustom('${day.key}','${catKey}')">+ Custom</span>
+      </div>`;
+    });
+    html += `</div>`;
+
+    html += `<div class="menu-section-title">Soups</div><div class="fields-grid">`;
+    ["soup","vegsoup"].forEach(catKey => {
+      const opts = MENU_OPTIONS[catKey] || [];
+      html += `<div class="menu-field">
+        <label>${CAT_LABELS[catKey]}</label>
+        <div class="combo-wrap">
+          <select id="m_${day.key}_${catKey}" onchange="handleSelect(this,'${day.key}','${catKey}')">
+            <option value="">— Select —</option>
+            ${opts.map(o => `<option value="${o==="Custom..."?"":o}"${o==="Custom..."?' data-custom="1"':''}>${o}</option>`).join("")}
+          </select>
+        </div>
+        <input class="custom-input" id="custom_${day.key}_${catKey}" type="text" placeholder="Type custom...">
+        <span class="custom-toggle" onclick="showCustom('${day.key}','${catKey}')">+ Custom</span>
+      </div>`;
+    });
+    html += `</div>`;
+
+    panel.innerHTML = html;
+    container.appendChild(panel);
+  });
+}
+
+function handleSelect(sel, day, cat) {
+  const ci = document.getElementById(`custom_${day}_${cat}`);
+  if (sel.options[sel.selectedIndex]?.dataset?.custom === "1") { sel.value = ""; ci.style.display = "block"; ci.focus(); }
+  else { ci.style.display = "none"; ci.value = ""; }
+}
+function showCustom(day, cat) {
+  const ci = document.getElementById(`custom_${day}_${cat}`);
+  document.getElementById(`m_${day}_${cat}`).value = "";
+  ci.style.display = "block"; ci.focus();
+}
+
+function loadMenuValues() {
+  const menu = getMenu();
+  DAYS.forEach(day => {
+    Object.keys(CAT_LABELS).forEach(catKey => {
+      const val = menu[day.key]?.[catKey] || "";
+      const sel = document.getElementById(`m_${day.key}_${catKey}`);
+      const ci = document.getElementById(`custom_${day.key}_${catKey}`);
+      if (!sel) return;
+      const exists = [...sel.options].some(o => o.value === val);
+      if (exists && val) { sel.value = val; }
+      else if (val) { sel.value = ""; ci.style.display = "block"; ci.value = val; }
+    });
+  });
+}
+
+function getFieldValue(day, cat) {
+  const ci = document.getElementById(`custom_${day}_${cat}`);
+  if (ci && ci.style.display === "block" && ci.value.trim()) return ci.value.trim();
+  const sel = document.getElementById(`m_${day}_${cat}`);
+  return sel ? sel.value : "";
+}
+
+function saveMenu() {
+  const menu = {};
+  DAYS.forEach(day => {
+    menu[day.key] = {};
+    Object.keys(CAT_LABELS).forEach(catKey => {
+      menu[day.key][catKey] = getFieldValue(day.key, catKey);
+    });
+  });
+  localStorage.setItem(MENU_KEY, JSON.stringify(menu));
+  showToast("✅ Menu saved & published to customer page!");
+}
+
+function forceReload() {
+  if (!confirm("Reload this week's auto-rotation menu? Any unsaved changes will be lost.")) return;
+  localStorage.removeItem("chongies_loaded_week"); // clear flag so it reloads
+  autoLoadWeeklyMenu();
+  loadMenuValues();
+  showToast("🔄 Week's menu reloaded — review and publish");
+}
+
+function buildStaples() {
+  const staples = getStaples();
+  const grid = document.getElementById("staples-grid");
+  grid.innerHTML = "";
+  STAPLES.forEach(s => {
+    const on = staples[s.key] !== false;
+    const div = document.createElement("div");
+    div.className = "staple-toggle " + (on ? "active" : "inactive");
+    div.id = "staple_" + s.key;
+    div.innerHTML = `<div class="staple-dot"></div><span class="staple-name">${s.label}</span>`;
+    div.onclick = () => { div.classList.toggle("active"); div.classList.toggle("inactive"); };
+    grid.appendChild(div);
+  });
+}
+
+function saveStaples() {
+  const result = {};
+  STAPLES.forEach(s => {
+    result[s.key] = document.getElementById("staple_" + s.key).classList.contains("active");
+  });
+  localStorage.setItem(STAPLES_KEY, JSON.stringify(result));
+  showToast("✅ Staples saved!");
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  btn.classList.add("active");
+}
+
+function updatePin() {
+  const cur = document.getElementById("cur-pin").value;
+  const nw = document.getElementById("new-pin").value;
+  const cn = document.getElementById("con-pin").value;
+  if (cur !== ADMIN_PIN) { alert("Current PIN incorrect."); return; }
+  if (nw.length < 4) { alert("PIN must be at least 4 digits."); return; }
+  if (nw !== cn) { alert("PINs don't match."); return; }
+  ADMIN_PIN = nw;
+  localStorage.setItem(PIN_KEY, nw);
+  ["cur-pin","new-pin","con-pin"].forEach(id => document.getElementById(id).value = "");
+  showToast("✅ PIN updated");
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+</script>
+</body>
+</html>
