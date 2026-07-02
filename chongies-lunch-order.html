@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chongie's — Lunch Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #1a1208; --gold: #c8922a; --gold-lt: #f0d080;
+  --cream: #fdf6e9; --warm: #f5ede0; --green: #2e4a2e;
+  --red: #b03a2e; --border: #e0d4be; --muted: #7a6a52;
+  --orange: #c85a1a; --radius: 10px;
+}
+body { font-family: "Inter", sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+/* HEADER */
+header { background: var(--ink); padding: 0 20px; border-bottom: 3px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { font-family: "Playfair Display", serif; color: var(--gold); font-size: 22px; font-weight: 900; letter-spacing: 0.02em; }
+.header-meta { text-align: right; }
+.header-meta .date { color: rgba(255,255,255,0.5); font-size: 11px; }
+.header-meta .cutoff { color: var(--gold-lt); font-size: 12px; font-weight: 600; }
+
+/* WEEKEND / CLOSED */
+#closed-screen { min-height: 100vh; background: var(--ink); display: none; align-items: center; justify-content: center; text-align: center; padding: 32px; }
+#closed-screen h2 { font-family: "Playfair Display", serif; color: var(--gold); font-size: 28px; margin-bottom: 12px; }
+#closed-screen p { color: rgba(255,255,255,0.5); font-size: 15px; }
+
+/* CUTOFF BANNER */
+.cutoff-banner { background: var(--orange); color: #fff; padding: 12px 20px; font-size: 13px; font-weight: 600; text-align: center; display: none; }
+.cutoff-banner.show { display: block; }
+
+/* PAGE */
+.page { max-width: 680px; margin: 0 auto; padding: 24px 16px 120px; }
+
+/* DELIVERY DAY BADGE */
+.delivery-badge { background: var(--ink); color: var(--gold-lt); border-radius: 8px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+/* SECTION LABEL */
+.section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; margin-top: 24px; }
+.section-title { font-family: "Playfair Display", serif; font-size: 20px; margin-bottom: 14px; }
+
+/* MENU CARDS */
+.menu-section { margin-bottom: 8px; }
+.menu-section-header { background: var(--ink); color: var(--gold-lt); padding: 10px 14px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
+.menu-section-body { border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; margin-bottom: 12px; }
+
+.menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--cream); transition: background 0.15s; cursor: pointer; }
+.menu-item:last-child { border-bottom: none; }
+.menu-item:hover { background: var(--warm); }
+.menu-item.selected { background: rgba(200,146,42,0.1); border-left: 3px solid var(--gold); }
+.item-qty { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--warm); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--ink); transition: all 0.15s; line-height: 1; }
+.qty-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.qty-num { font-size: 15px; font-weight: 700; min-width: 20px; text-align: center; }
+.item-info { flex: 1; }
+.item-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.item-price { font-size: 14px; font-weight: 700; color: var(--ink); flex-shrink: 0; }
+.anchor-tag { font-size: 10px; background: var(--gold); color: var(--ink); padding: 2px 6px; border-radius: 10px; font-weight: 700; margin-left: 6px; }
+.unavailable { opacity: 0.4; pointer-events: none; }
+
+/* CUSTOMER INFO */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.field input, .field select, .field textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 14px; color: var(--ink); background: var(--warm); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); background: #fff; }
+.field textarea { resize: vertical; min-height: 70px; }
+
+/* DELIVERY ZONES */
+.zone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.zone-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; cursor: pointer; transition: all 0.15s; background: var(--warm); }
+.zone-card:hover { border-color: var(--gold); }
+.zone-card.selected { border-color: var(--gold); background: rgba(200,146,42,0.1); }
+.zone-card input { display: none; }
+.zone-name { font-size: 13px; font-weight: 600; }
+.zone-fee { font-size: 12px; color: var(--muted); }
+
+/* ORDER SUMMARY */
+#summary-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 20px; display: none; }
+#summary-card.visible { display: block; }
+.summary-line { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--border); }
+.summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding: 10px 0 0; border-top: 2px solid var(--ink); margin-top: 6px; }
+
+/* STICKY ORDER BAR */
+.order-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--ink); border-top: 2px solid var(--gold); padding: 12px 20px; z-index: 100; }
+.order-bar-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.order-bar-info { color: rgba(255,255,255,0.7); font-size: 13px; }
+.order-bar-info strong { color: var(--gold-lt); font-size: 16px; display: block; }
+.btn-order { padding: 14px 28px; background: var(--green); color: #fff; border: none; border-radius: var(--radius); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.btn-order:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-order:not(:disabled):hover { background: #1a3a1a; }
+
+/* SUCCESS */
+#success-screen { display: none; min-height: 100vh; background: var(--cream); align-items: center; justify-content: center; padding: 24px; text-align: center; }
+.success-card { background: #fff; border-radius: 16px; padding: 40px 32px; max-width: 420px; border: 1px solid var(--border); }
+.success-icon { font-size: 52px; margin-bottom: 16px; }
+.success-card h2 { font-family: "Playfair Display", serif; font-size: 26px; margin-bottom: 10px; }
+.success-card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.success-delivery { background: var(--warm); border-radius: var(--radius); padding: 14px; margin: 16px 0; font-size: 14px; font-weight: 600; }
+
+@media(max-width:480px) { .zone-grid { grid-template-columns: 1fr; } .order-bar-inner { flex-direction: column; } .btn-order { width: 100%; text-align: center; } }
+</style>
+</head>
+<body>
+
+<!-- CLOSED SCREEN -->
+<div id="closed-screen">
+  <div>
+    <div style="font-size:56px;margin-bottom:16px;">🌴</div>
+    <h2 id="closed-title">Enjoy your weekend!</h2>
+    <p id="closed-msg">Chongie's is open Monday to Friday.<br>We'll see you back on Monday!</p>
+    <p style="margin-top:20px;color:rgba(255,255,255,0.3);font-size:12px;">Chongie's by Mark Chong's Cooking Mastery</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+  <header>
+    <div class="header-inner">
+      <div class="brand">Chongie's</div>
+      <div class="header-meta">
+        <div class="date" id="header-date"></div>
+        <div class="cutoff" id="header-cutoff">Order by 10:00 AM</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="cutoff-banner" id="cutoff-banner">
+    ⏰ Today's orders are closed — you're now ordering for <span id="cutoff-next-day"></span>
+  </div>
+
+  <div class="page">
+
+    <div class="delivery-badge">
+      🚚 <span id="delivery-notice">Loading...</span>
+    </div>
+
+    <!-- DAILY STAPLES -->
+    <div class="section-label">Always Available</div>
+    <div class="section-title" id="menu-title">Today's Menu</div>
+
+    <!-- NOODLE BOWLS -->
+    <div class="menu-section" id="section-noodles">
+      <div class="menu-section-header">🍜 Asian Noodle Bowls <span>J$1,200</span></div>
+      <div class="menu-section-body" id="noodles-body">
+        <div class="menu-item" onclick="changeQty('noodle-chicken',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-chicken',-1)">−</button><span class="qty-num" id="qty-noodle-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-chicken',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Chicken Noodle Bowl</div><div class="item-desc">Wok-tossed noodles, vegetables & sauce</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('noodle-pork',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-pork',-1)">−</button><span class="qty-num" id="qty-noodle-pork">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-pork',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Pork Noodle Bowl</div><div class="item-desc">Wok-tossed noodles, vegetables & sauce</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('noodle-veg',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-veg',-1)">−</button><span class="qty-num" id="qty-noodle-veg">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-veg',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Vegetarian Noodle Bowl</div><div class="item-desc">Wok-tossed noodles, fresh vegetables & sauce</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WINGS -->
+    <div class="menu-section" id="section-wings">
+      <div class="menu-section-header">🍗 Chicken Wings <span>6 pcs + Wedges — J$1,200</span></div>
+      <div class="menu-section-body" id="wings-body">
+        <div class="menu-item" onclick="changeQty('wings-jerk',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-jerk',-1)">−</button><span class="qty-num" id="qty-wings-jerk">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-jerk',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Jerk Wings</div><div class="item-desc">6 pcs jerk-seasoned wings with seasoned wedges</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('wings-bbq',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-bbq',-1)">−</button><span class="qty-num" id="qty-wings-bbq">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-bbq',1)">+</button></div>
+          <div class="item-info"><div class="item-name">BBQ Wings</div><div class="item-desc">6 pcs BBQ glazed wings with seasoned wedges</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('wings-buffalo',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-buffalo',-1)">−</button><span class="qty-num" id="qty-wings-buffalo">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-buffalo',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Buffalo Wings</div><div class="item-desc">6 pcs buffalo sauce wings with seasoned wedges</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('wings-lemon',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-lemon',-1)">−</button><span class="qty-num" id="qty-wings-lemon">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-lemon',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Lemon Pepper Wings</div><div class="item-desc">6 pcs lemon pepper wings with seasoned wedges</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WRAPS -->
+    <div class="menu-section" id="section-wraps">
+      <div class="menu-section-header">🌯 Wraps</div>
+      <div class="menu-section-body" id="wraps-body">
+        <div class="menu-item" onclick="changeQty('wrap-chicken',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-chicken',-1)">−</button><span class="qty-num" id="qty-wrap-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-chicken',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Chicken Wrap</div><div class="item-desc">Grilled chicken, fresh veggies & sauce</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('wrap-pork',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-pork',-1)">−</button><span class="qty-num" id="qty-wrap-pork">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-pork',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Pork Wrap</div><div class="item-desc">Seasoned pork, fresh veggies & sauce</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('wrap-veg',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-veg',-1)">−</button><span class="qty-num" id="qty-wrap-veg">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-veg',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Vegetarian Wrap</div><div class="item-desc">Fresh vegetables, cheese & sauce</div></div>
+          <div class="item-price">J$1,000</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALFREDO PASTA -->
+    <div class="menu-section" id="section-pasta">
+      <div class="menu-section-header">🍝 Alfredo Pasta <span>J$1,200</span></div>
+      <div class="menu-section-body" id="pasta-body">
+        <div class="menu-item" onclick="changeQty('pasta-chicken',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-chicken',-1)">−</button><span class="qty-num" id="qty-pasta-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-chicken',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Chicken Alfredo</div><div class="item-desc">Creamy alfredo pasta with grilled chicken</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('pasta-veg',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-veg',-1)">−</button><span class="qty-num" id="qty-pasta-veg">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-veg',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Vegetarian Alfredo</div><div class="item-desc">Creamy alfredo pasta with fresh vegetables</div></div>
+          <div class="item-price">J$1,200</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SALADS -->
+    <div class="menu-section" id="section-salads">
+      <div class="menu-section-header">🥗 Salads <span>J$1,350</span></div>
+      <div class="menu-section-body" id="salads-body">
+        <div class="menu-item" onclick="changeQty('salad-chicken',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-chicken',-1)">−</button><span class="qty-num" id="qty-salad-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-chicken',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Chicken Salad</div><div class="item-desc">Grilled chicken over fresh garden salad</div></div>
+          <div class="item-price">J$1,350</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('salad-garden',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-garden',-1)">−</button><span class="qty-num" id="qty-salad-garden">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-garden',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Garden Salad</div><div class="item-desc">Fresh seasonal vegetables & dressing</div></div>
+          <div class="item-price">J$1,350</div>
+        </div>
+        <div class="menu-item" onclick="changeQty('salad-fish',1)">
+          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-fish',-1)">−</button><span class="qty-num" id="qty-salad-fish">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-fish',1)">+</button></div>
+          <div class="item-info"><div class="item-name">Fish Salad</div><div class="item-desc">Seasoned fish over fresh garden salad</div></div>
+          <div class="item-price">J$1,350</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JAMAICAN DAILY MAINS (from admin) -->
+    <div class="section-label" style="margin-top:28px;">Today's Jamaican Selection</div>
+    <div class="menu-section" id="section-jamaican">
+      <div class="menu-section-header">🇯🇲 Jamaican Mains <span>J$1,100</span></div>
+      <div class="menu-section-body" id="jamaican-body">
+        <!-- Populated by JS from admin menu -->
+      </div>
+    </div>
+
+    <!-- SOUP -->
+    <div class="menu-section" id="section-soup">
+      <div class="menu-section-header">🍲 Soup of the Day <span>J$600</span></div>
+      <div class="menu-section-body" id="soup-body">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- CUSTOMER DETAILS -->
+    <div class="section-label" style="margin-top:28px;">Your Details</div>
+    <div class="field"><label>Your Name</label><input type="text" id="cust-name" placeholder="First & last name"></div>
+    <div class="field"><label>Phone Number</label><input type="tel" id="cust-phone" placeholder="876-XXX-XXXX"></div>
+
+    <!-- DELIVERY / PICKUP -->
+    <div class="field">
+      <label>Order Type</label>
+      <select id="order-type" onchange="toggleDelivery()">
+        <option value="delivery">Delivery</option>
+        <option value="pickup">Pickup</option>
+      </select>
+    </div>
+
+    <div id="delivery-section">
+      <div class="field"><label>Delivery Address</label><input type="text" id="cust-address" placeholder="Street address, area"></div>
+      <div class="section-label">Delivery Zone</div>
+      <div class="zone-grid" id="zone-grid">
+        <label class="zone-card selected" onclick="selectZone(this, 0)"><input type="radio" name="zone" checked><div class="zone-name">Zone 1 — Kingston 10</div><div class="zone-fee">Free delivery</div></label>
+        <label class="zone-card" onclick="selectZone(this, 300)"><input type="radio" name="zone"><div class="zone-name">Zone 2 — Kingston 6/8</div><div class="zone-fee">J$300 delivery fee</div></label>
+        <label class="zone-card" onclick="selectZone(this, 500)"><input type="radio" name="zone"><div class="zone-name">Zone 3 — New Kingston</div><div class="zone-fee">J$500 delivery fee</div></label>
+        <label class="zone-card" onclick="selectZone(this, 800)"><input type="radio" name="zone"><div class="zone-name">Zone 4 — Other Areas</div><div class="zone-fee">J$800 delivery fee</div></label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Special Instructions (optional)</label>
+      <textarea id="cust-notes" placeholder="Allergies, special requests..."></textarea>
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    <div id="summary-card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Order Summary</div>
+      <div id="summary-lines"></div>
+      <div class="summary-total"><span>Total</span><span id="summary-total">J$0</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px;" id="delivery-note"></div>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- STICKY ORDER BAR -->
+  <div class="order-bar">
+    <div class="order-bar-inner">
+      <div class="order-bar-info">
+        <strong id="bar-total">J$0</strong>
+        <span id="bar-items">No items selected</span>
+      </div>
+      <button class="btn-order" id="order-btn" onclick="placeOrder()" disabled>Order via WhatsApp →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="success-screen">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Order Sent!</h2>
+    <p>Your order has been sent to Chongie's via WhatsApp. We'll confirm shortly.</p>
+    <div class="success-delivery" id="success-delivery">Delivery: Tomorrow</div>
+    <p style="font-size:12px;color:var(--muted);">Questions? Call 876-818-7335</p>
+  </div>
+</div>
+
+<script>
+const MENU_KEY = "jse_weekly_menu"; // shared with admin panel
+const STAPLES_KEY = "jse_staples";
+const WHATSAPP_NUMBER = "18768947767";
+
+// ── PRICING ──
+const PRICES = {
+  "noodle-chicken": {name:"Chicken Noodle Bowl", price:1200},
+  "noodle-pork":    {name:"Pork Noodle Bowl", price:1200},
+  "noodle-veg":     {name:"Vegetarian Noodle Bowl", price:1200},
+  "wings-jerk":     {name:"Jerk Wings (6pcs + Wedges)", price:1200},
+  "wings-bbq":      {name:"BBQ Wings (6pcs + Wedges)", price:1200},
+  "wings-buffalo":  {name:"Buffalo Wings (6pcs + Wedges)", price:1200},
+  "wings-lemon":    {name:"Lemon Pepper Wings (6pcs + Wedges)", price:1200},
+  "wrap-chicken":   {name:"Chicken Wrap", price:1200},
+  "wrap-pork":      {name:"Pork Wrap", price:1200},
+  "wrap-veg":       {name:"Vegetarian Wrap", price:1000},
+  "pasta-chicken":  {name:"Chicken Alfredo", price:1200},
+  "pasta-veg":      {name:"Vegetarian Alfredo", price:1200},
+  "salad-chicken":  {name:"Chicken Salad", price:1350},
+  "salad-garden":   {name:"Garden Salad", price:1350},
+  "salad-fish":     {name:"Fish Salad", price:1350},
+};
+
+let cart = {};
+let deliveryFee = 0;
+let orderType = "delivery";
+
+// ── DATE HELPERS ──
+function getJamaicaNow() {
+  return new Date(new Date().toLocaleString("en-US", {timeZone:"America/Jamaica"}));
+}
+function formatDate(d) {
+  return d.toLocaleDateString("en-JM", {weekday:"long", month:"long", day:"numeric"});
+}
+function getDeliveryDate(now, afterCutoff) {
+  const d = new Date(now);
+  const dow = d.getDay();
+  if (!afterCutoff) {
+    // Before 10am — deliver today
+    return d;
+  }
+  // After 10am — next working day
+  let add = 1;
+  if (dow === 5) add = 3; // Fri → Mon
+  if (dow === 4) add = 1; // Thu → Fri
+  d.setDate(d.getDate() + add);
+  return d;
+}
+function getMenuDay(now, afterCutoff) {
+  // Which day's menu to show
+  const d = new Date(now);
+  const dow = d.getDay();
+  if (!afterCutoff) return dow; // today
+  // After cutoff — show next working day
+  let add = 1;
+  if (dow === 5) add = 3;
+  const next = new Date(d);
+  next.setDate(d.getDate() + add);
+  return next.getDay();
+}
+
+// ── WEEKLY MENU ──
+function getWeeklyMenu() {
+  try { return JSON.parse(localStorage.getItem(MENU_KEY)) || {}; } catch(e) { return {}; }
+}
+function getStaples() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STAPLES_KEY));
+    if (s) return s;
+  } catch(e) {}
+  const def = {};
+  ["noodles","wings","pasta","salads","wraps"].forEach(k => def[k] = true);
+  return def;
+}
+
+const DAY_KEYS = ["sun","mon","tue","wed","thu","fri","sat"];
+
+// ── INIT ──
+function init() {
+  const now = getJamaicaNow();
+  const dow = now.getDay();
+  const hour = now.getHours();
+  const afterCutoff = hour >= 10;
+
+  // Weekend check
+  if (dow === 0 || dow === 6) {
+    document.getElementById("closed-screen").style.display = "flex";
+    document.getElementById("app").style.display = "none";
+    return;
+  }
+
+  document.getElementById("app").style.display = "block";
+  document.getElementById("header-date").textContent = formatDate(now);
+
+  // After cutoff banner
+  if (afterCutoff) {
+    const delivery = getDeliveryDate(now, true);
+    document.getElementById("cutoff-banner").classList.add("show");
+    document.getElementById("cutoff-next-day").textContent = formatDate(delivery);
+    document.getElementById("header-cutoff").textContent = "Next delivery order";
+    document.getElementById("menu-title").textContent = formatDate(delivery) + " Menu";
+  } else {
+    document.getElementById("menu-title").textContent = "Today's Menu";
+  }
+
+  // Delivery notice
+  const delivery = getDeliveryDate(now, afterCutoff);
+  document.getElementById("delivery-notice").textContent =
+    afterCutoff
+      ? `Ordering now for ${formatDate(delivery)} delivery`
+      : `Order now — delivery today by 11:30 AM`;
+  document.getElementById("success-delivery").textContent =
+    `Delivery: ${formatDate(delivery)}`;
+
+  // Staples visibility
+  const staples = getStaples();
+  if (!staples.noodles) document.getElementById("section-noodles").style.display = "none";
+  if (!staples.wings)   document.getElementById("section-wings").style.display = "none";
+  if (!staples.wraps)   document.getElementById("section-wraps").style.display = "none";
+  if (!staples.pasta)   document.getElementById("section-pasta").style.display = "none";
+  if (!staples.salads)  document.getElementById("section-salads").style.display = "none";
+
+  // Load daily Jamaican menu
+  const menuDow = getMenuDay(now, afterCutoff);
+  const dayKey = DAY_KEYS[menuDow];
+  const menu = getWeeklyMenu();
+  const dayMenu = menu[dayKey] || null;
+
+  loadJamaicanMenu(dayMenu, menuDow);
+  loadSoup(dayMenu);
+}
+
+function loadJamaicanMenu(dayMenu, dow) {
+  const body = document.getElementById("jamaican-body");
+  body.innerHTML = "";
+
+  const mains = [];
+
+  if (dayMenu) {
+    // Wednesday anchor
+    if (dow === 3) mains.push({key:"stew-peas", name:"Stew Peas with Pigtail", desc:"Wednesday special — slow cooked red peas & pigtail", anchor:true});
+    // Thursday anchor
+    if (dow === 4) mains.push({key:"curry-goat", name:"Curry Goat", desc:"Thursday special — tender curried goat", anchor:true});
+    // Friday anchor
+    if (dow === 5) mains.push({key:"jerk-pork", name:"Jerk Pork", desc:"Friday special — authentic jerk pork", anchor:true});
+
+    // Rotating proteins
+    ["protein1","protein2","protein3"].forEach((k,i) => {
+      if (dayMenu[k] && dayMenu[k] !== "Stew Peas with Pigtail" && dayMenu[k] !== "Curry Goat" && dayMenu[k] !== "Jerk Pork") {
+        mains.push({key:"main-"+i, name:dayMenu[k], desc:"Served with your choice of rice & provisions", anchor:false});
+      }
+    });
+
+    // Veg main
+    if (dayMenu.veg) {
+      mains.push({key:"main-veg", name:dayMenu.veg, desc:"Vegetarian option", anchor:false});
+    }
+  } else {
+    // Default fallback
+    if (dow === 3) mains.push({key:"stew-peas", name:"Stew Peas with Pigtail", desc:"Wednesday special", anchor:true});
+    else if (dow === 4) mains.push({key:"curry-goat", name:"Curry Goat", desc:"Thursday special", anchor:true});
+    else if (dow === 5) mains.push({key:"jerk-pork", name:"Jerk Pork", desc:"Friday special", anchor:true});
+    else {
+      mains.push({key:"main-0", name:"Brown Stew Chicken", desc:"Served with rice & provisions", anchor:false});
+      mains.push({key:"main-1", name:"Stewed Beef", desc:"Served with rice & provisions", anchor:false});
+    }
+  }
+
+  if (mains.length === 0) {
+    body.innerHTML = `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px;">Menu coming soon — check back shortly.</div>`;
+    return;
+  }
+
+  mains.forEach(item => {
+    // Register in prices
+    PRICES[item.key] = {name: item.name, price: 1100};
+    const div = document.createElement("div");
+    div.className = "menu-item";
+    div.onclick = () => changeQty(item.key, 1);
+    div.innerHTML = `
+      <div class="item-qty">
+        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${item.key}',-1)">−</button>
+        <span class="qty-num" id="qty-${item.key}">0</span>
+        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${item.key}',1)">+</button>
+      </div>
+      <div class="item-info">
+        <div class="item-name">${item.name}${item.anchor ? '<span class="anchor-tag">⭐ Today\'s Special</span>' : ''}</div>
+        <div class="item-desc">${item.desc}</div>
+      </div>
+      <div class="item-price">J$1,100</div>`;
+    body.appendChild(div);
+  });
+}
+
+function loadSoup(dayMenu) {
+  const body = document.getElementById("soup-body");
+  body.innerHTML = "";
+  const soupName = (dayMenu && dayMenu.soup) ? dayMenu.soup : "Soup of the Day";
+  const vegSoupName = (dayMenu && dayMenu.vegsoup) ? dayMenu.vegsoup : "Vegetarian Soup";
+
+  PRICES["soup-regular"] = {name: soupName, price: 600};
+  PRICES["soup-veg"] = {name: vegSoupName, price: 600};
+
+  [[`soup-regular`, soupName], [`soup-veg`, vegSoupName]].forEach(([key, name]) => {
+    const div = document.createElement("div");
+    div.className = "menu-item";
+    div.onclick = () => changeQty(key, 1);
+    div.innerHTML = `
+      <div class="item-qty">
+        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${key}',-1)">−</button>
+        <span class="qty-num" id="qty-${key}">0</span>
+        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${key}',1)">+</button>
+      </div>
+      <div class="item-info"><div class="item-name">${name}</div></div>
+      <div class="item-price">J$600</div>`;
+    body.appendChild(div);
+  });
+}
+
+// ── CART ──
+function changeQty(key, delta) {
+  cart[key] = Math.max(0, (cart[key] || 0) + delta);
+  if (cart[key] === 0) delete cart[key];
+  const el = document.getElementById("qty-" + key);
+  if (el) el.textContent = cart[key] || 0;
+  updateBar();
+}
+
+function updateBar() {
+  let total = 0;
+  let count = 0;
+  Object.entries(cart).forEach(([key, qty]) => {
+    if (PRICES[key]) { total += PRICES[key].price * qty; count += qty; }
+  });
+  total += (orderType === "delivery") ? deliveryFee : 0;
+
+  document.getElementById("bar-total").textContent = "J$" + total.toLocaleString();
+  document.getElementById("bar-items").textContent = count === 0 ? "No items selected" : count + " item" + (count > 1 ? "s" : "");
+  document.getElementById("order-btn").disabled = count === 0;
+
+  updateSummary(total - (orderType === "delivery" ? deliveryFee : 0));
+}
+
+function updateSummary(subtotal) {
+  const card = document.getElementById("summary-card");
+  const lines = document.getElementById("summary-lines");
+  const totalEl = document.getElementById("summary-total");
+  const noteEl = document.getElementById("delivery-note");
+
+  if (Object.keys(cart).length === 0) { card.classList.remove("visible"); return; }
+  card.classList.add("visible");
+
+  lines.innerHTML = "";
+  Object.entries(cart).forEach(([key, qty]) => {
+    if (!PRICES[key] || qty === 0) return;
+    const line = document.createElement("div");
+    line.className = "summary-line";
+    line.innerHTML = `<span>${PRICES[key].name} × ${qty}</span><span>J$${(PRICES[key].price * qty).toLocaleString()}</span>`;
+    lines.appendChild(line);
+  });
+
+  if (orderType === "delivery" && deliveryFee > 0) {
+    const fee = document.createElement("div");
+    fee.className = "summary-line";
+    fee.innerHTML = `<span>Delivery fee</span><span>J$${deliveryFee.toLocaleString()}</span>`;
+    lines.appendChild(fee);
+  }
+
+  const grandTotal = subtotal + (orderType === "delivery" ? deliveryFee : 0);
+  totalEl.textContent = "J$" + grandTotal.toLocaleString();
+  noteEl.textContent = orderType === "pickup" ? "Pickup from Chongie's — 9 Bloomsbury Road, Kingston 10" : "";
+}
+
+function selectZone(el, fee) {
+  document.querySelectorAll(".zone-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  deliveryFee = fee;
+  updateBar();
+}
+
+function toggleDelivery() {
+  orderType = document.getElementById("order-type").value;
+  document.getElementById("delivery-section").style.display = orderType === "delivery" ? "block" : "none";
+  updateBar();
+}
+
+// ── PLACE ORDER ──
+function placeOrder() {
+  const name = document.getElementById("cust-name").value.trim();
+  const phone = document.getElementById("cust-phone").value.trim();
+  const notes = document.getElementById("cust-notes").value.trim();
+  const address = orderType === "delivery" ? document.getElementById("cust-address").value.trim() : "PICKUP";
+
+  if (!name) { alert("Please enter your name."); return; }
+  if (!phone) { alert("Please enter your phone number."); return; }
+  if (orderType === "delivery" && !address) { alert("Please enter your delivery address."); return; }
+
+  const now = getJamaicaNow();
+  const afterCutoff = now.getHours() >= 10;
+  const delivery = getDeliveryDate(now, afterCutoff);
+
+  let msg = `🍽️ *CHONGIE'S ORDER*\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+  msg += `👤 *Name:* ${name}\n`;
+  msg += `📞 *Phone:* ${phone}\n`;
+  msg += `📦 *Type:* ${orderType === "pickup" ? "Pickup" : "Delivery"}\n`;
+  if (orderType === "delivery") msg += `📍 *Address:* ${address}\n`;
+  msg += `🗓️ *For:* ${formatDate(delivery)}\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+  msg += `*ORDER ITEMS:*\n`;
+
+  let subtotal = 0;
+  Object.entries(cart).forEach(([key, qty]) => {
+    if (!PRICES[key] || qty === 0) return;
+    msg += `• ${PRICES[key].name} × ${qty} — J$${(PRICES[key].price * qty).toLocaleString()}\n`;
+    subtotal += PRICES[key].price * qty;
+  });
+
+  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+  if (orderType === "delivery" && deliveryFee > 0) msg += `🚚 Delivery Fee: J$${deliveryFee.toLocaleString()}\n`;
+  msg += `💰 *TOTAL: J$${(subtotal + (orderType === "delivery" ? deliveryFee : 0)).toLocaleString()}*\n`;
+  if (notes) msg += `📝 *Notes:* ${notes}\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+  msg += `_Sent from chongiesja.github.io_`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+
+  document.getElementById("app").style.display = "none";
+  document.getElementById("success-screen").style.display = "flex";
+}
+
+// ── START ──
+init();
+</script>
+</body>
+</html>
