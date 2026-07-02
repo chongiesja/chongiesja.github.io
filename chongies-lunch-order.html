@@ -10,98 +10,87 @@
 :root {
   --ink: #1a1208; --gold: #c8922a; --gold-lt: #f0d080;
   --cream: #fdf6e9; --warm: #f5ede0; --green: #2e4a2e;
-  --red: #b03a2e; --border: #e0d4be; --muted: #7a6a52;
-  --orange: #c85a1a; --radius: 10px;
+  --red: #b03a2e; --border: #e0d4be; --muted: #7a6a52; --radius: 10px;
+  --orange: #c85a1a;
 }
 body { font-family: "Inter", sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
 
-/* HEADER */
-header { background: var(--ink); padding: 0 20px; border-bottom: 3px solid var(--gold); position: sticky; top: 0; z-index: 100; }
-.header-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
-.brand { font-family: "Playfair Display", serif; color: var(--gold); font-size: 22px; font-weight: 900; letter-spacing: 0.02em; }
-.header-meta { text-align: right; }
-.header-meta .date { color: rgba(255,255,255,0.5); font-size: 11px; }
-.header-meta .cutoff { color: var(--gold-lt); font-size: 12px; font-weight: 600; }
+header { background: var(--ink); padding: 18px 20px 14px; text-align: center; border-bottom: 3px solid var(--gold); }
+.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.tagline { font-family: "Playfair Display", serif; font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 0.02em; margin-bottom: 4px; }
+.badge { display: inline-block; background: rgba(200,146,42,0.15); border: 1px solid rgba(200,146,42,0.4); color: var(--gold-lt); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 4px; }
 
-/* WEEKEND / CLOSED */
-#closed-screen { min-height: 100vh; background: var(--ink); display: none; align-items: center; justify-content: center; text-align: center; padding: 32px; }
+/* CLOSED SCREEN */
+#closed-screen { display: none; min-height: 100vh; background: var(--ink); align-items: center; justify-content: center; text-align: center; padding: 32px; }
 #closed-screen h2 { font-family: "Playfair Display", serif; color: var(--gold); font-size: 28px; margin-bottom: 12px; }
 #closed-screen p { color: rgba(255,255,255,0.5); font-size: 15px; }
 
-/* CUTOFF BANNER */
-.cutoff-banner { background: var(--orange); color: #fff; padding: 12px 20px; font-size: 13px; font-weight: 600; text-align: center; display: none; }
-.cutoff-banner.show { display: block; }
+.notice { background: var(--green); color: #fff; text-align: center; padding: 10px; font-size: 13px; font-weight: 600; }
+.cutoff-notice { background: var(--orange); color: #fff; text-align: center; padding: 10px; font-size: 13px; font-weight: 600; display: none; }
+.date-bar { text-align: center; padding: 10px; font-size: 13px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
 
-/* PAGE */
-.page { max-width: 680px; margin: 0 auto; padding: 24px 16px 120px; }
+main { max-width: 680px; margin: 0 auto; padding: 20px 16px 40px; }
 
-/* DELIVERY DAY BADGE */
-.delivery-badge { background: var(--ink); color: var(--gold-lt); border-radius: 8px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin: 20px 0 8px; }
+.card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
 
-/* SECTION LABEL */
-.section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; margin-top: 24px; }
-.section-title { font-family: "Playfair Display", serif; font-size: 20px; margin-bottom: 14px; }
+/* FORM */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.form-group input, .form-group select, .form-group textarea { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; color: var(--ink); background: var(--warm); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); background: #fff; }
+.form-group textarea { resize: vertical; min-height: 70px; }
 
-/* MENU CARDS */
-.menu-section { margin-bottom: 8px; }
-.menu-section-header { background: var(--ink); color: var(--gold-lt); padding: 10px 14px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
-.menu-section-body { border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; margin-bottom: 12px; }
+.transfer-note { background: #f0f7f0; border: 1px solid var(--green); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--ink); }
 
-.menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--cream); transition: background 0.15s; cursor: pointer; }
+/* MENU */
+.cat-title { font-family: "Playfair Display", serif; font-size: 16px; font-weight: 700; color: var(--ink); margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--gold); }
+.menu-item { padding: 12px 0; border-bottom: 1px dashed var(--border); }
 .menu-item:last-child { border-bottom: none; }
-.menu-item:hover { background: var(--warm); }
-.menu-item.selected { background: rgba(200,146,42,0.1); border-left: 3px solid var(--gold); }
-.item-qty { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--warm); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--ink); transition: all 0.15s; line-height: 1; }
-.qty-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
-.qty-num { font-size: 15px; font-weight: 700; min-width: 20px; text-align: center; }
+.menu-item-top { display: flex; align-items: flex-start; gap: 10px; }
 .item-info { flex: 1; }
-.item-name { font-size: 14px; font-weight: 600; color: var(--ink); }
-.item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.item-price { font-size: 14px; font-weight: 700; color: var(--ink); flex-shrink: 0; }
-.anchor-tag { font-size: 10px; background: var(--gold); color: var(--ink); padding: 2px 6px; border-radius: 10px; font-weight: 700; margin-left: 6px; }
-.unavailable { opacity: 0.4; pointer-events: none; }
+.item-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+.item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.item-price { font-size: 14px; font-weight: 700; color: var(--green); white-space: nowrap; min-width: 70px; text-align: right; }
+.qty-control { display: flex; align-items: center; gap: 8px; }
+.qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--warm); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.15s; }
+.qty-btn:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
+.qty-num { font-size: 15px; font-weight: 700; min-width: 20px; text-align: center; }
+.item-extras { display: none; margin-top: 10px; padding: 10px; background: var(--warm); border-radius: 8px; }
+.extras-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 8px 0 4px; }
+.extras-label:first-child { margin-top: 0; }
+.extra-option { display: block; font-size: 13px; color: var(--ink); margin-bottom: 4px; cursor: pointer; }
+.extra-option input { width: auto; margin-right: 6px; }
+.anchor-badge { display: inline-block; background: var(--gold); color: var(--ink); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
 
-/* CUSTOMER INFO */
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.field input, .field select, .field textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 14px; color: var(--ink); background: var(--warm); }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); background: #fff; }
-.field textarea { resize: vertical; min-height: 70px; }
-
-/* DELIVERY ZONES */
-.zone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-.zone-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; cursor: pointer; transition: all 0.15s; background: var(--warm); }
-.zone-card:hover { border-color: var(--gold); }
-.zone-card.selected { border-color: var(--gold); background: rgba(200,146,42,0.1); }
-.zone-card input { display: none; }
-.zone-name { font-size: 13px; font-weight: 600; }
-.zone-fee { font-size: 12px; color: var(--muted); }
-
-/* ORDER SUMMARY */
-#summary-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 20px; display: none; }
+/* SUMMARY */
+.summary-line { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding: 10px 0 0; margin-top: 6px; border-top: 2px solid var(--ink); }
+.fee-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+#summary-card { display: none; }
 #summary-card.visible { display: block; }
-.summary-line { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--border); }
-.summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding: 10px 0 0; border-top: 2px solid var(--ink); margin-top: 6px; }
+.empty-note { text-align: center; padding: 16px; font-size: 13px; color: var(--muted); font-style: italic; }
 
-/* STICKY ORDER BAR */
-.order-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--ink); border-top: 2px solid var(--gold); padding: 12px 20px; z-index: 100; }
-.order-bar-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.order-bar-info { color: rgba(255,255,255,0.7); font-size: 13px; }
-.order-bar-info strong { color: var(--gold-lt); font-size: 16px; display: block; }
-.btn-order { padding: 14px 28px; background: var(--green); color: #fff; border: none; border-radius: var(--radius); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.btn-order:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-order:not(:disabled):hover { background: #1a3a1a; }
+/* SUBMIT */
+.submit-btn { display: block; width: 100%; margin-top: 20px; padding: 18px; background: var(--green); color: #fff; font-family: "Inter", sans-serif; font-size: 17px; font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer; text-align: center; }
+.submit-btn:hover { background: #1a3a1a; }
+#wa-link-box { display: none; margin-top: 16px; padding: 16px; background: #f0f7f0; border: 2px solid var(--green); border-radius: 10px; text-align: center; }
+#wa-link-box p { font-size: 14px; color: var(--ink); margin-bottom: 12px; font-weight: 600; }
+#wa-link { display: block; padding: 14px; background: #25D366; color: #fff; font-size: 16px; font-weight: 700; border-radius: 10px; text-decoration: none; }
+#wa-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
 
-/* SUCCESS */
-#success-screen { display: none; min-height: 100vh; background: var(--cream); align-items: center; justify-content: center; padding: 24px; text-align: center; }
-.success-card { background: #fff; border-radius: 16px; padding: 40px 32px; max-width: 420px; border: 1px solid var(--border); }
+#success { display: none; text-align: center; padding: 40px 20px; }
+#success.visible { display: block; }
 .success-icon { font-size: 52px; margin-bottom: 16px; }
-.success-card h2 { font-family: "Playfair Display", serif; font-size: 26px; margin-bottom: 10px; }
-.success-card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
-.success-delivery { background: var(--warm); border-radius: var(--radius); padding: 14px; margin: 16px 0; font-size: 14px; font-weight: 600; }
+.success-title { font-family: "Playfair Display", serif; font-size: 26px; color: var(--green); margin-bottom: 10px; }
+.success-msg { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.success-msg a { color: var(--gold); }
 
-@media(max-width:480px) { .zone-grid { grid-template-columns: 1fr; } .order-bar-inner { flex-direction: column; } .btn-order { width: 100%; text-align: center; } }
+footer { text-align: center; padding: 18px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
+
+@media(max-width:480px) { .form-row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -117,555 +106,527 @@ header { background: var(--ink); padding: 0 20px; border-bottom: 3px solid var(-
 </div>
 
 <!-- MAIN APP -->
-<div id="app" style="display:none;">
+<div id="main-app">
   <header>
-    <div class="header-inner">
-      <div class="brand">Chongie's</div>
-      <div class="header-meta">
-        <div class="date" id="header-date"></div>
-        <div class="cutoff" id="header-cutoff">Order by 10:00 AM</div>
-      </div>
-    </div>
+    <div class="eyebrow">Mark Chong's Cooking Mastery</div>
+    <div class="tagline">Chongie's</div>
+    <div class="badge">📅 Orders: Monday – Friday</div>
   </header>
 
-  <div class="cutoff-banner" id="cutoff-banner">
-    ⏰ Today's orders are closed — you're now ordering for <span id="cutoff-next-day"></span>
-  </div>
+  <div class="notice" id="main-notice">⏰ Order by 10:00 AM for same-day delivery · Kingston</div>
+  <div class="cutoff-notice" id="cutoff-notice"></div>
+  <div class="date-bar">📋 <span id="menu-label">Today's Menu</span>: <span id="menu-date">—</span></div>
 
-  <div class="page">
+  <main>
+    <div id="order-form">
 
-    <div class="delivery-badge">
-      🚚 <span id="delivery-notice">Loading...</span>
-    </div>
-
-    <!-- DAILY STAPLES -->
-    <div class="section-label">Always Available</div>
-    <div class="section-title" id="menu-title">Today's Menu</div>
-
-    <!-- NOODLE BOWLS -->
-    <div class="menu-section" id="section-noodles">
-      <div class="menu-section-header">🍜 Asian Noodle Bowls <span>J$1,200</span></div>
-      <div class="menu-section-body" id="noodles-body">
-        <div class="menu-item" onclick="changeQty('noodle-chicken',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-chicken',-1)">−</button><span class="qty-num" id="qty-noodle-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-chicken',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Chicken Noodle Bowl</div><div class="item-desc">Wok-tossed noodles, vegetables & sauce</div></div>
-          <div class="item-price">J$1,200</div>
+      <div class="section-label">Your Details</div>
+      <div class="card">
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="fname" placeholder="e.g. Keisha"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="lname" placeholder="e.g. Brown"></div>
+          <div class="form-group"><label>WhatsApp / Phone</label><input type="tel" id="phone" placeholder="876-XXX-XXXX"></div>
+          <div class="form-group">
+            <label>Preferred Delivery Time</label>
+            <select id="delivery-time">
+              <option value="">Select time slot...</option>
+              <option value="11:30 AM – 12:00 PM">11:30 AM – 12:00 PM</option>
+              <option value="12:00 PM – 12:30 PM">12:00 PM – 12:30 PM</option>
+              <option value="12:30 PM – 1:00 PM">12:30 PM – 1:00 PM</option>
+              <option value="1:00 PM – 1:30 PM">1:00 PM – 1:30 PM</option>
+            </select>
+          </div>
+          <div class="form-group full" id="address-group">
+            <label>Delivery Address <span style="color:var(--muted);font-weight:400;">(required for delivery)</span></label>
+            <input type="text" id="address" placeholder="Street, Community, Parish">
+          </div>
+          <div class="form-group full">
+            <label>Payment Method</label>
+            <select id="payment">
+              <option value="" disabled selected>Select how you'll pay…</option>
+              <option value="Cash on Delivery">💵 Cash on Delivery</option>
+              <option value="Card on Delivery">💳 Card on Delivery</option>
+              <option value="Bank Transfer">🏦 Bank Transfer</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Order Type</label>
+            <select id="order-type" onchange="updateSummary()">
+              <option value="" disabled selected>Select order type…</option>
+              <option value="Delivery">🚗 Delivery</option>
+              <option value="Pick Up">🏃 Pick Up (free)</option>
+              <option value="Dine In">🍽️ Dine In (free)</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Delivery Zone</label>
+            <select id="delivery-zone" onchange="updateSummary()">
+              <option value="0">Zone 1 — Kingston 10 (Free)</option>
+              <option value="300">Zone 2 — Kingston 6/8 (J$300)</option>
+              <option value="500">Zone 3 — New Kingston (J$500)</option>
+              <option value="800">Zone 4 — Other Areas (J$800)</option>
+            </select>
+          </div>
+          <div class="form-group full" id="transfer-box" style="display:none;">
+            <div class="transfer-note">
+              <strong style="color:var(--green);">Bank Transfer Instructions</strong><br>
+              Please send your transfer receipt to <strong>876-894-7767</strong> on WhatsApp to confirm your order.
+            </div>
+          </div>
+          <div class="form-group full"><label>Special Instructions (optional)</label><textarea id="notes" placeholder="e.g. No pepper, extra gravy, leave at gate…"></textarea></div>
         </div>
-        <div class="menu-item" onclick="changeQty('noodle-pork',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-pork',-1)">−</button><span class="qty-num" id="qty-noodle-pork">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-pork',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Pork Noodle Bowl</div><div class="item-desc">Wok-tossed noodles, vegetables & sauce</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('noodle-veg',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-veg',-1)">−</button><span class="qty-num" id="qty-noodle-veg">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('noodle-veg',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Vegetarian Noodle Bowl</div><div class="item-desc">Wok-tossed noodles, fresh vegetables & sauce</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
+      </div>
+
+      <div class="section-label">Choose Your Meals</div>
+      <div class="card" id="menu-container"><div class="empty-note">Loading menu…</div></div>
+
+      <div class="section-label">Order Summary</div>
+      <div class="card" id="summary-card">
+        <div id="summary-lines"></div>
+        <div class="summary-total"><span>Total</span><span id="total-amt"></span></div>
+        <p class="fee-note">* Delivery fee based on your selected zone.</p>
+      </div>
+      <div class="empty-note" id="empty-note">Add items above to see your order summary.</div>
+
+      <button class="submit-btn" id="submit-btn">Place Order via WhatsApp 📲</button>
+      <div id="wa-link-box">
+        <p>✅ Order ready! Tap below to send via WhatsApp:</p>
+        <a id="wa-link" href="#">📲 Send Order on WhatsApp</a>
+        <p id="wa-note">Tap the green button above to open WhatsApp and send your order.</p>
       </div>
     </div>
 
-    <!-- WINGS -->
-    <div class="menu-section" id="section-wings">
-      <div class="menu-section-header">🍗 Chicken Wings <span>6 pcs + Wedges — J$1,200</span></div>
-      <div class="menu-section-body" id="wings-body">
-        <div class="menu-item" onclick="changeQty('wings-jerk',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-jerk',-1)">−</button><span class="qty-num" id="qty-wings-jerk">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-jerk',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Jerk Wings</div><div class="item-desc">6 pcs jerk-seasoned wings with seasoned wedges</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('wings-bbq',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-bbq',-1)">−</button><span class="qty-num" id="qty-wings-bbq">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-bbq',1)">+</button></div>
-          <div class="item-info"><div class="item-name">BBQ Wings</div><div class="item-desc">6 pcs BBQ glazed wings with seasoned wedges</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('wings-buffalo',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-buffalo',-1)">−</button><span class="qty-num" id="qty-wings-buffalo">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-buffalo',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Buffalo Wings</div><div class="item-desc">6 pcs buffalo sauce wings with seasoned wedges</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('wings-lemon',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-lemon',-1)">−</button><span class="qty-num" id="qty-wings-lemon">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wings-lemon',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Lemon Pepper Wings</div><div class="item-desc">6 pcs lemon pepper wings with seasoned wedges</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-      </div>
+    <div id="success">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Order Sent!</div>
+      <p class="success-msg">
+        Your order has been sent to Chongie's via WhatsApp.<br>
+        <strong>Please press Send in WhatsApp to complete your order!</strong><br><br>
+        Questions? <a href="tel:8768947767">876-894-7767</a>
+      </p>
     </div>
+  </main>
 
-    <!-- WRAPS -->
-    <div class="menu-section" id="section-wraps">
-      <div class="menu-section-header">🌯 Wraps</div>
-      <div class="menu-section-body" id="wraps-body">
-        <div class="menu-item" onclick="changeQty('wrap-chicken',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-chicken',-1)">−</button><span class="qty-num" id="qty-wrap-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-chicken',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Chicken Wrap</div><div class="item-desc">Grilled chicken, fresh veggies & sauce</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('wrap-pork',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-pork',-1)">−</button><span class="qty-num" id="qty-wrap-pork">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-pork',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Pork Wrap</div><div class="item-desc">Seasoned pork, fresh veggies & sauce</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('wrap-veg',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-veg',-1)">−</button><span class="qty-num" id="qty-wrap-veg">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('wrap-veg',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Vegetarian Wrap</div><div class="item-desc">Fresh vegetables, cheese & sauce</div></div>
-          <div class="item-price">J$1,000</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ALFREDO PASTA -->
-    <div class="menu-section" id="section-pasta">
-      <div class="menu-section-header">🍝 Alfredo Pasta <span>J$1,200</span></div>
-      <div class="menu-section-body" id="pasta-body">
-        <div class="menu-item" onclick="changeQty('pasta-chicken',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-chicken',-1)">−</button><span class="qty-num" id="qty-pasta-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-chicken',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Chicken Alfredo</div><div class="item-desc">Creamy alfredo pasta with grilled chicken</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('pasta-veg',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-veg',-1)">−</button><span class="qty-num" id="qty-pasta-veg">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('pasta-veg',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Vegetarian Alfredo</div><div class="item-desc">Creamy alfredo pasta with fresh vegetables</div></div>
-          <div class="item-price">J$1,200</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SALADS -->
-    <div class="menu-section" id="section-salads">
-      <div class="menu-section-header">🥗 Salads <span>J$1,350</span></div>
-      <div class="menu-section-body" id="salads-body">
-        <div class="menu-item" onclick="changeQty('salad-chicken',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-chicken',-1)">−</button><span class="qty-num" id="qty-salad-chicken">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-chicken',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Chicken Salad</div><div class="item-desc">Grilled chicken over fresh garden salad</div></div>
-          <div class="item-price">J$1,350</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('salad-garden',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-garden',-1)">−</button><span class="qty-num" id="qty-salad-garden">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-garden',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Garden Salad</div><div class="item-desc">Fresh seasonal vegetables & dressing</div></div>
-          <div class="item-price">J$1,350</div>
-        </div>
-        <div class="menu-item" onclick="changeQty('salad-fish',1)">
-          <div class="item-qty"><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-fish',-1)">−</button><span class="qty-num" id="qty-salad-fish">0</span><button class="qty-btn" onclick="event.stopPropagation();changeQty('salad-fish',1)">+</button></div>
-          <div class="item-info"><div class="item-name">Fish Salad</div><div class="item-desc">Seasoned fish over fresh garden salad</div></div>
-          <div class="item-price">J$1,350</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- JAMAICAN DAILY MAINS (from admin) -->
-    <div class="section-label" style="margin-top:28px;">Today's Jamaican Selection</div>
-    <div class="menu-section" id="section-jamaican">
-      <div class="menu-section-header">🇯🇲 Jamaican Mains <span>J$1,100</span></div>
-      <div class="menu-section-body" id="jamaican-body">
-        <!-- Populated by JS from admin menu -->
-      </div>
-    </div>
-
-    <!-- SOUP -->
-    <div class="menu-section" id="section-soup">
-      <div class="menu-section-header">🍲 Soup of the Day <span>J$600</span></div>
-      <div class="menu-section-body" id="soup-body">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-
-    <!-- CUSTOMER DETAILS -->
-    <div class="section-label" style="margin-top:28px;">Your Details</div>
-    <div class="field"><label>Your Name</label><input type="text" id="cust-name" placeholder="First & last name"></div>
-    <div class="field"><label>Phone Number</label><input type="tel" id="cust-phone" placeholder="876-XXX-XXXX"></div>
-
-    <!-- DELIVERY / PICKUP -->
-    <div class="field">
-      <label>Order Type</label>
-      <select id="order-type" onchange="toggleDelivery()">
-        <option value="delivery">Delivery</option>
-        <option value="pickup">Pickup</option>
-      </select>
-    </div>
-
-    <div id="delivery-section">
-      <div class="field"><label>Delivery Address</label><input type="text" id="cust-address" placeholder="Street address, area"></div>
-      <div class="section-label">Delivery Zone</div>
-      <div class="zone-grid" id="zone-grid">
-        <label class="zone-card selected" onclick="selectZone(this, 0)"><input type="radio" name="zone" checked><div class="zone-name">Zone 1 — Kingston 10</div><div class="zone-fee">Free delivery</div></label>
-        <label class="zone-card" onclick="selectZone(this, 300)"><input type="radio" name="zone"><div class="zone-name">Zone 2 — Kingston 6/8</div><div class="zone-fee">J$300 delivery fee</div></label>
-        <label class="zone-card" onclick="selectZone(this, 500)"><input type="radio" name="zone"><div class="zone-name">Zone 3 — New Kingston</div><div class="zone-fee">J$500 delivery fee</div></label>
-        <label class="zone-card" onclick="selectZone(this, 800)"><input type="radio" name="zone"><div class="zone-name">Zone 4 — Other Areas</div><div class="zone-fee">J$800 delivery fee</div></label>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Special Instructions (optional)</label>
-      <textarea id="cust-notes" placeholder="Allergies, special requests..."></textarea>
-    </div>
-
-    <!-- ORDER SUMMARY -->
-    <div id="summary-card">
-      <div style="font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Order Summary</div>
-      <div id="summary-lines"></div>
-      <div class="summary-total"><span>Total</span><span id="summary-total">J$0</span></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px;" id="delivery-note"></div>
-    </div>
-
-  </div><!-- /page -->
-
-  <!-- STICKY ORDER BAR -->
-  <div class="order-bar">
-    <div class="order-bar-inner">
-      <div class="order-bar-info">
-        <strong id="bar-total">J$0</strong>
-        <span id="bar-items">No items selected</span>
-      </div>
-      <button class="btn-order" id="order-btn" onclick="placeOrder()" disabled>Order via WhatsApp →</button>
-    </div>
-  </div>
-</div>
-
-<!-- SUCCESS -->
-<div id="success-screen">
-  <div class="success-card">
-    <div class="success-icon">✅</div>
-    <h2>Order Sent!</h2>
-    <p>Your order has been sent to Chongie's via WhatsApp. We'll confirm shortly.</p>
-    <div class="success-delivery" id="success-delivery">Delivery: Tomorrow</div>
-    <p style="font-size:12px;color:var(--muted);">Questions? Call 876-818-7335</p>
-  </div>
+  <footer>Chongie's by <strong>Mark Chong's Cooking Mastery</strong> · 9 Bloomsbury Road, Kingston 10 · <a href="tel:8768947767" style="color:var(--gold);">876-894-7767</a></footer>
 </div>
 
 <script>
-const MENU_KEY = "jse_weekly_menu"; // shared with admin panel
+const MENU_KEY = "jse_weekly_menu";
 const STAPLES_KEY = "jse_staples";
-const WHATSAPP_NUMBER = "18768947767";
+const DAY_KEYS = ["sun","mon","tue","wed","thu","fri","sat"];
 
-// ── PRICING ──
-const PRICES = {
-  "noodle-chicken": {name:"Chicken Noodle Bowl", price:1200},
-  "noodle-pork":    {name:"Pork Noodle Bowl", price:1200},
-  "noodle-veg":     {name:"Vegetarian Noodle Bowl", price:1200},
-  "wings-jerk":     {name:"Jerk Wings (6pcs + Wedges)", price:1200},
-  "wings-bbq":      {name:"BBQ Wings (6pcs + Wedges)", price:1200},
-  "wings-buffalo":  {name:"Buffalo Wings (6pcs + Wedges)", price:1200},
-  "wings-lemon":    {name:"Lemon Pepper Wings (6pcs + Wedges)", price:1200},
-  "wrap-chicken":   {name:"Chicken Wrap", price:1200},
-  "wrap-pork":      {name:"Pork Wrap", price:1200},
-  "wrap-veg":       {name:"Vegetarian Wrap", price:1000},
-  "pasta-chicken":  {name:"Chicken Alfredo", price:1200},
-  "pasta-veg":      {name:"Vegetarian Alfredo", price:1200},
-  "salad-chicken":  {name:"Chicken Salad", price:1350},
-  "salad-garden":   {name:"Garden Salad", price:1350},
-  "salad-fish":     {name:"Fish Salad", price:1350},
-};
-
-let cart = {};
-let deliveryFee = 0;
-let orderType = "delivery";
+var quantities = {};
 
 // ── DATE HELPERS ──
 function getJamaicaNow() {
   return new Date(new Date().toLocaleString("en-US", {timeZone:"America/Jamaica"}));
 }
 function formatDate(d) {
-  return d.toLocaleDateString("en-JM", {weekday:"long", month:"long", day:"numeric"});
+  return d.toLocaleDateString("en-JM", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
 }
 function getDeliveryDate(now, afterCutoff) {
-  const d = new Date(now);
-  const dow = d.getDay();
-  if (!afterCutoff) {
-    // Before 10am — deliver today
-    return d;
+  var d = new Date(now);
+  var dow = d.getDay();
+  if (afterCutoff) {
+    var add = 1;
+    if (dow === 5) add = 3; // Fri → Mon
+    d.setDate(d.getDate() + add);
   }
-  // After 10am — next working day
-  let add = 1;
-  if (dow === 5) add = 3; // Fri → Mon
-  if (dow === 4) add = 1; // Thu → Fri
-  d.setDate(d.getDate() + add);
   return d;
 }
-function getMenuDay(now, afterCutoff) {
-  // Which day's menu to show
-  const d = new Date(now);
-  const dow = d.getDay();
-  if (!afterCutoff) return dow; // today
-  // After cutoff — show next working day
-  let add = 1;
-  if (dow === 5) add = 3;
-  const next = new Date(d);
-  next.setDate(d.getDate() + add);
-  return next.getDay();
+function getMenuDow(now, afterCutoff) {
+  if (!afterCutoff) return now.getDay();
+  var d = new Date(now);
+  var dow = d.getDay();
+  var add = dow === 5 ? 3 : 1;
+  d.setDate(d.getDate() + add);
+  return d.getDay();
 }
 
-// ── WEEKLY MENU ──
+// ── MENU DATA ──
 function getWeeklyMenu() {
   try { return JSON.parse(localStorage.getItem(MENU_KEY)) || {}; } catch(e) { return {}; }
 }
 function getStaples() {
-  try {
-    const s = JSON.parse(localStorage.getItem(STAPLES_KEY));
-    if (s) return s;
-  } catch(e) {}
-  const def = {};
-  ["noodles","wings","pasta","salads","wraps"].forEach(k => def[k] = true);
-  return def;
+  try { var s = JSON.parse(localStorage.getItem(STAPLES_KEY)); if(s) return s; } catch(e) {}
+  return {noodles:true, wings:true, wraps:true, pasta:true, salads:true};
 }
 
-const DAY_KEYS = ["sun","mon","tue","wed","thu","fri","sat"];
+// ── FIXED MENU ITEMS ──
+function buildStaticMenu(staples, dayMenu, menuDow) {
+  var cats = [];
+
+  // ── JAMAICAN DAILY MAINS ──
+  var jamItems = [];
+  // Anchors
+  if (menuDow === 3) jamItems.push({id:"anchor-wed", name:"Stew Peas with Pigtail", desc:"Wednesday special — slow-cooked red peas & pigtail", price:1100, anchor:true});
+  if (menuDow === 4) jamItems.push({id:"anchor-thu", name:"Curry Goat", desc:"Thursday special — tender curried goat", price:1100, anchor:true});
+  if (menuDow === 5) jamItems.push({id:"anchor-fri", name:"Jerk Pork", desc:"Friday special — authentic jerk pork", price:1100, anchor:true});
+  // Rotating
+  if (dayMenu) {
+    ["protein1","protein2","protein3"].forEach(function(k, i) {
+      var v = dayMenu[k];
+      if (v && v !== "Stew Peas with Pigtail" && v !== "Curry Goat" && v !== "Jerk Pork") {
+        jamItems.push({id:"jm-"+i, name:v, desc:"Served with your choice of rice & provisions", price:1100});
+      }
+    });
+    if (dayMenu.veg) jamItems.push({id:"jm-veg", name:dayMenu.veg, desc:"Vegetarian option — served with rice & provisions", price:1100});
+  } else {
+    jamItems.push({id:"jm-0", name:"Brown Stew Chicken", desc:"Slow-cooked with herbs & Scotch bonnet", price:1100});
+    jamItems.push({id:"jm-1", name:"Stewed Beef", desc:"Tender stewed beef", price:1100});
+  }
+  if (jamItems.length) cats.push({category:"🇯🇲 Jamaican Daily Mains", items: jamItems.map(function(i) { return Object.assign({on:true}, i); })});
+
+  // ── SOUP ──
+  var soupItems = [];
+  var soupName = (dayMenu && dayMenu.soup) ? dayMenu.soup : "Soup of the Day";
+  var vegSoup = (dayMenu && dayMenu.vegsoup) ? dayMenu.vegsoup : "Vegetarian Soup";
+  soupItems.push({id:"soup-reg", name:soupName, desc:"Freshly made daily — 32 oz", price:600, on:true});
+  soupItems.push({id:"soup-veg", name:vegSoup, desc:"Vegetarian — 32 oz", price:600, on:true});
+  cats.push({category:"🍲 Soups", items:soupItems});
+
+  // ── NOODLE BOWLS ──
+  if (staples.noodles) {
+    cats.push({category:"🍜 Chongie's Noodle Bowls", items:[
+      {id:"nb1", name:"Teriyaki Chicken Noodle Bowl", desc:"Grilled chicken, ramen noodles, teriyaki glaze, shredded cabbage, sesame seeds, scallions. Served with steamed veggies.", price:1200, on:true, hasBase:true},
+      {id:"nb2", name:"Coconut Curry Chicken Noodle", desc:"Chicken in coconut-ginger curry broth, rice noodles, pak choi. Served with steamed veggies.", price:1200, on:true, hasBase:true},
+      {id:"nb3", name:"Cold Sesame Chicken Noodle", desc:"Chilled egg noodles, shredded poached chicken, sesame-peanut-soy dressing, cucumber, chili oil.", price:1200, on:true, hasBase:true},
+      {id:"nb4", name:"Sweet Chili Fish Noodle Bowl", desc:"Pan-seared fish fillet, vermicelli noodles, sweet chili glaze, pickled cucumber, fresh herbs.", price:1350, on:true, hasBase:true},
+      {id:"nb5", name:"Miso Ginger Fish & Soba", desc:"Miso-ginger marinated fish, soba noodles, light ginger broth, scallions.", price:1350, on:true, hasBase:true},
+      {id:"nb6", name:"Asian Fish Stir-Fry Noodle Box", desc:"Fish fillet wok-tossed in oyster sauce, garlic, bell peppers, lo mein noodles.", price:1350, on:true, hasBase:true},
+      {id:"nb7", name:"Coconut Curry Shrimp Noodle", desc:"Shrimp in coconut-ginger curry broth, rice noodles, pak choi.", price:1800, on:true, hasBase:true},
+      {id:"nb8", name:"Garlic Butter Shrimp Noodle", desc:"Jumbo shrimp in rich garlic butter sauce, egg noodles, fresh herbs, lemon.", price:1800, on:true, hasBase:true},
+    ]});
+  }
+
+  // ── WINGS ──
+  if (staples.wings) {
+    cats.push({category:"🍗 Wings (6 pcs + Wedges)", items:[
+      {id:"w1", name:"Jerk Wings", desc:"Crispy wings tossed in smoky jerk sauce, served with seasoned wedges", price:1200, on:true, hasSide:true},
+      {id:"w2", name:"BBQ Wings", desc:"Golden wings glazed in BBQ sauce, served with seasoned wedges", price:1200, on:true, hasSide:true},
+      {id:"w3", name:"Buffalo Wings", desc:"Classic hot buffalo sauce wings, served with seasoned wedges", price:1200, on:true, hasSide:true},
+      {id:"w4", name:"Lemon Pepper Wings", desc:"Seasoned wings tossed in zesty lemon pepper butter, served with seasoned wedges", price:1200, on:true, hasSide:true},
+      {id:"w5", name:"Honey Garlic Wings", desc:"Golden wings glazed in sweet honey garlic sauce", price:1200, on:true, hasSide:true},
+      {id:"w6", name:"Sweet Chili Wings", desc:"Crispy wings coated in Asian-style sweet chili sauce, sesame seeds, scallions", price:1200, on:true, hasSide:true},
+      {id:"w7", name:"Teriyaki Wings", desc:"Wings glazed in teriyaki sauce", price:1200, on:true, hasSide:true},
+    ]});
+  }
+
+  // ── ALFREDO PASTA ──
+  if (staples.pasta) {
+    cats.push({category:"🍝 Alfredo Pasta", items:[
+      {id:"pa1", name:"Chicken Alfredo", desc:"Creamy alfredo pasta with grilled chicken", price:1200, on:true},
+      {id:"pa2", name:"Vegetarian Alfredo", desc:"Creamy alfredo pasta with fresh vegetables", price:1200, on:true},
+    ]});
+  }
+
+  // ── SALADS ──
+  if (staples.salads) {
+    cats.push({category:"🥗 Salads", items:[
+      {id:"sa1", name:"Chicken Salad", desc:"Grilled chicken over fresh garden salad", price:1350, on:true},
+      {id:"sa2", name:"Garden Salad", desc:"Fresh seasonal vegetables & dressing", price:1350, on:true},
+      {id:"sa3", name:"Fish Salad", desc:"Seasoned fish over fresh garden salad", price:1350, on:true},
+    ]});
+  }
+
+  // ── WRAPS ──
+  if (staples.wraps) {
+    cats.push({category:"🌯 Wraps", items:[
+      {id:"wr1", name:"Build Your Own Wrap", desc:"Choose wrap type, protein, fillings and sauce — flat price", price:1200, on:true, isWrap:true},
+      {id:"wr2", name:"Vegetarian Wrap", desc:"Fresh vegetables, cheese & sauce in your choice of wrap", price:1000, on:true},
+    ]});
+  }
+
+  // ── SIDES & EXTRAS ──
+  cats.push({category:"🍌 Sides & Extras", items:[
+    {id:"s1", name:"Festival", desc:"Sweet fried dumplings", price:200, on:true},
+    {id:"s2", name:"Fried Plantain", desc:"Ripe, golden-fried", price:200, on:true},
+    {id:"s3", name:"Steamed Vegetables", desc:"Seasoned medley", price:300, on:true},
+    {id:"s4", name:"Extra Rice & Peas", desc:"Full portion", price:400, on:true},
+    {id:"s5", name:"Bammy", desc:"Traditional cassava flatbread", price:250, on:true},
+  ]});
+
+  // ── MCCM JUICES ──
+  cats.push({category:"🍹 MCCM Juices — 100% Natural", items:[
+    {id:"j1", name:"Mango Juice", desc:"100% natural MCCM juice", price:500, on:true},
+    {id:"j2", name:"June Plum Juice", desc:"100% natural MCCM juice", price:500, on:true},
+    {id:"j3", name:"Lemonade", desc:"100% natural MCCM juice", price:500, on:true},
+    {id:"j4", name:"Beet Root Juice", desc:"100% natural MCCM juice", price:500, on:true},
+    {id:"j5", name:"Carrot Juice", desc:"100% natural MCCM juice", price:500, on:true},
+    {id:"j6", name:"Bottled Water", desc:"500ml", price:150, on:true},
+  ]});
+
+  // ── FRIDAY SPECIALS ──
+  if (menuDow === 5) {
+    cats.push({category:"🎉 Friday Take Home Specials", items:[
+      {id:"fs1", name:"Seafood Boil (2 lbs)", desc:"Fresh seafood boil — ask us what's in the pot today!", price:4000, on:true},
+      {id:"fs2", name:"Ribs, Potato, Corn & Coleslaw Platter", desc:"Slow-cooked ribs with potato, corn and house coleslaw", price:5000, on:true},
+      {id:"fs3", name:"Garlic Crab Platter (2 lbs)", desc:"Fresh crab in rich garlic butter sauce", price:3000, on:true},
+      {id:"fs4", name:"Escallion Ginger Crab (2 lbs)", desc:"Fresh crab in fragrant escallion and ginger sauce", price:3000, on:true},
+    ]});
+  }
+
+  return cats;
+}
+
+// ── BUILD MENU ──
+var MENU = [];
+function buildMenu(cats) {
+  MENU = cats;
+  var container = document.getElementById("menu-container");
+  container.innerHTML = "";
+
+  cats.forEach(function(cat) {
+    var activeItems = cat.items.filter(function(i) { return i.on !== false; });
+    if (!activeItems.length) return;
+    var catDiv = document.createElement("div");
+    catDiv.innerHTML = "<div class='cat-title'>" + cat.category + "</div>";
+
+    activeItems.forEach(function(item) {
+      quantities[item.id] = 0;
+
+      var extrasHtml = "";
+      if (item.hasBase) {
+        extrasHtml = "<div class='item-extras' id='extras-" + item.id + "'>" +
+          "<div class='extras-label'>Choose base:</div>" +
+          "<label class='extra-option'><input type='radio' name='base-" + item.id + "' value='Noodles' checked> Noodles (included)</label>" +
+          "<label class='extra-option'><input type='radio' name='base-" + item.id + "' value='Mashed Potatoes'> Mashed Potatoes (+J$200)</label>" +
+          "</div>";
+      } else if (item.hasSide) {
+        extrasHtml = "<div class='item-extras' id='extras-" + item.id + "'>" +
+          "<div class='extras-label'>Choose your side:</div>" +
+          "<label class='extra-option'><input type='radio' name='side-" + item.id + "' value='Wedges' checked> Wedges</label>" +
+          "<label class='extra-option'><input type='radio' name='side-" + item.id + "' value='Rice'> Rice</label>" +
+          "<label class='extra-option'><input type='radio' name='side-" + item.id + "' value='Noodles'> Noodles</label>" +
+          "</div>";
+      } else if (item.isWrap) {
+        var fillings = ["Lettuce","Carrots","Black Olives","Sweet Peppers","Cucumber","Red Onion","Tomato","Corn","Shredded Cabbage","Jalapeños"];
+        var fillHtml = fillings.map(function(f) {
+          return "<label class='extra-option'><input type='checkbox' class='wrap-fill-" + item.id + "' value='" + f + "'> " + f + "</label>";
+        }).join("");
+        extrasHtml = "<div class='item-extras' id='extras-" + item.id + "'>" +
+          "<div class='extras-label'>Wrap type:</div>" +
+          "<label class='extra-option'><input type='radio' name='wtype-" + item.id + "' value='White' checked> White</label>" +
+          "<label class='extra-option'><input type='radio' name='wtype-" + item.id + "' value='Wheat'> Wheat</label>" +
+          "<div class='extras-label'>Protein (pick 1):</div>" +
+          "<label class='extra-option'><input type='checkbox' class='wrap-prot-" + item.id + "' value='Fish'> Fish</label>" +
+          "<label class='extra-option'><input type='checkbox' class='wrap-prot-" + item.id + "' value='Chicken'> Chicken</label>" +
+          "<label class='extra-option'><input type='checkbox' class='wrap-prot-" + item.id + "' value='Beef Pastrami'> Beef Pastrami</label>" +
+          "<div class='extras-label'>Fillings (up to 4):</div>" + fillHtml +
+          "<div class='extras-label'>Sauce:</div>" +
+          "<label class='extra-option'><input type='radio' name='wsauce-" + item.id + "' value='Honey Mustard' checked> Honey Mustard</label>" +
+          "<label class='extra-option'><input type='radio' name='wsauce-" + item.id + "' value='Garlic Aioli'> Garlic Aioli</label>" +
+          "<label class='extra-option'><input type='radio' name='wsauce-" + item.id + "' value='Sweet Chili'> Sweet Chili</label>" +
+          "</div>";
+      }
+
+      var anchorBadge = item.anchor ? "<span class='anchor-badge'>⭐ Today's Special</span>" : "";
+      var row = document.createElement("div");
+      row.className = "menu-item";
+      row.innerHTML = "<div class='menu-item-top'>" +
+        "<div class='item-info'><div class='item-name'>" + item.name + anchorBadge + "</div><div class='item-desc'>" + item.desc + "</div></div>" +
+        "<div class='item-price'>J$" + item.price.toLocaleString() + "</div>" +
+        "<div class='qty-control'>" +
+        "<button class='qty-btn' data-id='" + item.id + "' data-delta='-1'>−</button>" +
+        "<div class='qty-num' id='qty-" + item.id + "'>0</div>" +
+        "<button class='qty-btn' data-id='" + item.id + "' data-delta='1'>+</button>" +
+        "</div></div>" + extrasHtml;
+      catDiv.appendChild(row);
+    });
+    container.appendChild(catDiv);
+  });
+
+  // Wrap filling limit
+  document.querySelectorAll("[class^='wrap-fill-']").forEach(function(cb) {
+    cb.addEventListener("change", function() {
+      var all = document.querySelectorAll("." + this.className);
+      var checked = Array.from(all).filter(function(c) { return c.checked; });
+      if (checked.length > 4) this.checked = false;
+    });
+  });
+  document.querySelectorAll("[class^='wrap-prot-']").forEach(function(cb) {
+    cb.addEventListener("change", function() {
+      var self = this;
+      document.querySelectorAll("." + this.className).forEach(function(c) { c.checked = false; });
+      self.checked = true;
+    });
+  });
+}
+
+// ── QTY ──
+function changeQty(id, delta) {
+  quantities[id] = Math.max(0, (quantities[id] || 0) + delta);
+  document.getElementById("qty-" + id).textContent = quantities[id];
+  var extEl = document.getElementById("extras-" + id);
+  if (extEl) extEl.style.display = quantities[id] > 0 ? "block" : "none";
+  updateSummary();
+}
+
+// ── EXTRAS ──
+function getExtras(item) {
+  var e = {};
+  if (item.hasBase) {
+    var sel = document.querySelector("input[name='base-" + item.id + "']:checked");
+    e.base = sel ? sel.value : "Noodles";
+    if (e.base === "Mashed Potatoes") e.extraCharge = 200;
+  }
+  if (item.hasSide) {
+    var sel = document.querySelector("input[name='side-" + item.id + "']:checked");
+    e.side = sel ? sel.value : "Wedges";
+  }
+  if (item.isWrap) {
+    var wt = document.querySelector("input[name='wtype-" + item.id + "']:checked");
+    e.wrapType = wt ? wt.value : "White";
+    var prots = Array.from(document.querySelectorAll(".wrap-prot-" + item.id + ":checked")).map(function(c) { return c.value; });
+    e.protein = prots.length ? prots[0] : "No protein";
+    var fills = Array.from(document.querySelectorAll(".wrap-fill-" + item.id + ":checked")).map(function(c) { return c.value; });
+    e.fillings = fills.length ? fills.join(", ") : "No fillings";
+    var sauce = document.querySelector("input[name='wsauce-" + item.id + "']:checked");
+    e.sauce = sauce ? sauce.value : "Honey Mustard";
+  }
+  return e;
+}
+
+function getOrdered() {
+  var items = [];
+  MENU.forEach(function(cat) {
+    cat.items.forEach(function(item) {
+      if (quantities[item.id] > 0) {
+        var extras = getExtras(item);
+        items.push(Object.assign({}, item, {qty: quantities[item.id], extras: extras, totalPrice: item.price + (extras.extraCharge || 0)}));
+      }
+    });
+  });
+  return items;
+}
+
+function updateSummary() {
+  var ordered = getOrdered();
+  var card = document.getElementById("summary-card");
+  var empty = document.getElementById("empty-note");
+  if (!ordered.length) { card.classList.remove("visible"); empty.style.display = "block"; return; }
+  card.classList.add("visible"); empty.style.display = "none";
+
+  var total = 0;
+  var lines = ordered.map(function(item) {
+    var sub = item.totalPrice * item.qty; total += sub;
+    var extra = item.extras.base ? " · " + item.extras.base : item.extras.side ? " · " + item.extras.side : "";
+    return "<div class='summary-line'><span>" + item.name + extra + " × " + item.qty + "</span><span>J$" + sub.toLocaleString() + "</span></div>";
+  }).join("");
+
+  var orderType = document.getElementById("order-type").value;
+  var zone = parseInt(document.getElementById("delivery-zone").value) || 0;
+  var delFee = orderType === "Delivery" ? zone : 0;
+  var grandTotal = total + delFee;
+
+  document.getElementById("summary-lines").innerHTML = lines +
+    (delFee > 0 ? "<div class='summary-line'><span>Delivery fee (Zone)</span><span>J$" + delFee.toLocaleString() + "</span></div>" : "");
+  document.getElementById("total-amt").textContent = "J$" + grandTotal.toLocaleString();
+}
+
+// ── SUBMIT ──
+document.getElementById("submit-btn").addEventListener("click", function() {
+  var fname = document.getElementById("fname").value.trim();
+  var lname = document.getElementById("lname").value.trim();
+  var phone = document.getElementById("phone").value.trim();
+  var delivTime = document.getElementById("delivery-time").value;
+  var address = document.getElementById("address").value.trim();
+  var notes = document.getElementById("notes").value.trim();
+  var payment = document.getElementById("payment").value;
+  var orderType = document.getElementById("order-type").value;
+  var ordered = getOrdered();
+
+  if (!fname || !phone || !payment || !orderType) { alert("Please fill in your name, phone, payment method and order type."); return; }
+  if (orderType === "Delivery" && !address) { alert("Please enter your delivery address."); return; }
+  if (!ordered.length) { alert("Please add at least one item to your order."); return; }
+
+  var now = getJamaicaNow();
+  var afterCutoff = now.getHours() >= 10;
+  var delivery = getDeliveryDate(now, afterCutoff);
+  var dateStr = formatDate(delivery);
+  var zone = parseInt(document.getElementById("delivery-zone").value) || 0;
+  var delFee = orderType === "Delivery" ? zone : 0;
+
+  var msg = "🍽️ *CHONGIE'S LUNCH ORDER*\n\n";
+  msg += "👤 *Name:* " + fname + " " + lname + "\n";
+  msg += "📞 *Phone:* " + phone + "\n";
+  msg += "📅 *Delivery Date:* " + dateStr + "\n";
+  msg += "🚗 *Order Type:* " + orderType + "\n";
+  if (delivTime) msg += "🕐 *Preferred Time:* " + delivTime + "\n";
+  if (orderType === "Delivery") msg += "📍 *Address:* " + address + "\n";
+  msg += "💰 *Payment:* " + payment + "\n\n";
+  msg += "*ORDER:*\n";
+
+  var total = 0;
+  ordered.forEach(function(item) {
+    var sub = item.totalPrice * item.qty; total += sub;
+    var extra = "";
+    if (item.extras.base) extra += " [Base: " + item.extras.base + "]";
+    if (item.extras.side) extra += " [Side: " + item.extras.side + "]";
+    if (item.extras.wrapType) extra += " [" + item.extras.wrapType + " | " + item.extras.protein + " | " + item.extras.fillings + " | " + item.extras.sauce + "]";
+    msg += "• " + item.name + extra + " × " + item.qty + " — J$" + sub.toLocaleString() + "\n";
+  });
+  if (delFee > 0) msg += "• Delivery Fee — J$" + delFee.toLocaleString() + "\n";
+  msg += "\n💰 *TOTAL: J$" + (total + delFee).toLocaleString() + "*";
+  if (notes) msg += "\n\n📝 *Notes:* " + notes;
+  msg += "\n\n_Sent from chongiesja.github.io_";
+
+  document.getElementById("wa-link").href = "https://wa.me/18768947767?text=" + encodeURIComponent(msg);
+  document.getElementById("submit-btn").style.display = "none";
+  document.getElementById("wa-link-box").style.display = "block";
+  document.getElementById("wa-link-box").scrollIntoView({behavior:"smooth"});
+});
+
+// ── QTY EVENT DELEGATION ──
+document.getElementById("menu-container").addEventListener("click", function(e) {
+  var btn = e.target.closest(".qty-btn");
+  if (!btn) return;
+  changeQty(btn.dataset.id, parseInt(btn.dataset.delta));
+});
+
+// ── PAYMENT TOGGLE ──
+document.getElementById("payment").addEventListener("change", function() {
+  document.getElementById("transfer-box").style.display = this.value === "Bank Transfer" ? "block" : "none";
+});
 
 // ── INIT ──
 function init() {
-  const now = getJamaicaNow();
-  const dow = now.getDay();
-  const hour = now.getHours();
-  const afterCutoff = hour >= 10;
+  var now = getJamaicaNow();
+  var dow = now.getDay();
+  var hour = now.getHours();
+  var afterCutoff = hour >= 10;
 
-  // Weekend check
+  // Weekend
   if (dow === 0 || dow === 6) {
     document.getElementById("closed-screen").style.display = "flex";
-    document.getElementById("app").style.display = "none";
+    document.getElementById("main-app").style.display = "none";
     return;
   }
 
-  document.getElementById("app").style.display = "block";
-  document.getElementById("header-date").textContent = formatDate(now);
-
-  // After cutoff banner
+  // Cutoff banner
   if (afterCutoff) {
-    const delivery = getDeliveryDate(now, true);
-    document.getElementById("cutoff-banner").classList.add("show");
-    document.getElementById("cutoff-next-day").textContent = formatDate(delivery);
-    document.getElementById("header-cutoff").textContent = "Next delivery order";
-    document.getElementById("menu-title").textContent = formatDate(delivery) + " Menu";
-  } else {
-    document.getElementById("menu-title").textContent = "Today's Menu";
+    var nextDelivery = getDeliveryDate(now, true);
+    document.getElementById("main-notice").style.display = "none";
+    document.getElementById("cutoff-notice").style.display = "block";
+    document.getElementById("cutoff-notice").textContent = "⏰ Today's orders are closed — you're now ordering for " + formatDate(nextDelivery);
+    document.getElementById("menu-label").textContent = formatDate(nextDelivery) + " Menu";
   }
 
-  // Delivery notice
-  const delivery = getDeliveryDate(now, afterCutoff);
-  document.getElementById("delivery-notice").textContent =
-    afterCutoff
-      ? `Ordering now for ${formatDate(delivery)} delivery`
-      : `Order now — delivery today by 11:30 AM`;
-  document.getElementById("success-delivery").textContent =
-    `Delivery: ${formatDate(delivery)}`;
+  // Date bar
+  var menuDow = getMenuDow(now, afterCutoff);
+  var delivery = getDeliveryDate(now, afterCutoff);
+  document.getElementById("menu-date").textContent = formatDate(delivery);
 
-  // Staples visibility
-  const staples = getStaples();
-  if (!staples.noodles) document.getElementById("section-noodles").style.display = "none";
-  if (!staples.wings)   document.getElementById("section-wings").style.display = "none";
-  if (!staples.wraps)   document.getElementById("section-wraps").style.display = "none";
-  if (!staples.pasta)   document.getElementById("section-pasta").style.display = "none";
-  if (!staples.salads)  document.getElementById("section-salads").style.display = "none";
+  // Load menu
+  var weeklyMenu = getWeeklyMenu();
+  var dayKey = DAY_KEYS[menuDow];
+  var dayMenu = weeklyMenu[dayKey] || null;
+  var staples = getStaples();
 
-  // Load daily Jamaican menu
-  const menuDow = getMenuDay(now, afterCutoff);
-  const dayKey = DAY_KEYS[menuDow];
-  const menu = getWeeklyMenu();
-  const dayMenu = menu[dayKey] || null;
-
-  loadJamaicanMenu(dayMenu, menuDow);
-  loadSoup(dayMenu);
+  var cats = buildStaticMenu(staples, dayMenu, menuDow);
+  buildMenu(cats);
 }
 
-function loadJamaicanMenu(dayMenu, dow) {
-  const body = document.getElementById("jamaican-body");
-  body.innerHTML = "";
-
-  const mains = [];
-
-  if (dayMenu) {
-    // Wednesday anchor
-    if (dow === 3) mains.push({key:"stew-peas", name:"Stew Peas with Pigtail", desc:"Wednesday special — slow cooked red peas & pigtail", anchor:true});
-    // Thursday anchor
-    if (dow === 4) mains.push({key:"curry-goat", name:"Curry Goat", desc:"Thursday special — tender curried goat", anchor:true});
-    // Friday anchor
-    if (dow === 5) mains.push({key:"jerk-pork", name:"Jerk Pork", desc:"Friday special — authentic jerk pork", anchor:true});
-
-    // Rotating proteins
-    ["protein1","protein2","protein3"].forEach((k,i) => {
-      if (dayMenu[k] && dayMenu[k] !== "Stew Peas with Pigtail" && dayMenu[k] !== "Curry Goat" && dayMenu[k] !== "Jerk Pork") {
-        mains.push({key:"main-"+i, name:dayMenu[k], desc:"Served with your choice of rice & provisions", anchor:false});
-      }
-    });
-
-    // Veg main
-    if (dayMenu.veg) {
-      mains.push({key:"main-veg", name:dayMenu.veg, desc:"Vegetarian option", anchor:false});
-    }
-  } else {
-    // Default fallback
-    if (dow === 3) mains.push({key:"stew-peas", name:"Stew Peas with Pigtail", desc:"Wednesday special", anchor:true});
-    else if (dow === 4) mains.push({key:"curry-goat", name:"Curry Goat", desc:"Thursday special", anchor:true});
-    else if (dow === 5) mains.push({key:"jerk-pork", name:"Jerk Pork", desc:"Friday special", anchor:true});
-    else {
-      mains.push({key:"main-0", name:"Brown Stew Chicken", desc:"Served with rice & provisions", anchor:false});
-      mains.push({key:"main-1", name:"Stewed Beef", desc:"Served with rice & provisions", anchor:false});
-    }
-  }
-
-  if (mains.length === 0) {
-    body.innerHTML = `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px;">Menu coming soon — check back shortly.</div>`;
-    return;
-  }
-
-  mains.forEach(item => {
-    // Register in prices
-    PRICES[item.key] = {name: item.name, price: 1100};
-    const div = document.createElement("div");
-    div.className = "menu-item";
-    div.onclick = () => changeQty(item.key, 1);
-    div.innerHTML = `
-      <div class="item-qty">
-        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${item.key}',-1)">−</button>
-        <span class="qty-num" id="qty-${item.key}">0</span>
-        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${item.key}',1)">+</button>
-      </div>
-      <div class="item-info">
-        <div class="item-name">${item.name}${item.anchor ? '<span class="anchor-tag">⭐ Today\'s Special</span>' : ''}</div>
-        <div class="item-desc">${item.desc}</div>
-      </div>
-      <div class="item-price">J$1,100</div>`;
-    body.appendChild(div);
-  });
-}
-
-function loadSoup(dayMenu) {
-  const body = document.getElementById("soup-body");
-  body.innerHTML = "";
-  const soupName = (dayMenu && dayMenu.soup) ? dayMenu.soup : "Soup of the Day";
-  const vegSoupName = (dayMenu && dayMenu.vegsoup) ? dayMenu.vegsoup : "Vegetarian Soup";
-
-  PRICES["soup-regular"] = {name: soupName, price: 600};
-  PRICES["soup-veg"] = {name: vegSoupName, price: 600};
-
-  [[`soup-regular`, soupName], [`soup-veg`, vegSoupName]].forEach(([key, name]) => {
-    const div = document.createElement("div");
-    div.className = "menu-item";
-    div.onclick = () => changeQty(key, 1);
-    div.innerHTML = `
-      <div class="item-qty">
-        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${key}',-1)">−</button>
-        <span class="qty-num" id="qty-${key}">0</span>
-        <button class="qty-btn" onclick="event.stopPropagation();changeQty('${key}',1)">+</button>
-      </div>
-      <div class="item-info"><div class="item-name">${name}</div></div>
-      <div class="item-price">J$600</div>`;
-    body.appendChild(div);
-  });
-}
-
-// ── CART ──
-function changeQty(key, delta) {
-  cart[key] = Math.max(0, (cart[key] || 0) + delta);
-  if (cart[key] === 0) delete cart[key];
-  const el = document.getElementById("qty-" + key);
-  if (el) el.textContent = cart[key] || 0;
-  updateBar();
-}
-
-function updateBar() {
-  let total = 0;
-  let count = 0;
-  Object.entries(cart).forEach(([key, qty]) => {
-    if (PRICES[key]) { total += PRICES[key].price * qty; count += qty; }
-  });
-  total += (orderType === "delivery") ? deliveryFee : 0;
-
-  document.getElementById("bar-total").textContent = "J$" + total.toLocaleString();
-  document.getElementById("bar-items").textContent = count === 0 ? "No items selected" : count + " item" + (count > 1 ? "s" : "");
-  document.getElementById("order-btn").disabled = count === 0;
-
-  updateSummary(total - (orderType === "delivery" ? deliveryFee : 0));
-}
-
-function updateSummary(subtotal) {
-  const card = document.getElementById("summary-card");
-  const lines = document.getElementById("summary-lines");
-  const totalEl = document.getElementById("summary-total");
-  const noteEl = document.getElementById("delivery-note");
-
-  if (Object.keys(cart).length === 0) { card.classList.remove("visible"); return; }
-  card.classList.add("visible");
-
-  lines.innerHTML = "";
-  Object.entries(cart).forEach(([key, qty]) => {
-    if (!PRICES[key] || qty === 0) return;
-    const line = document.createElement("div");
-    line.className = "summary-line";
-    line.innerHTML = `<span>${PRICES[key].name} × ${qty}</span><span>J$${(PRICES[key].price * qty).toLocaleString()}</span>`;
-    lines.appendChild(line);
-  });
-
-  if (orderType === "delivery" && deliveryFee > 0) {
-    const fee = document.createElement("div");
-    fee.className = "summary-line";
-    fee.innerHTML = `<span>Delivery fee</span><span>J$${deliveryFee.toLocaleString()}</span>`;
-    lines.appendChild(fee);
-  }
-
-  const grandTotal = subtotal + (orderType === "delivery" ? deliveryFee : 0);
-  totalEl.textContent = "J$" + grandTotal.toLocaleString();
-  noteEl.textContent = orderType === "pickup" ? "Pickup from Chongie's — 9 Bloomsbury Road, Kingston 10" : "";
-}
-
-function selectZone(el, fee) {
-  document.querySelectorAll(".zone-card").forEach(c => c.classList.remove("selected"));
-  el.classList.add("selected");
-  deliveryFee = fee;
-  updateBar();
-}
-
-function toggleDelivery() {
-  orderType = document.getElementById("order-type").value;
-  document.getElementById("delivery-section").style.display = orderType === "delivery" ? "block" : "none";
-  updateBar();
-}
-
-// ── PLACE ORDER ──
-function placeOrder() {
-  const name = document.getElementById("cust-name").value.trim();
-  const phone = document.getElementById("cust-phone").value.trim();
-  const notes = document.getElementById("cust-notes").value.trim();
-  const address = orderType === "delivery" ? document.getElementById("cust-address").value.trim() : "PICKUP";
-
-  if (!name) { alert("Please enter your name."); return; }
-  if (!phone) { alert("Please enter your phone number."); return; }
-  if (orderType === "delivery" && !address) { alert("Please enter your delivery address."); return; }
-
-  const now = getJamaicaNow();
-  const afterCutoff = now.getHours() >= 10;
-  const delivery = getDeliveryDate(now, afterCutoff);
-
-  let msg = `🍽️ *CHONGIE'S ORDER*\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
-  msg += `👤 *Name:* ${name}\n`;
-  msg += `📞 *Phone:* ${phone}\n`;
-  msg += `📦 *Type:* ${orderType === "pickup" ? "Pickup" : "Delivery"}\n`;
-  if (orderType === "delivery") msg += `📍 *Address:* ${address}\n`;
-  msg += `🗓️ *For:* ${formatDate(delivery)}\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
-  msg += `*ORDER ITEMS:*\n`;
-
-  let subtotal = 0;
-  Object.entries(cart).forEach(([key, qty]) => {
-    if (!PRICES[key] || qty === 0) return;
-    msg += `• ${PRICES[key].name} × ${qty} — J$${(PRICES[key].price * qty).toLocaleString()}\n`;
-    subtotal += PRICES[key].price * qty;
-  });
-
-  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
-  if (orderType === "delivery" && deliveryFee > 0) msg += `🚚 Delivery Fee: J$${deliveryFee.toLocaleString()}\n`;
-  msg += `💰 *TOTAL: J$${(subtotal + (orderType === "delivery" ? deliveryFee : 0)).toLocaleString()}*\n`;
-  if (notes) msg += `📝 *Notes:* ${notes}\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━\n`;
-  msg += `_Sent from chongiesja.github.io_`;
-
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-  window.open(url, "_blank");
-
-  document.getElementById("app").style.display = "none";
-  document.getElementById("success-screen").style.display = "flex";
-}
-
-// ── START ──
 init();
 </script>
 </body>
