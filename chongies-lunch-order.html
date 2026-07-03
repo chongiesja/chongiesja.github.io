@@ -676,6 +676,14 @@ const FIREBASE_CONFIG = {
 firebase.initializeApp(FIREBASE_CONFIG);
 var db = firebase.firestore();
 
+// Timeout helper — if Firebase takes more than 4 seconds, use defaults
+function withTimeout(promise, ms) {
+  var timeout = new Promise(function(_, reject) {
+    setTimeout(function() { reject(new Error("timeout")); }, ms);
+  });
+  return Promise.race([promise, timeout]);
+}
+
 // ── INIT ──
 async function init() {
   var now = getJamaicaNow();
@@ -703,33 +711,34 @@ async function init() {
   var menuDow = getMenuDow(now, afterCutoff);
   var delivery = getDeliveryDate(now, afterCutoff);
   document.getElementById("menu-date").textContent = formatDate(delivery);
+  var dayKey = DAY_KEYS[menuDow];
 
-  // Show loading
+  // Show loading briefly
   document.getElementById("menu-container").innerHTML = "<div class='empty-note'>Loading today's menu...</div>";
 
+  // Try Firebase with 4 second timeout — always fall back to defaults
+  var weeklyMenu = {}, specialsData = null, fcData = null;
+
   try {
-    // Load menu, specials and fried chicken from Firebase in parallel
-    var dayKey = DAY_KEYS[menuDow];
-    var [menuSnap, specialsSnap, fcSnap] = await Promise.all([
-      db.collection("chongies_settings").doc("menu").get(),
-      db.collection("chongies_settings").doc("specials").get(),
-      db.collection("chongies_settings").doc("fried_chicken").get(),
-    ]);
-
-    var weeklyMenu = menuSnap.exists ? menuSnap.data() : {};
-    var dayMenu = weeklyMenu[dayKey] || null;
-    var specialsData = specialsSnap.exists ? specialsSnap.data() : null;
-    var fcData = fcSnap.exists ? fcSnap.data() : null;
-
-    var cats = buildStaticMenu(specialsData, fcData, dayMenu, menuDow, dayKey);
-    buildMenu(cats);
-
+    var results = await withTimeout(
+      Promise.all([
+        db.collection("chongies_settings").doc("menu").get(),
+        db.collection("chongies_settings").doc("specials").get(),
+        db.collection("chongies_settings").doc("fried_chicken").get(),
+      ]),
+      4000
+    );
+    if (results[0].exists) weeklyMenu = results[0].data();
+    if (results[1].exists) specialsData = results[1].data();
+    if (results[2].exists) fcData = results[2].data();
   } catch(err) {
-    console.error("Firebase load error:", err);
-    // Fallback to defaults
-    var cats = buildStaticMenu(null, null, null, menuDow, DAY_KEYS[menuDow]);
-    buildMenu(cats);
+    console.log("Firebase unavailable, using defaults:", err.message);
   }
+
+  // Always build menu — with Firebase data or defaults
+  var dayMenu = weeklyMenu[dayKey] || null;
+  var cats = buildStaticMenu(specialsData, fcData, dayMenu, menuDow, dayKey);
+  buildMenu(cats);
 }
 
 init();
