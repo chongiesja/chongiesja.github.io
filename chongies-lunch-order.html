@@ -232,12 +232,13 @@ function getDeliveryDate(now, afterCutoff) {
   return d;
 }
 function getMenuDow(now, afterCutoff) {
-  if (!afterCutoff) return now.getDay();
-  var d = new Date(now);
-  var dow = d.getDay();
-  var add = dow === 5 ? 3 : 1;
-  d.setDate(d.getDate() + add);
-  return d.getDay();
+  var dow = now.getDay();
+  if (!afterCutoff) return dow;
+  // After cutoff — show next working day's menu
+  if (dow === 5) return 1; // Friday → Monday
+  if (dow === 6) return 1; // Saturday → Monday
+  if (dow === 0) return 1; // Sunday → Monday
+  return dow + 1;          // Mon→Tue, Tue→Wed, Wed→Thu, Thu→Fri
 }
 
 // ── FIXED MENU ITEMS ──
@@ -684,13 +685,15 @@ var FOUR_WEEK_MENU = {
 };
 
 function getRotationWeek() {
-  var anchor = new Date("2026-07-06");
+  // Anchored to week of June 29 2026 as Week 1
+  var anchor = new Date("2026-06-29");
   var now = getJamaicaNow();
   var d = new Date(now);
   var day = d.getDay();
   d.setDate(d.getDate() - (day===0?6:day-1));
   d.setHours(0,0,0,0);
-  var diffWeeks = Math.floor((d-anchor)/(7*24*60*60*1000));
+  var diffMs = d.getTime() - anchor.getTime();
+  var diffWeeks = Math.floor(diffMs / (7*24*60*60*1000));
   return ((diffWeeks%4)+4)%4+1;
 }
 
@@ -734,7 +737,7 @@ async function init() {
   // Start with built-in rotation as base (always works)
   var weekNum = getRotationWeek();
   var weekMenu = FOUR_WEEK_MENU[weekNum] || FOUR_WEEK_MENU[1];
-  var dayMenu = weekMenu[dayKey] || null;
+  var dayMenu = weekMenu[dayKey] || weekMenu["mon"] || null;
   var specialsData = null;
   var fcData = null;
 
