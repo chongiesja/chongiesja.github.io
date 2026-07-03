@@ -73,7 +73,10 @@ body { font-family: Arial, sans-serif; background: #f5f5f5; }
 
 <div id="app">
   <div class="topbar">
-    <h1>Chongie's Admin</h1>
+    <div>
+      <h1>Chongie's Admin</h1>
+      <div id="admin-date" style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:2px;"></div>
+    </div>
     <div style="display:flex;align-items:center;gap:12px;">
       <span class="saved-msg" id="saved-msg">✓ Saved!</span>
       <button class="save-btn" onclick="saveAll()">💾 Save & Publish</button>
@@ -368,6 +371,8 @@ function login() {
   if (p === PIN) {
     document.getElementById('lock').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    var now = new Date(new Date().toLocaleString('en-US',{timeZone:'America/Jamaica'}));
+    document.getElementById('admin-date').textContent = now.toLocaleDateString('en-JM',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     loadSaved();
     buildLists();
   } else {
