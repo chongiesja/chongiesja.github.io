@@ -378,7 +378,12 @@ let unsubMenu = null, unsubOrders = null;
 let ordersCache = [];
 
 /* ── PIN GATE ── */
+const ADMIN_VERSION = "v2.1";
 async function initGate(){
+  const vTag = document.createElement("p");
+  vTag.style.cssText = "margin-top:10px;font-size:.7rem;color:#b0a68f";
+  vTag.textContent = "Chongie's Admin " + ADMIN_VERSION;
+  document.querySelector("#gate .box").appendChild(vTag);
   if(DEMO){
     el("gateErr").textContent = "🧪 Preview mode (no Firebase connected yet) — PIN is 1234";
     document.querySelector("header .tag").textContent = "PREVIEW";
@@ -386,18 +391,26 @@ async function initGate(){
   const ref = doc(db,"settings","config");
   let snap;
   try{ snap = await getDoc(ref); }
-  catch(e){ el("gateErr").textContent = "Can't reach Firebase — check the config in this file."; return; }
+  catch(e){ el("gateErr").textContent = "Can't reach the database — check your internet and refresh. (" + (e.message||e) + ")"; return; }
   if(!snap.exists()){
     await setDoc(ref, { pin: DEFAULT_PIN, closedDates: [], closureMessage:
       "Chongie's is closed today — see you tomorrow! 🌴", greetingTemplate: DEFAULT_GREETING,
       bankInfo: "Bank: [Your bank name]\nAccount name: Mark Chong's Cooking Mastery\nAccount number: [enter account #]\nAccount type: [Savings / Chequing]\nBranch: [branch]" });
-    snap = await getDoc(ref);
     el("gateErr").textContent = `First run: PIN initialised to ${DEFAULT_PIN}. Change it after you log in!`;
   }
-  const pin = snap.data().pin;
   if(sessionStorage.getItem("chongies_admin") === "ok"){ unlock(); return; }
-  const tryPin = ()=>{
-    if(el("pinInput").value === String(pin)){
+  const tryPin = async ()=>{
+    el("gateErr").textContent = "Checking…";
+    let pin;
+    try{
+      const s = await getDoc(ref);           // fresh read every attempt — never compares against a stale PIN
+      pin = String((s.data()||{}).pin ?? "").trim();
+    }catch(e){
+      el("gateErr").textContent = "Can't reach the database — check your internet. (" + (e.message||e) + ")";
+      return;
+    }
+    const entered = el("pinInput").value.trim();
+    if(entered && entered === pin){
       sessionStorage.setItem("chongies_admin","ok"); unlock();
     } else el("gateErr").textContent = "Wrong PIN — try again.";
   };
