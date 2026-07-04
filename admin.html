@@ -228,6 +228,13 @@
     </div>
     <div class="setrow">
       <div class="grow">
+        <label class="lbl">Closed every week on</label>
+        <div id="weeklyDays"></div>
+        <span style="font-size:.78rem;color:var(--muted)">Both panels automatically skip these days — e.g. tick Sunday and Saturday-after-cutoff orders go to Monday.</span>
+      </div>
+    </div>
+    <div class="setrow">
+      <div class="grow">
         <label class="lbl">Schedule a closure</label>
         <input type="date" id="schedDate" style="padding:9px;border:1.5px solid var(--line);border-radius:9px;font:inherit">
         <button class="btn small" id="addSched" style="margin-left:8px">Add</button>
@@ -351,8 +358,16 @@ function addDays(isoDate,n){ const [y,m,d]=isoDate.split("-").map(Number);
   const dt=new Date(Date.UTC(y,m-1,d+n,12)); return iso(dt.getUTCFullYear(),dt.getUTCMonth()+1,dt.getUTCDate()); }
 function prettyDate(isoDate){ const [y,m,d]=isoDate.split("-").map(Number);
   return new Date(Date.UTC(y,m-1,d,12)).toLocaleDateString("en-JM",{weekday:"long",month:"long",day:"numeric",timeZone:"UTC"}); }
+function dowOf(isoDate){ const [y,m,d]=isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y,m-1,d,12)).getUTCDay(); }   // 0=Sunday … 6=Saturday
+function isClosedDate(d){
+  return (settings.closedDates||[]).includes(d) || (settings.weeklyClosedDays||[]).includes(dowOf(d));
+}
 function autoDate(){ const t=jmParts(); const today=iso(t.y,t.m,t.d);
-  return t.hour>=CUTOFF_HOUR ? {date:addDays(today,1),after:true} : {date:today,after:false}; }
+  const r = t.hour>=CUTOFF_HOUR ? {date:addDays(today,1),after:true} : {date:today,after:false};
+  r.skipped = [];
+  for(let i=0; i<7 && isClosedDate(r.date); i++){ r.skipped.push(r.date); r.date = addDays(r.date,1); }
+  return r; }
 
 /* ── State ── */
 let override = null;           // manual date override (ISO) or null
@@ -427,6 +442,10 @@ function refreshDate(){
     b.className = "datebanner override";
     b.innerHTML = `📅 MANUAL OVERRIDE — You are setting the menu for <u>${prettyDate(workingDate)}</u>
       <small>Auto mode would target ${prettyDate(auto.date)}</small>`;
+  } else if(auto.skipped.length){
+    b.className = "datebanner tomorrow";
+    b.innerHTML = `📅 You are setting the menu for the NEXT OPEN DAY — ${prettyDate(workingDate)}
+      <small>Skipped (closed): ${auto.skipped.map(prettyDate).join(", ")}</small>`;
   } else if(auto.after){
     b.className = "datebanner tomorrow";
     b.innerHTML = `📅 CUT-OFF PASSED — You are now setting the menu for TOMORROW — ${prettyDate(workingDate)}
@@ -451,9 +470,26 @@ function listenSettings(){
     el("greetingText").value = settings.greetingTemplate || DEFAULT_GREETING;
     el("bankInfo").value = settings.bankInfo || "";
     renderClosureUI();
+    // closed-day settings can change which date auto mode targets
+    if(!override && autoDate().date !== workingDate) refreshDate();
+  });
+}
+const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function renderWeeklyDays(){
+  const wrap = el("weeklyDays");
+  const on = settings.weeklyClosedDays || [];
+  wrap.innerHTML = DAY_NAMES.map((n,i)=>
+    `<label style="display:inline-flex;align-items:center;gap:5px;margin:4px 10px 4px 0;font-size:.88rem;font-weight:600">
+      <input type="checkbox" data-dow="${i}" ${on.includes(i)?"checked":""}> ${n}</label>`).join("");
+  wrap.querySelectorAll("input").forEach(cb=> cb.onchange = async ()=>{
+    const days = new Set(settings.weeklyClosedDays || []);
+    cb.checked ? days.add(+cb.dataset.dow) : days.delete(+cb.dataset.dow);
+    await updateDoc(doc(db,"settings","config"), { weeklyClosedDays: [...days].sort() });
+    flash("setFlash","✅ Weekly closing days saved.");
   });
 }
 function renderClosureUI(){
+  renderWeeklyDays();
   const closed = settings.closedDates || [];
   el("closeToday").checked = closed.includes(workingDate);
   const today = autoDate().date;
@@ -596,9 +632,12 @@ function builderRow(sec, item){
 }
 /* Publish writes the doc; once published, edits auto-sync live */
 async function writeMenu(publish){
-  const clean = { published: publish ?? menu.published ?? false,
+  clearTimeout(syncT);                       // cancel any pending draft save so it can't overwrite this write
+  const pub = publish ?? menu.published ?? false;
+  const clean = { published: pub,
     sections: menu.sections.map(s=>({ id:s.id, title:s.title, items:s.items })) };
   await setDoc(doc(db,"menus",workingDate), clean);
+  menu.published = pub;                      // keep local state in step so later auto-saves preserve it
 }
 let syncT = null;
 function autoSync(){
@@ -606,19 +645,27 @@ function autoSync(){
   // otherwise as a draft (customers see drafts only after you hit Publish)
   clearTimeout(syncT);
   syncT = setTimeout(async ()=>{
-    await writeMenu(menu.published === true);
-    flash("menuFlash", menu.published ? "🔄 Live menu updated." : "💾 Draft saved — hit Publish when ready.");
+    try{
+      await writeMenu(menu.published === true);
+      flash("menuFlash", menu.published ? "🔄 Live menu updated." : "💾 Draft saved — hit Publish when ready.");
+    }catch(err){ flash("menuFlash","⚠️ Couldn't save: " + (err.message||err)); }
   }, 600);
 }
 el("publishBtn").onclick = async ()=>{
   const anyOn = menu.sections.some(s=>s.items.some(i=>i.active));
   if(!anyOn && !confirm("No items are toggled ON — publish an empty menu?")) return;
-  await writeMenu(true);
-  flash("menuFlash", `🚀 Menu published for ${prettyDate(workingDate)} — customer panel updated instantly.`);
+  try{
+    await writeMenu(true);
+    flash("menuFlash", `🚀 Menu published for ${prettyDate(workingDate)} — customer panel updated instantly.`);
+  }catch(err){
+    alert("Couldn't publish: " + (err.message||err) + "\nCheck your connection and try again.");
+  }
 };
 el("unpublishBtn").onclick = async ()=>{
-  await writeMenu(false);
-  flash("menuFlash","Menu unpublished — customers now see “Menu coming soon”.");
+  try{
+    await writeMenu(false);
+    flash("menuFlash","Menu unpublished — customers now see “Menu coming soon”.");
+  }catch(err){ alert("Couldn't unpublish: " + (err.message||err)); }
 };
 
 /* ── Broadcast generator ── */
