@@ -309,6 +309,18 @@ function activeDeliveryDate(){
   return t.hour >= CUTOFF_HOUR ? { date: addDays(today,1), afterCutoff:true }
                                : { date: today, afterCutoff:false };
 }
+function dowOf(isoDate){ const [y,m,d]=isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y,m-1,d,12)).getUTCDay(); }   // 0=Sunday … 6=Saturday
+function isClosedDate(d){
+  return (settings.closedDates||[]).includes(d) || (settings.weeklyClosedDays||[]).includes(dowOf(d));
+}
+/* The delivery date skips past closed days (Sundays, holidays, etc.) */
+function resolveActive(){
+  const base = activeDeliveryDate();
+  let date = base.date; const skipped = [];
+  for(let i=0; i<7 && isClosedDate(date); i++){ skipped.push(date); date = addDays(date,1); }
+  return { date, afterCutoff: base.afterCutoff, skipped };
+}
 const J = n => "J$" + Number(n).toLocaleString("en-JM");
 
 /* ── State ── */
@@ -350,39 +362,50 @@ function boot(){
     d.textContent = "🧪 Preview mode — this is a sample menu saved in your browser (no Firebase connected yet). Orders here are pretend; nothing is sent.";
     document.querySelector("main").prepend(d);
   }
-  current = activeDeliveryDate();
+  current = resolveActive();
   renderDateBar();
   restoreLocal();
   listenSettings();
   listenMenu(current.date);
-  // re-check the cut-off every 30s: flips the panel to tomorrow at 10AM automatically
+  // re-check every 30s: flips at 10AM (and past closed days) automatically
   setInterval(()=>{
-    const next = activeDeliveryDate();
+    const next = resolveActive();
     if(next.date !== current.date){
       current = next; cart = []; saveLocal();
       renderDateBar(); listenMenu(current.date); renderCartBar();
-    }
+    } else { current = next; renderDateBar(); }
   }, 30000);
 }
 
 function renderDateBar(){
   el("dateBar").innerHTML = `Ordering for delivery on <strong>${prettyDate(current.date)}</strong>`;
-  el("cutoffBanner").classList.toggle("hidden", !current.afterCutoff);
-  if(current.afterCutoff)
-    el("cutoffBanner").textContent =
-      `⏰ Today's cut-off has passed. You are now ordering for delivery on ${prettyDate(current.date)}.`;
+  const skipped = current.skipped || [];
+  const b = el("cutoffBanner");
+  if(skipped.length){
+    b.classList.remove("hidden");
+    b.textContent = `🌴 We're closed ${skipped.map(prettyDate).join(" and ")} — you are ordering for delivery on ${prettyDate(current.date)}.`;
+  } else if(current.afterCutoff){
+    b.classList.remove("hidden");
+    b.textContent = `⏰ Today's cut-off has passed. You are now ordering for delivery on ${prettyDate(current.date)}.`;
+  } else b.classList.add("hidden");
 }
 
 /* ── Settings: closures, banner, closure message ── */
 function listenSettings(){
   onSnapshot(doc(db,"settings","config"), snap=>{
     settings = snap.exists() ? snap.data() : {};
+    const next = resolveActive();
+    if(next.date !== current.date){
+      current = next; cart = []; saveLocal();
+      listenMenu(current.date); renderCartBar();
+    } else current = next;
+    renderDateBar();
     applyClosureState();
   }, err=>console.warn("settings", err));
 }
 function applyClosureState(){
   const closedDates = settings.closedDates || [];
-  const isClosed = closedDates.includes(current.date);
+  const isClosed = isClosedDate(current.date);   // only true if the whole week ahead is closed
   el("closedNotice").classList.toggle("hidden", !isClosed);
   el("menuArea").classList.toggle("hidden", isClosed);
   el("cartBar").classList.toggle("hidden", isClosed || cart.length===0);
