@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#14532d">
+<title>Chongie's — Daily Lunch Menu | by Mark Chong's Cooking Mastery</title>
+<meta name="description" content="Order today's Chongie's lunch — Jamaican mains, soups, noodle bowls, wraps and more. Delivery in Kingston or free pickup.">
+<style>
+  :root{
+    --green:#14532d; --green-deep:#0c3a1e; --gold:#e9a820; --gold-soft:#f5c85c;
+    --pepper:#c24528; --ink:#241c15; --paper:#f7efdf; --card:#fffaf0;
+    --line:#e4d7bd; --muted:#7a6f5d; --ok:#1b7a3d; --radius:14px;
+    --shadow:0 2px 10px rgba(36,28,21,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.45;padding-bottom:120px}
+  /* ── Signature: flag-striped chalkboard header ── */
+  header{background:var(--green-deep);color:#fff;padding:22px 16px 18px;text-align:center;
+    border-bottom:6px solid var(--gold);position:relative}
+  header::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;
+    background:repeating-linear-gradient(90deg,var(--gold) 0 28px,var(--green) 28px 56px,#111 56px 84px)}
+  header h1{font-family:Georgia,'Times New Roman',serif;font-size:1.7rem;letter-spacing:.5px}
+  header h1 span{color:var(--gold-soft)}
+  header p{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:#cfe3d4;margin-top:4px}
+  .datebar{background:var(--green);color:#fff;text-align:center;font-size:.85rem;padding:7px 12px}
+  .datebar strong{color:var(--gold-soft)}
+  /* banners */
+  .banner{margin:12px 14px 0;padding:11px 14px;border-radius:var(--radius);font-size:.9rem;box-shadow:var(--shadow)}
+  .banner.amber{background:#fdf1d7;border:1px solid #ecc35e;color:#6b4b09}
+  .banner.notice{background:#e8f1ea;border:1px solid #bcd6c4;color:#173f26}
+  .banner.offline{background:#fbe3dc;border:1px solid #e0a08e;color:#7a2a14;display:none;position:sticky;top:0;z-index:60;margin:0;border-radius:0;text-align:center}
+  main{max-width:640px;margin:0 auto;padding:0 14px}
+  /* sections */
+  .section{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .section>button.sec-head{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    background:none;border:0;padding:14px 15px;font:inherit;font-weight:700;font-size:1.02rem;cursor:pointer;color:var(--green-deep);text-align:left}
+  .sec-head .chev{transition:transform .2s;color:var(--muted);font-size:.8rem}
+  .section.open .chev{transform:rotate(180deg)}
+  .sec-body{display:none;border-top:1px dashed var(--line)}
+  .section.open .sec-body{display:block}
+  .item{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:0}
+  .item .info{flex:1;min-width:0}
+  .item .name{font-weight:600;font-size:.95rem}
+  .item .price{color:var(--green);font-weight:700;font-size:.9rem}
+  .lowstock{display:inline-block;background:#fdf1d7;color:#8a5b06;border:1px solid #ecc35e;border-radius:99px;font-size:.7rem;font-weight:700;padding:1px 8px;margin-left:6px;vertical-align:1px}
+  .soldout{display:inline-block;background:#3b3b3b;color:#fff;border-radius:4px;font-size:.68rem;font-weight:800;letter-spacing:.08em;padding:2px 7px;margin-left:6px}
+  .item.is-soldout .name,.item.is-soldout .price{opacity:.45;text-decoration:line-through}
+  /* stepper */
+  .stepper{display:flex;align-items:center;gap:2px}
+  .stepper button{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--green);background:#fff;color:var(--green);
+    font-size:1.15rem;font-weight:700;cursor:pointer;line-height:1}
+  .stepper button:disabled{opacity:.3;cursor:default}
+  .stepper .qty{min-width:28px;text-align:center;font-weight:700}
+  .wrap-btn{border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:9px;padding:7px 12px;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer}
+  .wrap-line{padding:8px 15px 10px 24px;font-size:.82rem;color:var(--muted);border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:flex-start}
+  .wrap-line .rm{border:0;background:none;color:var(--pepper);font-weight:700;cursor:pointer;font-size:.8rem}
+  /* form */
+  .panel{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 15px;box-shadow:var(--shadow)}
+  .panel h2{font-family:Georgia,serif;color:var(--green-deep);font-size:1.15rem;margin-bottom:10px}
+  label{display:block;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 4px}
+  label .req{color:var(--pepper)}
+  input[type=text],input[type=tel],select,textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;
+    font:inherit;background:#fff;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+  .err{color:var(--pepper);font-size:.78rem;margin-top:3px;display:none}
+  .field.invalid .err{display:block}
+  .field.invalid input,.field.invalid select{border-color:var(--pepper)}
+  .zone-note{margin-top:8px;font-size:.82rem;background:#fdf6e7;border:1px dashed var(--gold);border-radius:10px;padding:9px 11px;color:#6b4b09;display:none}
+  /* cart bar */
+  .cartbar{position:fixed;bottom:0;left:0;right:0;background:var(--green-deep);color:#fff;z-index:50;
+    box-shadow:0 -3px 14px rgba(0,0,0,.25);border-top:4px solid var(--gold)}
+  .cartbar .inner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 16px}
+  .cartbar .sum{flex:1;font-size:.85rem}
+  .cartbar .sum strong{display:block;font-size:1.15rem;color:var(--gold-soft)}
+  .cartbar button{background:var(--gold);color:#241c15;border:0;border-radius:11px;padding:12px 20px;font:inherit;font-weight:800;font-size:.95rem;cursor:pointer}
+  .cartbar button:disabled{opacity:.5}
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(20,25,18,.6);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:0}
+  .modal.open{display:flex}
+  .modal .box{background:var(--card);border-radius:18px 18px 0 0;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:20px 18px}
+  .modal h3{font-family:Georgia,serif;color:var(--green-deep);margin-bottom:6px}
+  .topgrid{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}
+  @media(min-width:480px){.topgrid{grid-template-columns:1fr 1fr}}
+  .modal .actions{display:flex;gap:10px;margin-top:14px}
+  .btn-primary{flex:1;background:var(--green);color:#fff;border:0;border-radius:11px;padding:13px;font:inherit;font-weight:800;cursor:pointer}
+  .btn-ghost{background:none;border:1.5px solid var(--line);border-radius:11px;padding:13px 16px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
+  .count-hint{font-size:.82rem;color:var(--muted)}
+  /* confirmation / fallback / closed */
+  .fullnote{margin:26px 14px;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px 20px;text-align:center;box-shadow:var(--shadow)}
+  .fullnote h2{font-family:Georgia,serif;color:var(--green-deep);margin-bottom:10px;font-size:1.35rem}
+  .fullnote p{color:#4c4335;margin-bottom:8px}
+  .fullnote .big{font-size:2.4rem;margin-bottom:6px}
+  .fullnote pre{text-align:left;white-space:pre-wrap;background:#fff;border:1px dashed var(--line);border-radius:10px;padding:12px;font-size:.82rem;margin:12px 0;font-family:inherit}
+  .fullnote .btn-primary{display:inline-block;text-decoration:none;padding:13px 22px;margin:4px}
+  footer{margin:34px 0 140px;text-align:center;font-size:.82rem;color:var(--muted)}
+  footer a{color:var(--green);font-weight:700;text-decoration:none}
+  .hidden{display:none!important}
+  .loading{text-align:center;padding:50px 0;color:var(--muted)}
+  @media(min-width:640px){.modal{align-items:center;padding:20px}.modal .box{border-radius:18px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="banner offline" id="offlineBanner">📶 Connection lost — reconnecting… Your cart is saved.</div>
+
+<header>
+  <h1>Chongie's <span>— Daily Lunch Menu</span></h1>
+  <p>by Mark Chong's Cooking Mastery</p>
+</header>
+<div class="datebar" id="dateBar">Loading today's menu…</div>
+
+<main>
+  <div id="closureBanner" class="banner amber hidden"></div>
+  <div id="cutoffBanner" class="banner notice hidden"></div>
+
+  <div id="closedNotice" class="fullnote hidden">
+    <div class="big">🌴</div>
+    <h2>We're closed</h2>
+    <p id="closedMsg">Chongie's is closed today — see you tomorrow!</p>
+  </div>
+
+  <div id="menuArea">
+    <div class="loading" id="loadingMsg">🍛 Loading menu…</div>
+    <div id="sections"></div>
+
+    <!-- Customer details -->
+    <div class="panel hidden" id="detailsPanel">
+      <h2>Your details</h2>
+      <div class="field" id="f-name">
+        <label>Full name <span class="req">*</span></label>
+        <input type="text" id="custName" autocomplete="name" placeholder="e.g. Andrea Brown">
+        <div class="err">Please enter your full name.</div>
+      </div>
+      <div class="field" id="f-phone">
+        <label>WhatsApp number <span class="req">*</span></label>
+        <input type="tel" id="custPhone" inputmode="tel" placeholder="876-XXX-XXXX" maxlength="12">
+        <div class="err">Enter a valid Jamaican number: 876-XXX-XXXX</div>
+      </div>
+      <div class="field" id="f-service">
+        <label>Service type <span class="req">*</span></label>
+        <select id="serviceType">
+          <option value="">Choose one…</option>
+          <option value="pickup">Pickup — FREE</option>
+          <option value="delivery">Delivery</option>
+        </select>
+        <div class="err">Please choose pickup or delivery.</div>
+      </div>
+      <div id="deliveryFields" class="hidden">
+        <div class="field" id="f-addr">
+          <label>Delivery address <span class="req">*</span></label>
+          <input type="text" id="custAddr" autocomplete="street-address" placeholder="Street address, landmark, etc.">
+          <div class="err">Please enter your delivery address.</div>
+        </div>
+        <div class="field" id="f-zone">
+          <label>Delivery zone <span class="req">*</span></label>
+          <select id="zoneSel">
+            <option value="">Choose your zone…</option>
+            <option value="1">Zone 1 — Kingston 10 (Half-Way-Tree area) — J$300</option>
+            <option value="2">Zone 2 — Kingston 6 / Kingston 8 — J$500</option>
+            <option value="3">Zone 3 — New Kingston — J$700</option>
+            <option value="4">Zone 4 — All Other Areas — J$800</option>
+          </select>
+          <div class="err">Please choose a delivery zone.</div>
+          <div class="zone-note" id="zone4Note">Orders outside our main zones are subject to confirmation — we'll reply on WhatsApp to confirm whether we can deliver to your area.</div>
+        </div>
+      </div>
+      <div class="field" id="f-pay">
+        <label>Payment method <span class="req">*</span></label>
+        <select id="paySel">
+          <option value="">Choose one…</option>
+          <option value="cash">Cash on Delivery / Pickup</option>
+          <option value="transfer">Bank to Bank Transfer</option>
+        </select>
+        <div class="err">Please choose a payment method.</div>
+        <div class="zone-note" id="payNote">🏦 Our banking details will appear right after you submit. Please send your <strong>proof of transfer</strong> to WhatsApp <strong>876-894-7767</strong> — your order is confirmed once we receive it.</div>
+      </div>
+      <div class="field">
+        <label>Order notes (optional)</label>
+        <textarea id="custNotes" rows="2" placeholder="e.g. no pepper, blue gate on the left"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation -->
+  <div id="confirmScreen" class="fullnote hidden">
+    <div class="big">✅</div>
+    <h2 id="confirmTitle">Order sent!</h2>
+    <p id="confirmText"></p>
+    <div id="bankBox" class="hidden" style="text-align:left;background:#fdf6e7;border:1.5px solid var(--gold);border-radius:12px;padding:14px;margin:12px 0">
+      <strong>🏦 Bank transfer details</strong>
+      <pre id="bankDetails" style="margin:8px 0;border-style:solid"></pre>
+      <p style="font-size:.88rem;color:#6b4b09;margin:0"><strong>⚠️ Important:</strong> your order is <strong>not confirmed yet</strong> — please send your proof of transfer (screenshot/receipt) to WhatsApp <strong>876-894-7767</strong>. We'll confirm as soon as we receive it.</p>
+    </div>
+    <a class="btn-primary" id="waRetryBtn" href="#" target="_blank" rel="noopener">Open WhatsApp</a>
+    <p style="font-size:.82rem;margin-top:10px">WhatsApp didn't open? Copy your order below and send it to <strong>876-894-7767</strong>.</p>
+    <pre id="orderTextPre"></pre>
+    <button class="btn-ghost" id="copyOrderBtn">📋 Copy order</button>
+  </div>
+</main>
+
+<!-- Cart bar -->
+<div class="cartbar hidden" id="cartBar">
+  <div class="inner">
+    <div class="sum">
+      <span id="cartCount">0 items</span>
+      <strong id="cartTotal">J$0</strong>
+    </div>
+    <button id="submitBtn">Send order on WhatsApp 📲</button>
+  </div>
+</div>
+
+<!-- Wrap builder modal -->
+<div class="modal" id="wrapModal">
+  <div class="box">
+    <h3 id="wrapTitle">Build Your Own Wrap</h3>
+    <p class="count-hint" id="wrapHint">Choose your 4 toppings <span id="topCount">(0/4)</span></p>
+    <div class="topgrid" id="toppingGrid"></div>
+    <div id="meatField">
+      <label>Protein <span class="req">*</span></label>
+      <select id="wrapMeat">
+        <option value="">Choose your protein…</option>
+        <option>Grilled Chicken</option>
+        <option>Grilled Fish</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" id="wrapCancel">Cancel</button>
+      <button class="btn-primary" id="wrapAdd" disabled>Add wrap to order</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://www.markchongscatering.com">← Back to markchongscatering.com</a><br>
+  Chongie's by Mark Chong's Cooking Mastery · Kingston, Jamaica<br>
+  <span style="font-size:.68rem;opacity:.55">v2.2</span>
+</footer>
+
+<script type="module">
+/* ══════════════════════════════════════════════════════════════
+   CHONGIE'S CUSTOMER ORDER PANEL
+   Firebase Firestore (Spark plan) + wa.me — no build step.
+   ⚠️ PASTE YOUR FIREBASE CONFIG BELOW (see SETUP.md, Step 2)
+══════════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCr3ne1R4haiy-aOUGTt00MrGMfKuNCwEU",
+  authDomain: "chongies-at-mark-chongs-lunch.firebaseapp.com",
+  projectId: "chongies-at-mark-chongs-lunch",
+  storageBucket: "chongies-at-mark-chongs-lunch.firebasestorage.app",
+  messagingSenderId: "800232515619",
+  appId: "1:800232515619:web:dcfbe048b432032f6b6996"
+};
+
+/* ── PREVIEW MODE ──────────────────────────────────────────────
+   While the config above still has placeholders, the page runs on
+   a sample menu stored in this browser — no Firebase needed.
+   Paste your real config and it switches to live Firestore. */
+const DEMO = String(firebaseConfig.apiKey).startsWith("PASTE");
+
+let doc, collection, onSnapshot, runTransaction, serverTimestamp, initializeApp, getFirestore;
+if (DEMO) {
+  ({ doc, collection, onSnapshot, runTransaction, serverTimestamp } = createMockFirestore());
+} else {
+  const A = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const F = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  initializeApp = A.initializeApp;
+  ({ getFirestore, doc, collection, onSnapshot, runTransaction, serverTimestamp } = F);
+}
+
+const WA_NUMBER = "18768947767";
+const CUTOFF_HOUR = 10;                 // 10:00 AM Jamaica time
+const ZONES = {
+  "1": { label: "Zone 1 — Kingston 10 (HWT)", fee: 300 },
+  "2": { label: "Zone 2 — Kingston 6/8",      fee: 500 },
+  "3": { label: "Zone 3 — New Kingston",      fee: 700 },
+  "4": { label: "Zone 4 — Other Areas",       fee: 800 }
+};
+const TOPPINGS = ["Lettuce","Tomato","Cheese","Carrots","Cucumber","Black Olives","Cabbage"];
+
+const db = DEMO ? null : getFirestore(initializeApp(firebaseConfig));
+
+/* ── Jamaica time helpers (America/Jamaica = UTC-5, no DST) ── */
+function jmParts(d = new Date()) {
+  const p = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Jamaica", year:"numeric", month:"2-digit", day:"2-digit",
+    hour:"2-digit", minute:"2-digit", hour12:false
+  }).formatToParts(d).reduce((a,x)=>(a[x.type]=x.value,a),{});
+  return { y:+p.year, m:+p.month, d:+p.day, hour:+p.hour, min:+p.minute };
+}
+function iso(y,m,d){ return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`; }
+function addDays(isoDate, n){
+  const [y,m,d] = isoDate.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m-1, d + n, 12));
+  return iso(dt.getUTCFullYear(), dt.getUTCMonth()+1, dt.getUTCDate());
+}
+function prettyDate(isoDate){
+  const [y,m,d] = isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y, m-1, d, 12)).toLocaleDateString("en-JM",
+    { weekday:"long", month:"long", day:"numeric", timeZone:"UTC" });
+}
+function activeDeliveryDate(){
+  const t = jmParts();
+  const today = iso(t.y, t.m, t.d);
+  return t.hour >= CUTOFF_HOUR ? { date: addDays(today,1), afterCutoff:true }
+                               : { date: today, afterCutoff:false };
+}
+function dowOf(isoDate){ const [y,m,d]=isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y,m-1,d,12)).getUTCDay(); }   // 0=Sunday … 6=Saturday
+function isClosedDate(d){
+  return (settings.closedDates||[]).includes(d) || (settings.weeklyClosedDays||[]).includes(dowOf(d));
+}
+/* The delivery date skips past closed days (Sundays, holidays, etc.) */
+function resolveActive(){
+  const base = activeDeliveryDate();
+  let date = base.date; const skipped = [];
+  for(let i=0; i<7 && isClosedDate(date); i++){ skipped.push(date); date = addDays(date,1); }
+  return { date, afterCutoff: base.afterCutoff, skipped };
+}
+const J = n => "J$" + Number(n).toLocaleString("en-JM");
+
+/* ── State ── */
+let menuDoc = null;                     // current published menu
+let settings = {};                      // settings/config
+let current = activeDeliveryDate();     // { date, afterCutoff }
+let cart = [];                          // [{key,itemId,name,unitPrice,qty,extra}]
+let stock = {};                         // itemId -> qty (null = unlimited)
+let unsubMenu = null;
+
+/* ── Cart persistence (survives connection drops / reloads) ── */
+const LS_KEY = "chongies_order_v1";
+function saveLocal(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify({ date: current.date, cart,
+    details:{ name:el("custName").value, phone:el("custPhone").value,
+      service:el("serviceType").value, addr:el("custAddr").value,
+      zone:el("zoneSel").value, pay:el("paySel").value, notes:el("custNotes").value } })); }catch(e){}
+}
+function restoreLocal(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+    if(!s || s.date !== current.date) return;   // stale carts from another day are dropped
+    cart = s.cart || [];
+    const d = s.details || {};
+    el("custName").value = d.name||""; el("custPhone").value = d.phone||"";
+    el("serviceType").value = d.service||""; el("custAddr").value = d.addr||"";
+    el("zoneSel").value = d.zone||""; el("paySel").value = d.pay||""; el("custNotes").value = d.notes||"";
+    onServiceChange(); onPayChange();
+  }catch(e){}
+}
+
+const el = id => document.getElementById(id);
+
+/* ── Boot ── */
+function boot(){
+  if(DEMO){
+    const d = document.createElement("div");
+    d.className = "banner amber";
+    d.textContent = "🧪 Preview mode — this is a sample menu saved in your browser (no Firebase connected yet). Orders here are pretend; nothing is sent.";
+    document.querySelector("main").prepend(d);
+  }
+  current = resolveActive();
+  renderDateBar();
+  restoreLocal();
+  listenSettings();
+  listenMenu(current.date);
+  // re-check every 30s: flips at 10AM (and past closed days) automatically
+  setInterval(()=>{
+    const next = resolveActive();
+    if(next.date !== current.date){
+      current = next; cart = []; saveLocal();
+      renderDateBar(); listenMenu(current.date); renderCartBar();
+    } else { current = next; renderDateBar(); }
+  }, 30000);
+}
+
+function renderDateBar(){
+  el("dateBar").innerHTML = `Ordering for delivery on <strong>${prettyDate(current.date)}</strong>`;
+  const skipped = current.skipped || [];
+  const b = el("cutoffBanner");
+  if(skipped.length){
+    b.classList.remove("hidden");
+    b.textContent = `🌴 We're closed ${skipped.map(prettyDate).join(" and ")} — you are ordering for delivery on ${prettyDate(current.date)}.`;
+  } else if(current.afterCutoff){
+    b.classList.remove("hidden");
+    b.textContent = `⏰ Today's cut-off has passed. You are now ordering for delivery on ${prettyDate(current.date)}.`;
+  } else b.classList.add("hidden");
+}
+
+/* ── Settings: closures, banner, closure message ── */
+function listenSettings(){
+  onSnapshot(doc(db,"settings","config"), snap=>{
+    settings = snap.exists() ? snap.data() : {};
+    const next = resolveActive();
+    if(next.date !== current.date){
+      current = next; cart = []; saveLocal();
+      listenMenu(current.date); renderCartBar();
+    } else current = next;
+    renderDateBar();
+    applyClosureState();
+  }, err=>console.warn("settings", err));
+}
+function applyClosureState(){
+  const closedDates = settings.closedDates || [];
+  const isClosed = isClosedDate(current.date);   // only true if the whole week ahead is closed
+  el("closedNotice").classList.toggle("hidden", !isClosed);
+  el("menuArea").classList.toggle("hidden", isClosed);
+  el("cartBar").classList.toggle("hidden", isClosed || cart.length===0);
+  if(isClosed) el("closedMsg").textContent =
+    settings.closureMessage || "Chongie's is closed today — see you tomorrow!";
+  // impending closure banner (future dates only)
+  const today = current.date;
+  const future = closedDates.filter(d => d > today).sort();
+  const b = el("closureBanner");
+  if(future.length){
+    b.classList.remove("hidden");
+    b.textContent = `📢 Please note: Chongie's will be CLOSED on ${future.map(prettyDate).join(", ")}.`;
+  } else b.classList.add("hidden");
+}
+
+/* ── Live menu ── */
+function listenMenu(date){
+  if(unsubMenu) unsubMenu();
+  unsubMenu = onSnapshot(doc(db,"menus",date), snap=>{
+    el("loadingMsg").classList.add("hidden");
+    menuDoc = (snap.exists() && snap.data().published) ? snap.data() : null;
+    renderMenu();
+  }, err=>{
+    el("loadingMsg").textContent = "Couldn't load the menu. Please check your connection and try again.";
+    console.warn("menu", err);
+  });
+}
+
+function renderMenu(){
+  const wrap = el("sections");
+  wrap.innerHTML = "";
+  stock = {};
+  if(!menuDoc || !menuDoc.sections || !menuDoc.sections.length){
+    wrap.innerHTML = `<div class="fullnote"><div class="big">🍳</div>
+      <h2>Menu coming soon</h2><p>The menu for ${prettyDate(current.date)} hasn't been posted yet — check back shortly!</p></div>`;
+    el("detailsPanel").classList.add("hidden");
+    renderCartBar();
+    return;
+  }
+  let anyItems = false;
+  menuDoc.sections.forEach((sec, si)=>{
+    const items = (sec.items||[]).filter(it=>it.active);
+    if(!items.length) return;               // hide empty sections entirely
+    anyItems = true;
+    const sEl = document.createElement("div");
+    sEl.className = "section" + (si<2 ? " open" : "");
+    sEl.innerHTML = `<button class="sec-head" type="button">
+        <span>${sec.title}</span><span class="chev">▼</span></button>
+      <div class="sec-body"></div>`;
+    sEl.querySelector(".sec-head").onclick = ()=>sEl.classList.toggle("open");
+    const body = sEl.querySelector(".sec-body");
+    items.forEach(it=>{
+      stock[it.id] = (it.qty === undefined || it.qty === null || it.qty === "") ? null : Number(it.qty);
+      body.appendChild(renderItem(it));
+      if(it.wrap) renderWrapLines(body, it);
+    });
+    wrap.appendChild(sEl);
+  });
+  el("detailsPanel").classList.toggle("hidden", !anyItems);
+  // prune cart lines for items no longer available; clamp to stock
+  cart = cart.filter(l=>{
+    const q = stock[l.itemId];
+    if(!(l.itemId in stock)) return false;
+    if(q !== null && q <= 0) return false;
+    return true;
+  });
+  renderCartBar(); saveLocal();
+}
+
+function cartQty(itemId){ return cart.filter(l=>l.itemId===itemId).reduce((a,l)=>a+l.qty,0); }
+
+function renderItem(it){
+  const row = document.createElement("div");
+  const q = stock[it.id];
+  const sold = q !== null && q <= 0;
+  row.className = "item" + (sold ? " is-soldout" : "");
+  const low = (!sold && q !== null && q <= 5) ? `<span class="lowstock">Only ${q} left!</span>` : "";
+  const badge = sold ? `<span class="soldout">SOLD OUT</span>` : low;
+  row.innerHTML = `<div class="info">
+      <div class="name">${esc(it.name)}${badge}</div>
+      <div class="price">${J(it.price)}</div></div>`;
+  if(it.wrap){
+    const b = document.createElement("button");
+    b.className = "wrap-btn"; b.type="button"; b.textContent = "Build it +";
+    b.disabled = sold;
+    b.onclick = ()=>openWrapModal(it);
+    row.appendChild(b);
+  }else{
+    const st = document.createElement("div");
+    st.className = "stepper";
+    const cur = cartQty(it.id);
+    st.innerHTML = `<button type="button" aria-label="Remove one">−</button>
+      <span class="qty">${cur}</span><button type="button" aria-label="Add one">+</button>`;
+    const [minus, plus] = st.querySelectorAll("button");
+    minus.disabled = cur===0;
+    plus.disabled = sold || (q!==null && cur>=q);
+    minus.onclick = ()=>changeQty(it, -1);
+    plus.onclick  = ()=>changeQty(it, +1);
+    row.appendChild(st);
+  }
+  return row;
+}
+function renderWrapLines(body, it){
+  cart.filter(l=>l.itemId===it.id).forEach(l=>{
+    const d = document.createElement("div");
+    d.className = "wrap-line";
+    d.innerHTML = `<span>🌯 ${l.qty} × ${esc(l.name)} — ${esc(l.extra.toppings.join(", "))}${l.extra.meat? " · "+esc(l.extra.meat):""}</span>
+      <button class="rm" type="button">remove</button>`;
+    d.querySelector(".rm").onclick = ()=>{ cart = cart.filter(x=>x.key!==l.key); renderMenu(); };
+    body.appendChild(d);
+  });
+}
+
+function changeQty(it, delta){
+  let line = cart.find(l=>l.itemId===it.id && !l.extra);
+  if(!line && delta>0){
+    line = { key: it.id, itemId: it.id, name: it.name, unitPrice: Number(it.price), qty: 0, extra: null };
+    cart.push(line);
+  }
+  if(!line) return;
+  line.qty += delta;
+  if(line.qty <= 0) cart = cart.filter(l=>l!==line);
+  renderMenu();
+}
+
+/* ── Wrap builder: 4 topping dropdowns + 1 protein dropdown ── */
+let wrapItem = null;
+function openWrapModal(it){
+  wrapItem = it;
+  el("wrapTitle").textContent = it.name + " — " + J(it.price);
+  el("meatField").style.display = it.wrap==="meat" ? "" : "none";
+  el("wrapHint").firstChild.textContent = it.wrap==="meat"
+    ? "Choose your 4 toppings + 1 protein " : "Choose your 4 toppings ";
+  el("wrapMeat").value = "";
+  const grid = el("toppingGrid"); grid.innerHTML = "";
+  for(let i=1;i<=4;i++){
+    const sel = document.createElement("select");
+    sel.innerHTML = `<option value="">Topping ${i} — choose…</option>` +
+      TOPPINGS.map(t=>`<option>${t}</option>`).join("");
+    sel.onchange = updateWrapState;
+    grid.appendChild(sel);
+  }
+  updateWrapState();
+  el("wrapModal").classList.add("open");
+}
+function updateWrapState(){
+  const sels = [...el("toppingGrid").querySelectorAll("select")];
+  const chosen = sels.map(s=>s.value).filter(Boolean);
+  // a topping picked in one dropdown is greyed out in the others — no doubles
+  sels.forEach(s=> [...s.options].forEach(o=>{
+    if(o.value) o.disabled = chosen.includes(o.value) && s.value !== o.value;
+  }));
+  el("topCount").textContent = `(${chosen.length}/4)`;
+  const meatOk = wrapItem?.wrap!=="meat" || el("wrapMeat").value;
+  el("wrapAdd").disabled = !(chosen.length===4 && meatOk);
+}
+el("wrapMeat").onchange = updateWrapState;
+el("wrapCancel").onclick = ()=>el("wrapModal").classList.remove("open");
+el("wrapAdd").onclick = ()=>{
+  const toppings = [...el("toppingGrid").querySelectorAll("select")].map(s=>s.value);
+  const q = stock[wrapItem.id];
+  if(q !== null && cartQty(wrapItem.id) >= q){ alert("Sorry — no more of these available today."); return; }
+  cart.push({ key: wrapItem.id + "_" + Date.now(), itemId: wrapItem.id, name: wrapItem.name,
+    unitPrice: Number(wrapItem.price), qty: 1,
+    extra: { toppings, meat: wrapItem.wrap==="meat" ? el("wrapMeat").value : null } });
+  el("wrapModal").classList.remove("open");
+  renderMenu();
+};
+
+/* ── Cart bar & totals ── */
+function totals(){
+  const sub = cart.reduce((a,l)=>a + l.unitPrice*l.qty, 0);
+  const svc = el("serviceType").value;
+  const zone = el("zoneSel").value;
+  const fee = (svc==="delivery" && ZONES[zone]) ? ZONES[zone].fee : 0;
+  return { sub, fee, total: sub+fee };
+}
+function renderCartBar(){
+  const n = cart.reduce((a,l)=>a+l.qty,0);
+  const t = totals();
+  el("cartCount").textContent = n===1 ? "1 item" : n+" items";
+  el("cartTotal").textContent = J(t.total);
+  el("cartBar").classList.toggle("hidden", n===0 || !el("closedNotice").classList.contains("hidden"));
+}
+
+/* ── Form behaviour ── */
+function onServiceChange(){
+  el("deliveryFields").classList.toggle("hidden", el("serviceType").value!=="delivery");
+  el("zone4Note").style.display = (el("serviceType").value==="delivery" && el("zoneSel").value==="4") ? "block" : "none";
+  renderCartBar(); saveLocal();
+}
+el("serviceType").onchange = onServiceChange;
+el("zoneSel").onchange = onServiceChange;
+function onPayChange(){
+  el("payNote").style.display = el("paySel").value==="transfer" ? "block" : "none";
+  saveLocal();
+}
+el("paySel").onchange = onPayChange;
+["custName","custPhone","custAddr","custNotes"].forEach(id=> el(id).addEventListener("input", saveLocal));
+// auto-format 876-XXX-XXXX
+el("custPhone").addEventListener("input", e=>{
+  let v = e.target.value.replace(/\D/g,"").replace(/^1/,"").slice(0,10);
+  if(v.length>6) v = v.slice(0,3)+"-"+v.slice(3,6)+"-"+v.slice(6);
+  else if(v.length>3) v = v.slice(0,3)+"-"+v.slice(3);
+  e.target.value = v;
+});
+
+function validate(){
+  let ok = true;
+  const mark = (fid, bad)=>{ el(fid).classList.toggle("invalid", bad); if(bad) ok=false; };
+  mark("f-name", !el("custName").value.trim());
+  mark("f-phone", !/^876-\d{3}-\d{4}$/.test(el("custPhone").value.trim()));
+  const svc = el("serviceType").value;
+  mark("f-service", !svc);
+  mark("f-pay", !el("paySel").value);
+  if(svc==="delivery"){
+    mark("f-addr", !el("custAddr").value.trim());
+    mark("f-zone", !el("zoneSel").value);
+  }else{ el("f-addr").classList.remove("invalid"); el("f-zone").classList.remove("invalid"); }
+  return ok;
+}
+
+/* ── Order text builder ── */
+function buildOrderText(order){
+  const svcLine = order.service==="pickup" ? "Pickup"
+    : `Delivery — ${ZONES[order.zone].label}`;
+  let lines = [];
+  order.items.forEach(l=>{
+    lines.push(`${l.qty} x ${l.name} — ${J(l.unitPrice*l.qty)}`);
+    if(l.extra) lines.push(`   ↳ ${l.extra.toppings.join(", ")}${l.extra.meat? " · Meat: "+l.extra.meat:""}`);
+  });
+  return [
+    `🍴 NEW CHONGIE'S ORDER — ${prettyDate(order.deliveryDate)}`,
+    `👤 Name: ${order.name}`,
+    `📱 WhatsApp: ${order.phone}`,
+    `🛵 Service: ${svcLine}`,
+    `📍 Address: ${order.service==="pickup" ? "Pickup" : order.address}`,
+    `💳 Payment: ${order.payment==="transfer" ? "Bank Transfer — sending proof" : "Cash on Delivery / Pickup"}`,
+    `— — — — —`,
+    ...lines,
+    `— — — — —`,
+    `Subtotal: ${J(order.subtotal)}`,
+    `Delivery: ${J(order.deliveryFee)}`,
+    `💰 TOTAL: ${J(order.total)}`,
+    `📝 Notes: ${order.notes || "—"}`
+  ].join("\n");
+}
+
+/* ── Submit: save to Firestore (transaction decrements stock) → open wa.me ── */
+el("submitBtn").onclick = async ()=>{
+  if(!cart.length) return;
+  if(!validate()){ el("detailsPanel").scrollIntoView({behavior:"smooth"}); return; }
+  const btn = el("submitBtn");
+  btn.disabled = true; btn.textContent = "Sending…";
+  const t = totals();
+  const order = {
+    deliveryDate: current.date,
+    createdAt: serverTimestamp(),
+    createdAtLocal: new Date().toISOString(),
+    name: el("custName").value.trim(),
+    phone: el("custPhone").value.trim(),
+    service: el("serviceType").value,
+    zone: el("serviceType").value==="delivery" ? el("zoneSel").value : null,
+    address: el("serviceType").value==="delivery" ? el("custAddr").value.trim() : null,
+    payment: el("paySel").value,
+    notes: el("custNotes").value.trim(),
+    items: cart.map(l=>({ itemId:l.itemId, name:l.name, unitPrice:l.unitPrice, qty:l.qty, extra:l.extra||null })),
+    subtotal: t.sub, deliveryFee: t.fee, total: t.total,
+    status: "New"
+  };
+  try{
+    await runTransaction(db, async tx=>{
+      // 1) re-read the menu, verify + decrement stock atomically
+      const mRef = doc(db,"menus",current.date);
+      const mSnap = await tx.get(mRef);
+      if(!mSnap.exists()) throw new Error("Menu unavailable — please refresh.");
+      const m = mSnap.data();
+      const need = {};
+      order.items.forEach(l=> need[l.itemId] = (need[l.itemId]||0) + l.qty);
+      m.sections.forEach(sec=> (sec.items||[]).forEach(it=>{
+        if(need[it.id] && it.qty !== null && it.qty !== undefined && it.qty !== ""){
+          const left = Number(it.qty) - need[it.id];
+          if(left < 0) throw new Error(`Sorry — "${it.name}" just sold out or has fewer left. Please adjust your order.`);
+          it.qty = left;
+        }
+      }));
+      tx.set(mRef, m);
+      // 2) save the order
+      const oRef = doc(collection(db, "orders", current.date, "entries"));
+      tx.set(oRef, order);
+    });
+  }catch(err){
+    alert(err.message || "Couldn't send your order — please check your connection and try again. Your cart is saved.");
+    btn.disabled = false; btn.textContent = "Send order on WhatsApp 📲";
+    return;
+  }
+  // success → WhatsApp
+  const text = buildOrderText(order);
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+  if(order.payment==="transfer"){
+    el("confirmText").textContent =
+      `Thanks ${order.name}! Your order has been sent to Chongie's on WhatsApp. Please make your transfer using the details below and send us your proof — we'll confirm your order once we receive it.`;
+    el("bankDetails").textContent = settings.bankInfo ||
+      "Message us on WhatsApp (876-894-7767) for our current banking details.";
+    el("bankBox").classList.remove("hidden");
+  }else{
+    el("confirmText").textContent =
+      `Thanks ${order.name}! Your order has been sent to Chongie's on WhatsApp. We'll confirm shortly.`;
+    el("bankBox").classList.add("hidden");
+  }
+  el("orderTextPre").textContent = text;
+  el("waRetryBtn").href = waUrl;
+  el("menuArea").classList.add("hidden");
+  el("cartBar").classList.add("hidden");
+  el("confirmScreen").classList.remove("hidden");
+  window.scrollTo(0,0);
+  cart = []; saveLocal();
+  // attempt to open WhatsApp (fallback screen already visible behind it)
+  if(!DEMO) window.location.href = waUrl;
+};
+el("copyOrderBtn").onclick = async ()=>{
+  const text = el("orderTextPre").textContent;
+  try{ await navigator.clipboard.writeText(text); el("copyOrderBtn").textContent = "✅ Copied!"; }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove();
+    el("copyOrderBtn").textContent = "✅ Copied!";
+  }
+  setTimeout(()=>el("copyOrderBtn").textContent="📋 Copy order", 2000);
+};
+
+/* ── Connectivity indicator ── */
+window.addEventListener("offline", ()=> el("offlineBanner").style.display="block");
+window.addEventListener("online",  ()=> el("offlineBanner").style.display="none");
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ── Preview-mode mock Firestore (same engine as admin.html) ── */
+function createMockFirestore(){
+  const KEY = "chongies_demo_db_v2";
+  const clone = o => JSON.parse(JSON.stringify(o));
+  let store = JSON.parse(localStorage.getItem(KEY) || "null") || seedDemo();
+  localStorage.setItem(KEY, JSON.stringify(store));
+  const listeners = [];
+  const persist = () => localStorage.setItem(KEY, JSON.stringify(store));
+  const revive = d => (d && d.createdAt && d.createdAt.__ts !== undefined)
+      ? { ...d, createdAt: { toDate: () => new Date(d.createdAt.__ts) } } : d;
+  const docSnap = p => ({ exists: () => store[p] !== undefined, data: () => revive(clone(store[p])) });
+  const colDocs = p => Object.keys(store)
+      .filter(k => k.startsWith(p + "/") && k.split("/").length === p.split("/").length + 1)
+      .map(k => ({ id: k.split("/").pop(), data: () => revive(clone(store[k])), _ts: (store[k].createdAt || {}).__ts || 0 }))
+      .sort((a, b) => a._ts - b._ts);
+  const fire = l => l.col ? l.cb({ docs: colDocs(l.path) }) : l.cb(docSnap(l.path));
+  const notify = p => listeners.forEach(l => { if (l.path === p || (l.col && p.startsWith(l.path + "/"))) fire(l); });
+  const write = (p, d) => { store[p] = clone(d); persist(); notify(p); };
+  window.addEventListener("storage", e => {
+    if (e.key === KEY) { store = JSON.parse(e.newValue || "{}"); listeners.forEach(fire); } });
+  return {
+    doc: (dbOrRef, ...segs) => (dbOrRef && dbOrRef.col)
+        ? { path: dbOrRef.path + "/" + Math.random().toString(36).slice(2, 10), col: false }
+        : { path: segs.join("/"), col: false },
+    collection: (_db, ...segs) => ({ path: segs.join("/"), col: true }),
+    getDoc: async ref => docSnap(ref.path),
+    setDoc: async (ref, d) => write(ref.path, d),
+    updateDoc: async (ref, patch) => write(ref.path, { ...(store[ref.path] || {}), ...clone(patch) }),
+    onSnapshot: (ref, cb) => {
+      const l = { path: ref.path, col: !!ref.col, cb };
+      listeners.push(l); setTimeout(() => fire(l), 0);
+      return () => { const i = listeners.indexOf(l); if (i > -1) listeners.splice(i, 1); };
+    },
+    query: col => col,
+    orderBy: () => null,
+    serverTimestamp: () => ({ __ts: Date.now() }),
+    runTransaction: async (_db, fn) => fn({ get: async ref => docSnap(ref.path), set: (ref, d) => write(ref.path, d) })
+  };
+}
+function seedDemo(){
+  const p = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Jamaica",year:"numeric",month:"2-digit",
+    day:"2-digit",hour:"2-digit",hour12:false}).formatToParts(new Date()).reduce((a,x)=>(a[x.type]=x.value,a),{});
+  const mk = n => new Date(Date.UTC(+p.year, +p.month-1, +p.day+n, 12)).toISOString().slice(0,10);
+  const active = +p.hour >= 10 ? mk(1) : mk(0);
+  const menu = { published:true, sections:[
+    { id:"mains", title:"🇯🇲 Jamaican Daily Mains", items:[
+      { id:"mains__brown-stew-chicken", name:"Brown Stew Chicken", group:"Chicken", price:1100, qty:null, active:true },
+      { id:"mains__curry-goat", name:"Curry Goat", group:"Beef & Goat", price:1100, qty:8, active:true },
+      { id:"mains__oxtail-and-beans", name:"Oxtail and Beans", group:"Beef & Goat", price:1100, qty:0, active:true },
+      { id:"mains__escovitch-whole-fish", name:"Escovitch Whole Fish", group:"Fish", price:1100, qty:3, active:true },
+      { id:"mains__ital-stew-vegetables", name:"Ital Stew Vegetables", group:"Vegetarian", price:1100, qty:null, active:true } ] },
+    { id:"soups", title:"🍲 Soups (16oz)", items:[
+      { id:"soups__chicken-soup", name:"Chicken Soup", group:"Regular", price:600, qty:null, active:true },
+      { id:"soups__pumpkin-soup", name:"Pumpkin Soup", group:"Vegetarian", price:600, qty:null, active:true } ] },
+    { id:"fried", title:"🍗 Fried Chicken", items:[
+      { id:"fried__2-pcs-fried-chicken", name:"2 Pcs Fried Chicken", group:"", price:650, qty:12, active:true } ] },
+    { id:"noodles", title:"🍜 Noodle Bowls", items:[
+      { id:"noodles__teriyaki-chicken-noodle-bowl", name:"Teriyaki Chicken Noodle Bowl", group:"Chicken — J$1,200", price:1200, qty:null, active:true } ] },
+    { id:"wraps", title:"🌯 Wraps", items:[
+      { id:"wraps__build-your-own-wrap", name:"Build Your Own Wrap", group:"", price:1200, qty:null, active:true, wrap:"meat" },
+      { id:"wraps__vegetarian-wrap", name:"Vegetarian Wrap", group:"", price:1000, qty:null, active:true, wrap:"veg" } ] },
+    { id:"sides", title:"🍌 Sides & Extras", items:[
+      { id:"sides__festival", name:"Festival", group:"", price:200, qty:null, active:true },
+      { id:"sides__fried-plantain", name:"Fried Plantain", group:"", price:200, qty:null, active:true } ] },
+    { id:"drinks", title:"🍹 MCCM Natural Juices & Drinks", items:[
+      { id:"drinks__mango-juice", name:"Mango Juice", group:"", price:500, qty:null, active:true },
+      { id:"drinks__lemonade", name:"Lemonade", group:"", price:500, qty:null, active:true } ] } ] };
+  const s = {};
+  [mk(0), mk(1), mk(2)].forEach(d => s["menus/"+d] = JSON.parse(JSON.stringify(menu)));
+  s["settings/config"] = { pin:"1234", closedDates:[],
+    closureMessage:"Chongie's is closed today — see you tomorrow! 🌴",
+    bankInfo:"Bank: [Your bank name]\nAccount name: Mark Chong's Cooking Mastery\nAccount number: [enter account #]\nAccount type: [Savings / Chequing]\nBranch: [branch]",
+    greetingTemplate:"🙌 Bless up [name]! Thanks for ordering with Chongie's by MCCM. Your order for [date] is confirmed ✅. [Delivery: expect your food between 12–2pm / Pickup: ready from 12pm at 9 Bloomsbury Road, Kingston 10]. Walk good! 🇯🇲" };
+  s["orders/"+active+"/entries/demo1"] = { deliveryDate:active, createdAt:{__ts:Date.now()-3600e3},
+    name:"Andrea Brown", phone:"876-555-0134", service:"delivery", zone:"1",
+    address:"12 Eastwood Park Rd, Kgn 10", payment:"cash", notes:"No pepper please",
+    items:[{itemId:"mains__brown-stew-chicken",name:"Brown Stew Chicken",unitPrice:1100,qty:2,extra:null},
+           {itemId:"drinks__lemonade",name:"Lemonade",unitPrice:500,qty:2,extra:null}],
+    subtotal:3200, deliveryFee:300, total:3500, status:"Confirmed" };
+  s["orders/"+active+"/entries/demo2"] = { deliveryDate:active, createdAt:{__ts:Date.now()-1200e3},
+    name:"Delroy Campbell", phone:"876-555-0188", service:"pickup", zone:null, address:null, payment:"transfer", notes:"",
+    items:[{itemId:"wraps__build-your-own-wrap",name:"Build Your Own Wrap",unitPrice:1200,qty:1,
+      extra:{toppings:["Lettuce","Tomato","Cheese","Cucumber"],meat:"Grilled Chicken"}}],
+    subtotal:1200, deliveryFee:0, total:1200, status:"New" };
+  return s;
+}
+
+boot();
+</script>
+</body>
+</html>
