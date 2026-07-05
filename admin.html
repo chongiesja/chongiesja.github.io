@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Chongie's Admin — MCCM</title>
+<style>
+  :root{
+    --green:#14532d; --green-deep:#0c3a1e; --gold:#e9a820; --gold-soft:#f5c85c;
+    --pepper:#c24528; --ink:#241c15; --paper:#f3ede0; --card:#fffdf7;
+    --line:#e0d5bc; --muted:#7a6f5d; --amber-bg:#fdf1d7; --amber-bd:#ecc35e;
+    --radius:12px; --shadow:0 2px 8px rgba(36,28,21,.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.45;padding-bottom:60px}
+  header{background:var(--green-deep);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;
+    border-bottom:5px solid var(--gold)}
+  header h1{font-family:Georgia,serif;font-size:1.2rem;flex:1}
+  header .tag{font-size:.7rem;background:var(--gold);color:#241c15;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:.08em}
+  main{max-width:900px;margin:0 auto;padding:0 14px}
+  /* date banner */
+  .datebanner{margin:14px 0 0;padding:16px;border-radius:var(--radius);font-size:1.05rem;font-weight:700;
+    text-align:center;box-shadow:var(--shadow)}
+  .datebanner.today{background:#e6f2ea;border:2px solid #2e7d4f;color:#123c22}
+  .datebanner.tomorrow{background:var(--amber-bg);border:2px solid var(--amber-bd);color:#6b4b09}
+  .datebanner.override{background:#e8ecfa;border:2px solid #6d7fd1;color:#2b3670}
+  .datebanner small{display:block;font-weight:500;font-size:.8rem;margin-top:4px}
+  .daterow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap;justify-content:center}
+  .daterow input[type=date]{padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin:16px 0 0;flex-wrap:wrap}
+  .tabs button{flex:1;min-width:120px;border:1.5px solid var(--line);background:#fff;border-radius:10px 10px 0 0;
+    padding:11px 8px;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer;color:var(--muted);border-bottom:0}
+  .tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
+  .tabpanel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:0 0 var(--radius) var(--radius);
+    padding:16px;box-shadow:var(--shadow)}
+  .tabpanel.on{display:block}
+  h2{font-family:Georgia,serif;color:var(--green-deep);font-size:1.15rem;margin-bottom:10px}
+  h3{font-size:.95rem;color:var(--green-deep);margin:14px 0 6px}
+  /* menu builder */
+  .cat{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden;background:#fff}
+  .cat>button.cat-head{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;
+    padding:12px 14px;font:inherit;font-weight:700;cursor:pointer;color:var(--green-deep);text-align:left}
+  .cat .oncount{font-size:.75rem;background:#e6f2ea;color:#1b5e34;border-radius:99px;padding:2px 9px;font-weight:800}
+  .cat-body{display:none;border-top:1px dashed var(--line);padding:6px 10px 12px}
+  .cat.open .cat-body{display:block}
+  .hint{font-size:.76rem;color:#8a5b06;background:var(--amber-bg);border:1px dashed var(--amber-bd);
+    border-radius:8px;padding:6px 10px;margin:8px 0}
+  .irow{display:grid;grid-template-columns:44px 1fr 92px 76px 26px;gap:8px;align-items:center;
+    padding:7px 2px;border-bottom:1px solid #f0e9d6;font-size:.88rem}
+  .irow:last-child{border-bottom:0}
+  .irow .iname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .irow input[type=number]{width:100%;padding:7px 8px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:.85rem}
+  .irow .del{border:0;background:none;color:var(--pepper);font-weight:800;cursor:pointer;font-size:1rem}
+  .irow.off .iname{color:#b0a68f}
+  /* toggle switch */
+  .sw{position:relative;width:42px;height:24px;display:inline-block}
+  .sw input{opacity:0;width:0;height:0}
+  .sw i{position:absolute;inset:0;background:#d5cbb2;border-radius:99px;transition:.15s;cursor:pointer}
+  .sw i::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s}
+  .sw input:checked+i{background:var(--green)}
+  .sw input:checked+i::after{transform:translateX(18px)}
+  .colhead{display:grid;grid-template-columns:44px 1fr 92px 76px 26px;gap:8px;font-size:.68rem;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.06em;font-weight:800;padding:8px 2px 4px}
+  .addrow{display:flex;gap:8px;margin-top:10px}
+  .addrow input{flex:1;padding:9px 10px;border:1.5px solid var(--line);border-radius:9px;font:inherit;font-size:.88rem}
+  /* buttons */
+  .btn{background:var(--green);color:#fff;border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer}
+  .btn.gold{background:var(--gold);color:#241c15}
+  .btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--muted)}
+  .btn.danger{background:var(--pepper)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.small{padding:8px 12px;font-size:.82rem}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;position:sticky;bottom:10px}
+  .flash{font-size:.85rem;font-weight:700;color:var(--green);margin-top:8px;min-height:1.2em}
+  /* broadcast + textareas */
+  textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px;font-family:inherit;font-size:.88rem;background:#fff}
+  /* orders */
+  .sumbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+  .sumcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .sumcard b{display:block;font-size:1.3rem;color:var(--green-deep)}
+  .sumcard span{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:800}
+  .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  table{border-collapse:collapse;width:100%;font-size:.82rem;min-width:900px}
+  th{background:var(--green-deep);color:#fff;padding:9px 10px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+  td{padding:9px 10px;border-bottom:1px solid #f0e9d6;vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td select{padding:6px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:.8rem}
+  .items-cell{max-width:260px;white-space:pre-wrap}
+  .st-New{background:#fff6df}.st-Completed{background:#eef7ef}.st-Declined{background:#faeae5;opacity:.7}
+  .selltbl td,.selltbl th{font-size:.8rem}
+  /* settings */
+  .setrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0;padding:12px;background:#fff;
+    border:1px solid var(--line);border-radius:10px}
+  .setrow .grow{flex:1;min-width:200px}
+  label.lbl{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+  .chipdate{display:inline-flex;align-items:center;gap:6px;background:var(--amber-bg);border:1px solid var(--amber-bd);
+    border-radius:99px;padding:4px 10px;font-size:.8rem;margin:3px}
+  .chipdate button{border:0;background:none;color:var(--pepper);font-weight:800;cursor:pointer}
+  .qr{ text-align:center;padding:10px}
+  .qr img{width:220px;height:220px;border:8px solid #fff;border-radius:10px;box-shadow:var(--shadow)}
+  /* PIN gate */
+  #gate{position:fixed;inset:0;background:var(--green-deep);display:flex;align-items:center;justify-content:center;z-index:200}
+  #gate .box{background:var(--card);border-radius:16px;padding:30px 24px;width:min(92vw,360px);text-align:center}
+  #gate h2{margin-bottom:4px}
+  #gate p{font-size:.85rem;color:var(--muted);margin-bottom:14px}
+  #gate input{width:100%;padding:13px;font-size:1.4rem;text-align:center;letter-spacing:.4em;border:2px solid var(--line);border-radius:10px}
+  #gate .btn{width:100%;margin-top:12px}
+  #gateErr{color:var(--pepper);font-size:.82rem;margin-top:8px;min-height:1.1em}
+  .hidden{display:none!important}
+  @media(max-width:560px){
+    .irow,.colhead{grid-template-columns:40px 1fr 76px 64px 22px;font-size:.8rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- PIN gate -->
+<div id="gate">
+  <div class="box">
+    <h2>🔒 Chongie's Admin</h2>
+    <p>Enter the team PIN to continue</p>
+    <input type="password" id="pinInput" inputmode="numeric" autocomplete="off" placeholder="••••">
+    <button class="btn" id="pinBtn">Unlock</button>
+    <div id="gateErr"></div>
+  </div>
+</div>
+
+<header>
+  <h1>Chongie's Admin</h1>
+  <span class="tag">MCCM TEAM</span>
+</header>
+
+<main>
+  <div class="datebanner today" id="dateBanner">Loading…</div>
+  <div class="daterow">
+    <label style="font-size:.82rem;font-weight:700;color:var(--muted)">Manual date override:</label>
+    <input type="date" id="dateOverride">
+    <button class="btn ghost small" id="clearOverride">Back to auto date</button>
+  </div>
+
+  <div class="tabs">
+    <button class="on" data-tab="menu">🍛 Menu Builder</button>
+    <button data-tab="broadcast">📣 Broadcast</button>
+    <button data-tab="orders">📋 Orders</button>
+    <button data-tab="settings">⛔ Closures & Settings</button>
+  </div>
+
+  <!-- ── MENU BUILDER ── -->
+  <div class="tabpanel on" id="tab-menu">
+    <h2>Menu for <span id="menuDateLabel"></span></h2>
+    <div class="hint" id="anchorHint"></div>
+    <div id="catList"></div>
+    <div class="toolbar">
+      <button class="btn gold" id="publishBtn">🚀 Publish Menu</button>
+      <button class="btn ghost" id="unpublishBtn">Unpublish</button>
+    </div>
+    <div class="flash" id="menuFlash"></div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:6px">
+      Every edit you publish syncs to the customer panel instantly. Leave “Qty” blank for unlimited.
+      Toggle an item ON to sell it that day.
+    </p>
+  </div>
+
+  <!-- ── BROADCAST ── -->
+  <div class="tabpanel" id="tab-broadcast">
+    <h2>WhatsApp Broadcast</h2>
+    <button class="btn" id="genBroadcast">✨ Generate Today's Broadcast</button>
+    <button class="btn gold" id="copyBroadcast">📋 Copy to Clipboard</button>
+    <div class="flash" id="bcFlash"></div>
+    <textarea id="broadcastText" rows="16" style="margin-top:10px" placeholder="Click Generate to build the day's broadcast from the published menu…"></textarea>
+
+    <h3>Quick reply — order confirmation</h3>
+    <p style="font-size:.8rem;color:var(--muted)">Copy, then replace the [name]/[date] bits before sending. Edit the template and it saves for the whole team.</p>
+    <textarea id="greetingText" rows="4"></textarea>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn ghost small" id="saveGreeting">Save template</button>
+      <button class="btn small" id="copyGreeting">📋 Copy</button>
+    </div>
+    <div class="flash" id="greetFlash"></div>
+  </div>
+
+  <!-- ── ORDERS ── -->
+  <div class="tabpanel" id="tab-orders">
+    <h2>Orders — <span id="ordersDateLabel"></span></h2>
+    <div class="sumbar">
+      <div class="sumcard"><b id="sumOrders">0</b><span>Orders</span></div>
+      <div class="sumcard"><b id="sumRevenue">J$0</b><span>Revenue</span></div>
+      <div class="sumcard"><b id="sumItems">0</b><span>Plates / items</span></div>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>Time</th><th>Name</th><th>WhatsApp</th><th>Service</th><th>Zone</th>
+          <th>Address</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th>
+        </tr></thead>
+        <tbody id="ordersBody"><tr><td colspan="10" style="text-align:center;color:var(--muted)">No orders yet for this date.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="toolbar">
+      <button class="btn ghost" id="csvBtn">⬇️ Export day to CSV</button>
+    </div>
+    <h3>Item sell-through (kitchen prep)</h3>
+    <div class="tblwrap"><table class="selltbl" style="min-width:0">
+      <thead><tr><th>Item</th><th>Qty ordered</th></tr></thead>
+      <tbody id="sellBody"><tr><td colspan="2" style="color:var(--muted)">—</td></tr></tbody>
+    </table></div>
+  </div>
+
+  <!-- ── SETTINGS / CLOSURES ── -->
+  <div class="tabpanel" id="tab-settings">
+    <h2>Closure controls</h2>
+    <div class="setrow">
+      <div class="grow">
+        <label class="lbl">Close for today</label>
+        <span style="font-size:.85rem;color:var(--muted)">Instantly replaces the customer order form with your closure message for the active delivery date.</span>
+      </div>
+      <label class="sw"><input type="checkbox" id="closeToday"><i></i></label>
+    </div>
+    <div class="setrow">
+      <div class="grow">
+        <label class="lbl">Closure message (shown to customers)</label>
+        <textarea id="closureMsg" rows="2">Chongie's is closed today — see you tomorrow! 🌴</textarea>
+      </div>
+      <button class="btn small" id="saveClosureMsg">Save</button>
+    </div>
+    <div class="setrow">
+      <div class="grow">
+        <label class="lbl">Closed every week on</label>
+        <div id="weeklyDays"></div>
+        <span style="font-size:.78rem;color:var(--muted)">Both panels automatically skip these days — e.g. tick Sunday and Saturday-after-cutoff orders go to Monday.</span>
+      </div>
+    </div>
+    <div class="setrow">
+      <div class="grow">
+        <label class="lbl">Schedule a closure</label>
+        <input type="date" id="schedDate" style="padding:9px;border:1.5px solid var(--line);border-radius:9px;font:inherit">
+        <button class="btn small" id="addSched" style="margin-left:8px">Add</button>
+        <div id="schedList" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:20px">🏦 Bank transfer details</h2>
+    <div class="setrow">
+      <div class="grow">
+        <label class="lbl">Shown to customers who choose Bank Transfer (after they submit)</label>
+        <textarea id="bankInfo" rows="5" placeholder="Bank, account name, account number, type, branch…"></textarea>
+      </div>
+      <button class="btn small" id="saveBank">Save</button>
+    </div>
+
+    <h2 style="margin-top:20px">Admin PIN</h2>
+    <div class="setrow">
+      <div class="grow">
+        <label class="lbl">Change PIN</label>
+        <input type="text" id="newPin" placeholder="New PIN (4–8 digits)" style="padding:9px;border:1.5px solid var(--line);border-radius:9px;font:inherit">
+        <button class="btn small" id="savePin" style="margin-left:8px">Update PIN</button>
+      </div>
+    </div>
+
+    <h2 style="margin-top:20px">Order page QR code</h2>
+    <div class="qr">
+      <img id="qrImg" alt="QR code to the Chongie's order page" loading="lazy">
+      <p style="font-size:.82rem;color:var(--muted);margin-top:8px">
+        Points to <strong>markchongscatering.com/lunch-orders</strong>.<br>
+        Long-press (phone) or right-click (desktop) to save for flyers, table tents and signage.
+      </p>
+    </div>
+    <div class="flash" id="setFlash"></div>
+  </div>
+</main>
+
+<script type="module">
+/* ══════════════════════════════════════════════════════════════
+   CHONGIE'S ADMIN PANEL — MCCM
+   ⚠️ PASTE THE SAME FIREBASE CONFIG AS index.html BELOW
+══════════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCr3ne1R4haiy-aOUGTt00MrGMfKuNCwEU",
+  authDomain: "chongies-at-mark-chongs-lunch.firebaseapp.com",
+  projectId: "chongies-at-mark-chongs-lunch",
+  storageBucket: "chongies-at-mark-chongs-lunch.firebasestorage.app",
+  messagingSenderId: "800232515619",
+  appId: "1:800232515619:web:dcfbe048b432032f6b6996"
+};
+
+/* ── PREVIEW MODE ──────────────────────────────────────────────
+   While the config above still has placeholders, the panel runs
+   on sample data stored in this browser (localStorage) — no
+   Firebase needed. PIN is 1234. Paste your real config and it
+   switches to live Firestore automatically. */
+const DEMO = String(firebaseConfig.apiKey).startsWith("PASTE");
+
+let doc, collection, getDoc, setDoc, updateDoc, onSnapshot, query, orderBy, initializeApp, getFirestore;
+if (DEMO) {
+  ({ doc, collection, getDoc, setDoc, updateDoc, onSnapshot, query, orderBy } = createMockFirestore());
+} else {
+  const A = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const F = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  initializeApp = A.initializeApp;
+  ({ getFirestore, doc, collection, getDoc, setDoc, updateDoc, onSnapshot, query, orderBy } = F);
+}
+
+const ORDER_LINK = "https://www.markchongscatering.com/lunch-orders";
+const CUTOFF_HOUR = 10;
+const DEFAULT_PIN = "1234";   // used only to initialise settings on first run — change it in the Settings tab!
+const DEFAULT_GREETING = "🙌 Bless up [name]! Thanks for ordering with Chongie's by MCCM. Your order for [date] is confirmed ✅. [Delivery: expect your food between 12–2pm / Pickup: ready from 12pm at 9 Bloomsbury Road, Kingston 10]. Walk good! 🇯🇲";
+
+/* ── MASTER MENU (seed data & dropdown source) ── */
+const MASTER = [
+  { id:"mains", title:"🇯🇲 Jamaican Daily Mains", price:1100, groups:{
+    "Chicken":["Brown Stew Chicken","Jerk Chicken","Curry Chicken","Roast Chicken","Sweet & Sour Chicken","BBQ Chicken","Honey Garlic Chicken","Escovitch Chicken","Stewed Chicken","Fricassee Chicken","Lemon Herb Chicken","Garlic Butter Chicken","Teriyaki Chicken","Rosemary Roast Chicken"],
+    "Beef & Goat":["Stewed Beef","Brown Stew Beef","Oxtail and Beans","Curry Goat","Brown Stew Goat"],
+    "Pork":["Grilled Smoked Pork Chop","Stew Peas with Pigtail","Stewed Pork with Beans","BBQ Pork Ribs","Pot Roast Pork","Honey Garlic Pork","Sweet & Sour Pork","Brown Stew Pork","Jerk Pork"],
+    "Fish":["Foil Roasted Snapper Fillet","Steamed Whole Snapper Fish","Sweet & Sour Fish Fillet","Brown Stew Fish Fillet","Garlic Butter Fish","Curry Fish Fillet","Jerk Fish Fillet","Escovitch Whole Fish","Fish Rundown"],
+    "Vegetarian":["Vegetable Curry & Chickpeas","Callaloo & Tofu Stir-fry","Callaloo & Lentils","Ital Stew Vegetables","Chickpea & Vegetable Curry","Lentil & Vegetable Stew","Mixed Bean Stew"] } },
+  { id:"soups", title:"🍲 Soups (16oz)", price:600, groups:{
+    "Regular":["Chicken Soup","Pepperpot Soup","Chicken Foot Soup","Beef Soup","Fish & Seafood Soup","Red Peas Soup with Pigtail","Mannish Water","Corn Soup"],
+    "Vegetarian":["Pumpkin Soup","Vegetable Soup","Callaloo Soup","Lentil Soup","Gungo Peas Soup","Red Peas Soup"] } },
+  { id:"fried", title:"🍗 Fried Chicken", price:650, groups:{ "":["2 Pcs Fried Chicken"] } },
+  { id:"noodles", title:"🍜 Noodle Bowls", price:1200, groups:{
+    "Chicken — J$1,200":["Teriyaki Chicken Noodle Bowl","Coconut Curry Chicken Noodle","Cold Sesame Chicken Noodle"],
+    "Fish — J$1,350":["Sweet Chili Fish Noodle Bowl","Miso Ginger Fish & Soba","Asian Fish Stir-Fry Noodle Box"],
+    "Shrimp — J$1,800":["Coconut Curry Shrimp Noodle","Garlic Butter Shrimp Noodle"] },
+    groupPrices:{ "Chicken — J$1,200":1200, "Fish — J$1,350":1350, "Shrimp — J$1,800":1800 } },
+  { id:"wings", title:"🍗 Wings (6 pcs + Wedges)", price:1200, groups:{
+    "":["Jerk Wings","BBQ Wings","Buffalo Wings","Lemon Pepper Wings","Honey Garlic Wings","Sweet Chili Wings","Teriyaki Wings"] } },
+  { id:"pasta", title:"🍝 Alfredo Pasta", price:1200, groups:{ "":["Chicken Alfredo","Vegetarian Alfredo"] } },
+  { id:"salads", title:"🥗 Salads", price:1350, groups:{ "":["Chicken Salad","Garden Salad","Fish Salad"] } },
+  { id:"wraps", title:"🌯 Wraps", price:1200, groups:{ "":["Build Your Own Wrap","Vegetarian Wrap"] },
+    special:{ "Build Your Own Wrap":{price:1200, wrap:"meat"}, "Vegetarian Wrap":{price:1000, wrap:"veg"} } },
+  { id:"sides", title:"🍌 Sides & Extras", price:200, groups:{ "":["Festival","Fried Plantain","Steamed Vegetables","Extra Rice & Peas","Bammy","Coleslaw"] },
+    itemPrices:{ "Festival":200,"Fried Plantain":200,"Steamed Vegetables":300,"Extra Rice & Peas":400,"Bammy":250,"Coleslaw":200 } },
+  { id:"drinks", title:"🍹 MCCM Natural Juices & Drinks", price:500, groups:{
+    "":["Mango Juice","June Plum Juice","Lemonade","Beet Root Juice","Carrot Juice","Bottled Water (500ml)"] },
+    itemPrices:{ "Bottled Water (500ml)":150 } },
+  { id:"friday", title:"🎉 Friday Take Home Specials", price:4000, groups:{
+    "":["Seafood Boil (2 lbs)","Ribs, Potato, Corn & Coleslaw","Garlic Crab Platter (2 lbs)","Escallion Ginger Crab (2 lbs)"] },
+    itemPrices:{ "Seafood Boil (2 lbs)":4000,"Ribs, Potato, Corn & Coleslaw":5000,"Garlic Crab Platter (2 lbs)":3000,"Escallion Ginger Crab (2 lbs)":3000 } }
+];
+const ANCHORS = "⭐ Anchor day reminders (not enforced): Stew Peas w/ Pigtail → Wednesday · Curry Goat → Thursday · Jerk Pork & Escovitch Whole Fish → Friday";
+
+const db = DEMO ? null : getFirestore(initializeApp(firebaseConfig));
+const el = id => document.getElementById(id);
+const J = n => "J$" + Number(n).toLocaleString("en-JM");
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+
+/* ── Jamaica time ── */
+function jmParts(d = new Date()){
+  const p = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Jamaica",year:"numeric",month:"2-digit",
+    day:"2-digit",hour:"2-digit",hour12:false}).formatToParts(d).reduce((a,x)=>(a[x.type]=x.value,a),{});
+  return { y:+p.year, m:+p.month, d:+p.day, hour:+p.hour };
+}
+const iso = (y,m,d)=>`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+function addDays(isoDate,n){ const [y,m,d]=isoDate.split("-").map(Number);
+  const dt=new Date(Date.UTC(y,m-1,d+n,12)); return iso(dt.getUTCFullYear(),dt.getUTCMonth()+1,dt.getUTCDate()); }
+function prettyDate(isoDate){ const [y,m,d]=isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y,m-1,d,12)).toLocaleDateString("en-JM",{weekday:"long",month:"long",day:"numeric",timeZone:"UTC"}); }
+function dowOf(isoDate){ const [y,m,d]=isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y,m-1,d,12)).getUTCDay(); }   // 0=Sunday … 6=Saturday
+function isClosedDate(d){
+  return (settings.closedDates||[]).includes(d) || (settings.weeklyClosedDays||[]).includes(dowOf(d));
+}
+function autoDate(){ const t=jmParts(); const today=iso(t.y,t.m,t.d);
+  const r = t.hour>=CUTOFF_HOUR ? {date:addDays(today,1),after:true} : {date:today,after:false};
+  r.skipped = [];
+  for(let i=0; i<7 && isClosedDate(r.date); i++){ r.skipped.push(r.date); r.date = addDays(r.date,1); }
+  return r; }
+
+/* ── State ── */
+let override = null;           // manual date override (ISO) or null
+let settings = {};             // must be declared BEFORE workingDate — autoDate() reads it via isClosedDate()
+let workingDate = autoDate().date;
+let menu = null;               // menu doc being edited for workingDate
+let unsubMenu = null, unsubOrders = null;
+let ordersCache = [];
+
+/* ── PIN GATE ── */
+const ADMIN_VERSION = "v2.2";
+async function initGate(){
+  const vTag = document.createElement("p");
+  vTag.style.cssText = "margin-top:10px;font-size:.7rem;color:#b0a68f";
+  vTag.textContent = "Chongie's Admin " + ADMIN_VERSION;
+  document.querySelector("#gate .box").appendChild(vTag);
+  if(DEMO){
+    el("gateErr").textContent = "🧪 Preview mode (no Firebase connected yet) — PIN is 1234";
+    document.querySelector("header .tag").textContent = "PREVIEW";
+  }
+  const ref = doc(db,"settings","config");
+  let snap;
+  try{ snap = await getDoc(ref); }
+  catch(e){ el("gateErr").textContent = "Can't reach the database — check your internet and refresh. (" + (e.message||e) + ")"; return; }
+  if(!snap.exists()){
+    await setDoc(ref, { pin: DEFAULT_PIN, closedDates: [], closureMessage:
+      "Chongie's is closed today — see you tomorrow! 🌴", greetingTemplate: DEFAULT_GREETING,
+      bankInfo: "Bank: [Your bank name]\nAccount name: Mark Chong's Cooking Mastery\nAccount number: [enter account #]\nAccount type: [Savings / Chequing]\nBranch: [branch]" });
+    el("gateErr").textContent = `First run: PIN initialised to ${DEFAULT_PIN}. Change it after you log in!`;
+  }
+  if(sessionStorage.getItem("chongies_admin") === "ok"){ unlock(); return; }
+  const tryPin = async ()=>{
+    el("gateErr").textContent = "Checking…";
+    let pin;
+    try{
+      const s = await getDoc(ref);           // fresh read every attempt — never compares against a stale PIN
+      pin = String((s.data()||{}).pin ?? "").trim();
+    }catch(e){
+      el("gateErr").textContent = "Can't reach the database — check your internet. (" + (e.message||e) + ")";
+      return;
+    }
+    const entered = el("pinInput").value.trim();
+    if(entered && entered === pin){
+      sessionStorage.setItem("chongies_admin","ok"); unlock();
+    } else el("gateErr").textContent = "Wrong PIN — try again.";
+  };
+  el("pinBtn").onclick = tryPin;
+  el("pinInput").onkeydown = e=>{ if(e.key==="Enter") tryPin(); };
+}
+function unlock(){ el("gate").classList.add("hidden"); boot(); }
+
+/* ── Boot ── */
+function boot(){
+  if(DEMO){
+    const d = document.createElement("div");
+    d.className = "hint";
+    d.style.margin = "12px 0 0";
+    d.textContent = "🧪 Preview mode — everything you see is sample data saved in this browser. Paste your Firebase config (see SETUP.md) to go live. Tip: open index.html in another tab and watch your edits appear there instantly.";
+    document.querySelector("main").insertBefore(d, document.querySelector(".datebanner"));
+  }
+  refreshDate();
+  listenSettings();
+  el("qrImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=2&data="
+    + encodeURIComponent(ORDER_LINK);
+  // auto-flip at 10AM — only reload when the target date actually changes,
+  // so in-progress menu edits are never wiped by the background check
+  setInterval(()=>{
+    if(override) return;
+    if(autoDate().date !== workingDate) refreshDate();
+  }, 30000);
+  // tabs
+  document.querySelectorAll(".tabs button").forEach(b=> b.onclick = ()=>{
+    document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on", x===b));
+    document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("on", p.id==="tab-"+b.dataset.tab));
+  });
+  el("dateOverride").onchange = e=>{ if(e.target.value){ override = e.target.value; refreshDate(); } };
+  el("clearOverride").onclick = ()=>{ override = null; el("dateOverride").value=""; refreshDate(); };
+}
+
+function refreshDate(){
+  const auto = autoDate();
+  workingDate = override || auto.date;
+  const b = el("dateBanner");
+  if(override){
+    b.className = "datebanner override";
+    b.innerHTML = `📅 MANUAL OVERRIDE — You are setting the menu for <u>${prettyDate(workingDate)}</u>
+      <small>Auto mode would target ${prettyDate(auto.date)}</small>`;
+  } else if(auto.skipped.length){
+    b.className = "datebanner tomorrow";
+    b.innerHTML = `📅 You are setting the menu for the NEXT OPEN DAY — ${prettyDate(workingDate)}
+      <small>Skipped (closed): ${auto.skipped.map(prettyDate).join(", ")}</small>`;
+  } else if(auto.after){
+    b.className = "datebanner tomorrow";
+    b.innerHTML = `📅 CUT-OFF PASSED — You are now setting the menu for TOMORROW — ${prettyDate(workingDate)}
+      <small>Orders placed now are for next-day delivery</small>`;
+  } else {
+    b.className = "datebanner today";
+    b.innerHTML = `📅 You are setting the menu for TODAY — ${prettyDate(workingDate)}
+      <small>Customer cut-off is 10:00 AM Jamaica time</small>`;
+  }
+  el("menuDateLabel").textContent = prettyDate(workingDate);
+  el("ordersDateLabel").textContent = prettyDate(workingDate);
+  el("anchorHint").textContent = ANCHORS;
+  loadMenu(workingDate);
+  listenOrders(workingDate);
+}
+
+/* ── Settings sync ── */
+function listenSettings(){
+  onSnapshot(doc(db,"settings","config"), snap=>{
+    settings = snap.exists()? snap.data() : {};
+    el("closureMsg").value = settings.closureMessage || "";
+    el("greetingText").value = settings.greetingTemplate || DEFAULT_GREETING;
+    el("bankInfo").value = settings.bankInfo || "";
+    renderClosureUI();
+    // closed-day settings can change which date auto mode targets
+    if(!override && autoDate().date !== workingDate) refreshDate();
+  });
+}
+const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function renderWeeklyDays(){
+  const wrap = el("weeklyDays");
+  const on = settings.weeklyClosedDays || [];
+  wrap.innerHTML = DAY_NAMES.map((n,i)=>
+    `<label style="display:inline-flex;align-items:center;gap:5px;margin:4px 10px 4px 0;font-size:.88rem;font-weight:600">
+      <input type="checkbox" data-dow="${i}" ${on.includes(i)?"checked":""}> ${n}</label>`).join("");
+  wrap.querySelectorAll("input").forEach(cb=> cb.onchange = async ()=>{
+    const days = new Set(settings.weeklyClosedDays || []);
+    cb.checked ? days.add(+cb.dataset.dow) : days.delete(+cb.dataset.dow);
+    await updateDoc(doc(db,"settings","config"), { weeklyClosedDays: [...days].sort() });
+    flash("setFlash","✅ Weekly closing days saved.");
+  });
+}
+function renderClosureUI(){
+  renderWeeklyDays();
+  const closed = settings.closedDates || [];
+  el("closeToday").checked = closed.includes(workingDate);
+  const today = autoDate().date;
+  const list = el("schedList");
+  list.innerHTML = closed.filter(d=>d>=today).sort().map(d=>
+    `<span class="chipdate">⛔ ${prettyDate(d)} <button data-d="${d}" title="Remove">✕</button></span>`).join("") ||
+    `<span style="font-size:.8rem;color:var(--muted)">No closures scheduled.</span>`;
+  list.querySelectorAll("button").forEach(b=> b.onclick = ()=>toggleClosure(b.dataset.d, false));
+}
+async function toggleClosure(dateIso, on){
+  const closed = new Set(settings.closedDates || []);
+  on ? closed.add(dateIso) : closed.delete(dateIso);
+  await updateDoc(doc(db,"settings","config"), { closedDates: [...closed] });
+}
+el("closeToday").onchange = e=> toggleClosure(workingDate, e.target.checked);
+el("addSched").onclick = ()=>{ const d = el("schedDate").value; if(d) toggleClosure(d, true); };
+el("saveClosureMsg").onclick = async ()=>{
+  await updateDoc(doc(db,"settings","config"), { closureMessage: el("closureMsg").value.trim() });
+  flash("setFlash","✅ Closure message saved.");
+};
+el("saveBank").onclick = async ()=>{
+  await updateDoc(doc(db,"settings","config"), { bankInfo: el("bankInfo").value.trim() });
+  flash("setFlash","✅ Bank details saved — customers see them instantly.");
+};
+el("savePin").onclick = async ()=>{
+  const p = el("newPin").value.trim();
+  if(!/^\d{4,8}$/.test(p)){ flash("setFlash","PIN must be 4–8 digits."); return; }
+  await updateDoc(doc(db,"settings","config"), { pin: p });
+  el("newPin").value=""; flash("setFlash","✅ PIN updated.");
+};
+el("saveGreeting").onclick = async ()=>{
+  await updateDoc(doc(db,"settings","config"), { greetingTemplate: el("greetingText").value });
+  flash("greetFlash","✅ Template saved.");
+};
+el("copyGreeting").onclick = ()=> copyText(el("greetingText").value, "greetFlash");
+
+/* ── Menu builder ── */
+function defaultMenuFor(){
+  return { published:false, sections: MASTER.map(cat=>({
+    id: cat.id, title: cat.title,
+    items: Object.entries(cat.groups).flatMap(([group, names])=> names.map(name=>{
+      const sp = cat.special?.[name] || {};
+      const price = sp.price ?? cat.itemPrices?.[name] ?? cat.groupPrices?.[group] ?? cat.price;
+      return { id: cat.id+"__"+slug(name), name, group, price, qty: null, active:false,
+               ...(sp.wrap ? {wrap: sp.wrap} : {}) };
+    }))
+  }))};
+}
+function loadMenu(date){
+  if(unsubMenu) unsubMenu();
+  unsubMenu = onSnapshot(doc(db,"menus",date), snap=>{
+    menu = mergeWithMaster(snap.exists() ? snap.data() : null);
+    renderBuilder();
+  });
+}
+/* The builder ALWAYS shows the full master catalog (every noodle bowl,
+   every wing flavour, etc.) with toggles — saved states are overlaid on
+   top, and any custom dishes from the saved doc are appended. */
+function mergeWithMaster(saved){
+  const base = defaultMenuFor();
+  base.published = saved?.published ?? false;
+  if(saved){
+    const savedSecs = Object.fromEntries((saved.sections||[]).map(s=>[s.id,s]));
+    base.sections.forEach(sec=>{
+      const ss = savedSecs[sec.id];
+      if(!ss) return;
+      const byId = Object.fromEntries((ss.items||[]).map(i=>[i.id,i]));
+      const masterIds = new Set(sec.items.map(i=>i.id));
+      sec.items.forEach(it=>{
+        const s = byId[it.id];
+        if(s){
+          it.active = !!s.active;
+          it.price = Number(s.price) || it.price;
+          it.qty = (s.qty === undefined || s.qty === "") ? null : s.qty;
+        }
+      });
+      (ss.items||[]).forEach(i=>{
+        if(!masterIds.has(i.id)) sec.items.push({ ...i, custom:true });
+      });
+    });
+  }
+  return base;
+}
+function renderBuilder(){
+  const list = el("catList");
+  const openIds = new Set([...list.querySelectorAll(".cat.open")].map(c=>c.dataset.id));
+  list.innerHTML = "";
+  menu.sections.forEach(sec=>{
+    const onCount = sec.items.filter(i=>i.active).length;
+    const cat = document.createElement("div");
+    cat.className = "cat" + (openIds.has(sec.id) ? " open" : "");
+    cat.dataset.id = sec.id;
+    cat.innerHTML = `<button class="cat-head" type="button">
+        <span>${sec.title}</span><span class="oncount">${onCount} ON</span></button>
+      <div class="cat-body">
+        <div class="colhead"><span>On</span><span>Item</span><span>Price J$</span><span>Qty</span><span></span></div>
+        <div class="rows"></div>
+        <div class="addrow">
+          <input type="text" placeholder="✏️ Type custom dish for this section…">
+          <button class="btn small" type="button">Add</button>
+        </div>
+      </div>`;
+    cat.querySelector(".cat-head").onclick = ()=>cat.classList.toggle("open");
+    const rows = cat.querySelector(".rows");
+    let lastGroup = null;
+    sec.items.forEach(item=>{
+      if(item.group && item.group !== lastGroup){
+        const g = document.createElement("div");
+        g.style.cssText = "font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 2px 2px";
+        g.textContent = item.group; rows.appendChild(g); lastGroup = item.group;
+      }
+      rows.appendChild(builderRow(sec, item));
+    });
+    const addInput = cat.querySelector(".addrow input");
+    cat.querySelector(".addrow button").onclick = ()=>{
+      const name = addInput.value.trim(); if(!name) return;
+      sec.items.push({ id: sec.id+"__custom-"+Date.now(), name, group:"Custom",
+        price: MASTER.find(m=>m.id===sec.id)?.price ?? 0, qty:null, active:true, custom:true });
+      addInput.value = ""; renderBuilder(); autoSync();
+    };
+    list.appendChild(cat);
+  });
+}
+function builderRow(sec, item){
+  const r = document.createElement("div");
+  r.className = "irow" + (item.active ? "" : " off");
+  r.innerHTML = `
+    <label class="sw"><input type="checkbox" ${item.active?"checked":""}><i></i></label>
+    <span class="iname" title="${item.name}">${item.name}${item.wrap?" 🌯":""}</span>
+    <input type="number" class="price" min="0" step="50" value="${item.price}">
+    <input type="number" class="qty" min="0" step="1" placeholder="∞" value="${item.qty ?? ""}">
+    ${item.custom ? '<button class="del" title="Remove custom item">✕</button>' : "<span></span>"}`;
+  r.querySelector(".sw input").onchange = e=>{ item.active = e.target.checked; renderBuilder(); autoSync(); };
+  r.querySelector(".price").onchange = e=>{ item.price = Number(e.target.value)||0; autoSync(); };
+  r.querySelector(".qty").onchange = e=>{
+    item.qty = e.target.value === "" ? null : Math.max(0, Number(e.target.value)); autoSync(); };
+  const del = r.querySelector(".del");
+  if(del) del.onclick = ()=>{ sec.items = sec.items.filter(i=>i!==item); renderBuilder(); autoSync(); };
+  return r;
+}
+/* Publish writes the doc; once published, edits auto-sync live */
+async function writeMenu(publish){
+  clearTimeout(syncT);                       // cancel any pending draft save so it can't overwrite this write
+  const pub = publish ?? menu.published ?? false;
+  const clean = { published: pub,
+    sections: menu.sections.map(s=>({ id:s.id, title:s.title, items:s.items })) };
+  await setDoc(doc(db,"menus",workingDate), clean);
+  menu.published = pub;                      // keep local state in step so later auto-saves preserve it
+}
+let syncT = null;
+function autoSync(){
+  // every edit is saved after a short pause — as a live update if published,
+  // otherwise as a draft (customers see drafts only after you hit Publish)
+  clearTimeout(syncT);
+  syncT = setTimeout(async ()=>{
+    try{
+      await writeMenu(menu.published === true);
+      flash("menuFlash", menu.published ? "🔄 Live menu updated." : "💾 Draft saved — hit Publish when ready.");
+    }catch(err){ flash("menuFlash","⚠️ Couldn't save: " + (err.message||err)); }
+  }, 600);
+}
+el("publishBtn").onclick = async ()=>{
+  const anyOn = menu.sections.some(s=>s.items.some(i=>i.active));
+  if(!anyOn && !confirm("No items are toggled ON — publish an empty menu?")) return;
+  try{
+    await writeMenu(true);
+    flash("menuFlash", `🚀 Menu published for ${prettyDate(workingDate)} — customer panel updated instantly.`);
+  }catch(err){
+    alert("Couldn't publish: " + (err.message||err) + "\nCheck your connection and try again.");
+  }
+};
+el("unpublishBtn").onclick = async ()=>{
+  try{
+    await writeMenu(false);
+    flash("menuFlash","Menu unpublished — customers now see “Menu coming soon”.");
+  }catch(err){ alert("Couldn't unpublish: " + (err.message||err)); }
+};
+
+/* ── Broadcast generator ── */
+el("genBroadcast").onclick = ()=>{
+  if(!menu){ return; }
+  const secs = menu.sections.map(sec=>{
+    const on = sec.items.filter(i=>i.active);
+    if(!on.length) return null;
+    return sec.title.toUpperCase().replace(/^([^\s]+)\s/,"$1 ") + "\n" +
+      on.map(i=>`- ${i.name} — ${J(i.price)}`).join("\n");
+  }).filter(Boolean);
+  el("broadcastText").value = [
+    `🍴 CHONGIE'S MENU — ${prettyDate(workingDate)}`,
+    `by Mark Chong's Cooking Mastery`,
+    ``,
+    secs.join("\n\n") || "(no items published yet)",
+    ``,
+    `⏰ Order by 10AM for same-day delivery!`,
+    `🛵 Delivery from J$300 | Pickup FREE`,
+    `👉 Order here: ${ORDER_LINK}`
+  ].join("\n");
+  flash("bcFlash","✨ Broadcast generated from the current menu.");
+};
+el("copyBroadcast").onclick = ()=> copyText(el("broadcastText").value, "bcFlash");
+
+/* ── Orders dashboard ── */
+const STATUSES = ["New","Confirmed","Preparing","Out for Delivery","Ready for Pickup","Completed","Declined"];
+function listenOrders(date){
+  if(unsubOrders) unsubOrders();
+  unsubOrders = onSnapshot(query(collection(db,"orders",date,"entries"), orderBy("createdAt","asc")), snap=>{
+    ordersCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderOrders(date);
+  });
+}
+function renderOrders(date){
+  const tb = el("ordersBody");
+  if(!ordersCache.length){
+    tb.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--muted)">No orders yet for this date.</td></tr>`;
+  } else {
+    tb.innerHTML = "";
+    ordersCache.forEach(o=>{
+      const tr = document.createElement("tr");
+      tr.className = "st-" + (o.status||"New").replace(/\s/g,"");
+      const time = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleTimeString("en-JM",
+        {timeZone:"America/Jamaica",hour:"numeric",minute:"2-digit"}) : "—";
+      const itemsTxt = (o.items||[]).map(l=>
+        `${l.qty}× ${l.name}${l.extra? " ("+l.extra.toppings.join(", ")+(l.extra.meat? " · "+l.extra.meat:"")+")":""}`).join("\n");
+      const payTxt = o.payment==="transfer" ? "🏦 Transfer<br><small>check proof!</small>"
+                   : o.payment==="cash" ? "💵 Cash" : "—";
+      tr.innerHTML = `<td>${time}</td><td>${esc(o.name)}</td>
+        <td><a href="https://wa.me/1${(o.phone||"").replace(/\D/g,"")}" target="_blank" rel="noopener">${esc(o.phone||"")}</a></td>
+        <td>${o.service==="pickup"?"Pickup":"Delivery"}</td>
+        <td>${o.zone? "Zone "+o.zone : "—"}</td>
+        <td>${esc(o.address||"—")}</td>
+        <td class="items-cell">${esc(itemsTxt)}${o.notes? "\n📝 "+esc(o.notes):""}</td>
+        <td>${payTxt}</td>
+        <td><b>${J(o.total||0)}</b></td><td></td>`;
+      const sel = document.createElement("select");
+      STATUSES.forEach(s=>{ const op=document.createElement("option"); op.textContent=s;
+        op.selected = (o.status||"New")===s; sel.appendChild(op); });
+      sel.onchange = ()=> updateDoc(doc(db,"orders",date,"entries",o.id), { status: sel.value });
+      tr.lastElementChild.appendChild(sel);
+      tb.appendChild(tr);
+    });
+  }
+  // summary
+  const live = ordersCache.filter(o=>o.status!=="Declined");
+  el("sumOrders").textContent = ordersCache.length;
+  el("sumRevenue").textContent = J(live.reduce((a,o)=>a+(o.total||0),0));
+  el("sumItems").textContent = live.reduce((a,o)=>a+(o.items||[]).reduce((x,l)=>x+l.qty,0),0);
+  // sell-through
+  const sell = {};
+  live.forEach(o=>(o.items||[]).forEach(l=> sell[l.name]=(sell[l.name]||0)+l.qty));
+  el("sellBody").innerHTML = Object.entries(sell).sort((a,b)=>b[1]-a[1])
+    .map(([n,q])=>`<tr><td>${esc(n)}</td><td><b>${q}</b></td></tr>`).join("") ||
+    `<tr><td colspan="2" style="color:var(--muted)">—</td></tr>`;
+}
+el("csvBtn").onclick = ()=>{
+  const rows = [["Time","Name","WhatsApp","Service","Zone","Address","Items","Payment","Notes","Subtotal","Delivery","Total","Status"]];
+  ordersCache.forEach(o=>{
+    const time = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleTimeString("en-JM",
+      {timeZone:"America/Jamaica",hour:"numeric",minute:"2-digit"}) : "";
+    const items = (o.items||[]).map(l=>`${l.qty}x ${l.name}${l.extra? " ["+l.extra.toppings.join("/")+(l.extra.meat? " +"+l.extra.meat:"")+"]":""}`).join("; ");
+    rows.push([time,o.name,o.phone,o.service,o.zone||"",o.address||"",items,
+      o.payment==="transfer"?"Bank Transfer":"Cash",o.notes||"",
+      o.subtotal||0,o.deliveryFee||0,o.total||0,o.status||"New"]);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = `chongies-orders-${workingDate}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* ── helpers ── */
+function flash(id,msg){ el(id).textContent = msg; setTimeout(()=>{ if(el(id).textContent===msg) el(id).textContent=""; }, 4000); }
+async function copyText(text, flashId){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove(); }
+  flash(flashId,"✅ Copied to clipboard.");
+}
+function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ── Preview-mode mock Firestore (runs entirely in this browser) ──
+   Implements the handful of Firestore functions this app uses, backed
+   by localStorage. Cross-tab "storage" events give you the same
+   live-sync feel as the real thing. Deleted automatically from the
+   flow once a real firebaseConfig is pasted. ── */
+function createMockFirestore(){
+  const KEY = "chongies_demo_db_v2";
+  const clone = o => JSON.parse(JSON.stringify(o));
+  let store = JSON.parse(localStorage.getItem(KEY) || "null") || seedDemo();
+  localStorage.setItem(KEY, JSON.stringify(store));
+  const listeners = [];
+  const persist = () => localStorage.setItem(KEY, JSON.stringify(store));
+  const revive = d => (d && d.createdAt && d.createdAt.__ts !== undefined)
+      ? { ...d, createdAt: { toDate: () => new Date(d.createdAt.__ts) } } : d;
+  const docSnap = p => ({ exists: () => store[p] !== undefined, data: () => revive(clone(store[p])) });
+  const colDocs = p => Object.keys(store)
+      .filter(k => k.startsWith(p + "/") && k.split("/").length === p.split("/").length + 1)
+      .map(k => ({ id: k.split("/").pop(), data: () => revive(clone(store[k])), _ts: (store[k].createdAt || {}).__ts || 0 }))
+      .sort((a, b) => a._ts - b._ts);
+  const fire = l => l.col ? l.cb({ docs: colDocs(l.path) }) : l.cb(docSnap(l.path));
+  const notify = p => listeners.forEach(l => { if (l.path === p || (l.col && p.startsWith(l.path + "/"))) fire(l); });
+  const write = (p, d) => { store[p] = clone(d); persist(); notify(p); };
+  window.addEventListener("storage", e => {
+    if (e.key === KEY) { store = JSON.parse(e.newValue || "{}"); listeners.forEach(fire); } });
+  return {
+    doc: (dbOrRef, ...segs) => (dbOrRef && dbOrRef.col)
+        ? { path: dbOrRef.path + "/" + Math.random().toString(36).slice(2, 10), col: false }
+        : { path: segs.join("/"), col: false },
+    collection: (_db, ...segs) => ({ path: segs.join("/"), col: true }),
+    getDoc: async ref => docSnap(ref.path),
+    setDoc: async (ref, d) => write(ref.path, d),
+    updateDoc: async (ref, patch) => write(ref.path, { ...(store[ref.path] || {}), ...clone(patch) }),
+    onSnapshot: (ref, cb) => {
+      const l = { path: ref.path, col: !!ref.col, cb };
+      listeners.push(l); setTimeout(() => fire(l), 0);
+      return () => { const i = listeners.indexOf(l); if (i > -1) listeners.splice(i, 1); };
+    },
+    query: col => col,
+    orderBy: () => null,
+    serverTimestamp: () => ({ __ts: Date.now() }),
+    runTransaction: async (_db, fn) => fn({ get: async ref => docSnap(ref.path), set: (ref, d) => write(ref.path, d) })
+  };
+}
+function seedDemo(){
+  const p = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Jamaica",year:"numeric",month:"2-digit",
+    day:"2-digit",hour:"2-digit",hour12:false}).formatToParts(new Date()).reduce((a,x)=>(a[x.type]=x.value,a),{});
+  const mk = n => new Date(Date.UTC(+p.year, +p.month-1, +p.day+n, 12)).toISOString().slice(0,10);
+  const active = +p.hour >= 10 ? mk(1) : mk(0);
+  const menu = { published:true, sections:[
+    { id:"mains", title:"🇯🇲 Jamaican Daily Mains", items:[
+      { id:"mains__brown-stew-chicken", name:"Brown Stew Chicken", group:"Chicken", price:1100, qty:null, active:true },
+      { id:"mains__curry-goat", name:"Curry Goat", group:"Beef & Goat", price:1100, qty:8, active:true },
+      { id:"mains__oxtail-and-beans", name:"Oxtail and Beans", group:"Beef & Goat", price:1100, qty:0, active:true },
+      { id:"mains__escovitch-whole-fish", name:"Escovitch Whole Fish", group:"Fish", price:1100, qty:3, active:true },
+      { id:"mains__ital-stew-vegetables", name:"Ital Stew Vegetables", group:"Vegetarian", price:1100, qty:null, active:true } ] },
+    { id:"soups", title:"🍲 Soups (16oz)", items:[
+      { id:"soups__chicken-soup", name:"Chicken Soup", group:"Regular", price:600, qty:null, active:true },
+      { id:"soups__pumpkin-soup", name:"Pumpkin Soup", group:"Vegetarian", price:600, qty:null, active:true } ] },
+    { id:"fried", title:"🍗 Fried Chicken", items:[
+      { id:"fried__2-pcs-fried-chicken", name:"2 Pcs Fried Chicken", group:"", price:650, qty:12, active:true } ] },
+    { id:"noodles", title:"🍜 Noodle Bowls", items:[
+      { id:"noodles__teriyaki-chicken-noodle-bowl", name:"Teriyaki Chicken Noodle Bowl", group:"Chicken — J$1,200", price:1200, qty:null, active:true } ] },
+    { id:"wraps", title:"🌯 Wraps", items:[
+      { id:"wraps__build-your-own-wrap", name:"Build Your Own Wrap", group:"", price:1200, qty:null, active:true, wrap:"meat" },
+      { id:"wraps__vegetarian-wrap", name:"Vegetarian Wrap", group:"", price:1000, qty:null, active:true, wrap:"veg" } ] },
+    { id:"sides", title:"🍌 Sides & Extras", items:[
+      { id:"sides__festival", name:"Festival", group:"", price:200, qty:null, active:true },
+      { id:"sides__fried-plantain", name:"Fried Plantain", group:"", price:200, qty:null, active:true } ] },
+    { id:"drinks", title:"🍹 MCCM Natural Juices & Drinks", items:[
+      { id:"drinks__mango-juice", name:"Mango Juice", group:"", price:500, qty:null, active:true },
+      { id:"drinks__lemonade", name:"Lemonade", group:"", price:500, qty:null, active:true } ] } ] };
+  const s = {};
+  [mk(0), mk(1), mk(2)].forEach(d => s["menus/"+d] = JSON.parse(JSON.stringify(menu)));
+  s["settings/config"] = { pin:"1234", closedDates:[],
+    closureMessage:"Chongie's is closed today — see you tomorrow! 🌴",
+    bankInfo:"Bank: [Your bank name]\nAccount name: Mark Chong's Cooking Mastery\nAccount number: [enter account #]\nAccount type: [Savings / Chequing]\nBranch: [branch]",
+    greetingTemplate:"🙌 Bless up [name]! Thanks for ordering with Chongie's by MCCM. Your order for [date] is confirmed ✅. [Delivery: expect your food between 12–2pm / Pickup: ready from 12pm at 9 Bloomsbury Road, Kingston 10]. Walk good! 🇯🇲" };
+  s["orders/"+active+"/entries/demo1"] = { deliveryDate:active, createdAt:{__ts:Date.now()-3600e3},
+    name:"Andrea Brown", phone:"876-555-0134", service:"delivery", zone:"1",
+    address:"12 Eastwood Park Rd, Kgn 10", payment:"cash", notes:"No pepper please",
+    items:[{itemId:"mains__brown-stew-chicken",name:"Brown Stew Chicken",unitPrice:1100,qty:2,extra:null},
+           {itemId:"drinks__lemonade",name:"Lemonade",unitPrice:500,qty:2,extra:null}],
+    subtotal:3200, deliveryFee:300, total:3500, status:"Confirmed" };
+  s["orders/"+active+"/entries/demo2"] = { deliveryDate:active, createdAt:{__ts:Date.now()-1200e3},
+    name:"Delroy Campbell", phone:"876-555-0188", service:"pickup", zone:null, address:null, payment:"transfer", notes:"",
+    items:[{itemId:"wraps__build-your-own-wrap",name:"Build Your Own Wrap",unitPrice:1200,qty:1,
+      extra:{toppings:["Lettuce","Tomato","Cheese","Cucumber"],meat:"Grilled Chicken"}}],
+    subtotal:1200, deliveryFee:0, total:1200, status:"New" };
+  return s;
+}
+
+initGate();
+</script>
+</body>
+</html>
