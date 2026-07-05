@@ -371,14 +371,14 @@ function autoDate(){ const t=jmParts(); const today=iso(t.y,t.m,t.d);
 
 /* ── State ── */
 let override = null;           // manual date override (ISO) or null
+let settings = {};             // must be declared BEFORE workingDate — autoDate() reads it via isClosedDate()
 let workingDate = autoDate().date;
 let menu = null;               // menu doc being edited for workingDate
-let settings = {};
 let unsubMenu = null, unsubOrders = null;
 let ordersCache = [];
 
 /* ── PIN GATE ── */
-const ADMIN_VERSION = "v2.1";
+const ADMIN_VERSION = "v2.2";
 async function initGate(){
   const vTag = document.createElement("p");
   vTag.style.cssText = "margin-top:10px;font-size:.7rem;color:#b0a68f";
