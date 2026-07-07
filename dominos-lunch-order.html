@@ -317,7 +317,8 @@ table.weekly td:first-child { font-weight: 600; color: var(--muted); font-size: 
     <label for="access-code">Weekly Access Code</label>
     <input type="password" id="access-code" placeholder="Enter code" maxlength="20" autocomplete="off">
     <button class="btn-unlock" onclick="checkCode()">Access Portal</button>
-    <span>MCCM Admin — Domino's Lunch Portal</span> → <span>MCCM Admin — First Order Brands Limited Lunch Portal</span>
+    <div class="lock-error" id="lock-error">Incorrect code. Please check with your coordinator.</div>
+  </div>
 </div>
 
 <!-- ── WEEKEND SCREEN ── -->
@@ -340,6 +341,7 @@ table.weekly td:first-child { font-weight: 600; color: var(--muted); font-size: 
       <div class="header-brand">
         <div class="header-logo">MC</div>
         <span>MCCM Lunch Portal — First Order Brands Limited</span>
+      </div>
       <div class="header-meta">
         <strong id="header-date"></strong>
         <span id="header-cutoff">Order by 10:00 AM</span>
@@ -566,7 +568,7 @@ table.weekly td:first-child { font-weight: 600; color: var(--muted); font-size: 
 
 <script>
 // ── CONFIG ──
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQhR2V8qBAcCeMhKjqS24WhXg8KvYJLBk5icB_peBJOl8hLwKbVT4ugyJWhMlQTqpc/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQhR2V8qBAcCeMhKjqS24WhXg8KvYJLBk5icB_peBJ0l8hLwKbVT4ugyJWhM1QTqpc/exec";
 const ADMIN_KEY = "dominos_weekly_code";
 const MENU_KEY = "dominos_weekly_menu";
 
@@ -574,7 +576,7 @@ const MENU_KEY = "dominos_weekly_menu";
 let ACCESS_CODE = localStorage.getItem("dominos_access_code") || "DOMINOS2026";
 
 // ── STAFF NAME ── (free-text entry — no preset list yet; ask MCCM to add a
-// dropdown list once Domino's provides staff names, following the same
+// dropdown list once the client provides staff names, following the same
 // pattern as the STAFF array used in the JSE reference build)
 
 // ── DAYS ──
