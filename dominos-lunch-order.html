@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domino's Pizza Jamaica — Daily Lunch Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0a1628;
+  --navy-mid: #162440;
+  --gold: #c9a84c;
+  --gold-lt: #e8cc7e;
+  --cream: #f8f5ef;
+  --warm: #f0ebe0;
+  --border: #ddd5c0;
+  --muted: #7a6e5f;
+  --green: #1a5c3a;
+  --red: #a03030;
+  --white: #ffffff;
+  --radius: 8px;
+}
+body { font-family: "DM Sans", sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+/* ── LOCK SCREEN ── */
+#lock-screen {
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.lock-card {
+  background: var(--navy-mid);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 16px;
+  padding: 48px 40px;
+  max-width: 420px; width: 100%;
+  text-align: center;
+}
+.lock-logo {
+  width: 64px; height: 64px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-family: "DM Serif Display", serif;
+  font-size: 22px; color: var(--navy); font-weight: bold;
+}
+.lock-card h1 {
+  font-family: "DM Serif Display", serif;
+  color: var(--white); font-size: 24px; margin-bottom: 6px;
+}
+.lock-card p { color: rgba(255,255,255,0.55); font-size: 14px; margin-bottom: 32px; }
+.lock-card label { display: block; text-align: left; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+.lock-card input {
+  width: 100%; padding: 14px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  color: var(--white); font-size: 16px; font-family: inherit;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.lock-card input:focus { outline: none; border-color: var(--gold); }
+.lock-card input::placeholder { color: rgba(255,255,255,0.3); letter-spacing: 0; }
+.btn-unlock {
+  width: 100%; padding: 14px;
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-unlock:hover { background: var(--gold-lt); }
+.lock-error { color: #ff7070; font-size: 13px; margin-top: 12px; display: none; }
+
+/* ── WEEKEND MSG ── */
+#weekend-screen {
+  min-height: 100vh;
+  background: var(--navy);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px; text-align: center;
+}
+#weekend-screen h2 { font-family: "DM Serif Display", serif; color: var(--gold); font-size: 28px; margin-bottom: 12px; }
+#weekend-screen p { color: rgba(255,255,255,0.6); font-size: 15px; }
+
+/* ── AFTER CUTOFF BANNER ── */
+.after-cutoff-banner {
+  background: #7a3a00;
+  color: #ffe0b0;
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  font-size: 14px; font-weight: 600;
+  margin-bottom: 16px;
+  display: none;
+  align-items: center; gap: 10px;
+}
+
+/* ── MAIN APP ── */
+#app { display: none; }
+
+header {
+  background: var(--navy);
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 100;
+  border-bottom: 2px solid var(--gold);
+}
+.header-inner {
+  max-width: 900px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.header-brand {
+  display: flex; align-items: center; gap: 12px;
+}
+.header-logo {
+  width: 36px; height: 36px; background: var(--gold);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: "DM Serif Display", serif; font-size: 14px; color: var(--navy);
+}
+.header-brand span { color: var(--white); font-size: 15px; font-weight: 600; }
+.header-meta { color: rgba(255,255,255,0.5); font-size: 13px; text-align: right; }
+.header-meta strong { color: var(--gold-lt); display: block; }
+
+.page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+/* ── DELIVERY BANNER ── */
+.delivery-banner {
+  background: var(--navy);
+  color: var(--gold-lt);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  font-size: 14px; font-weight: 600;
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 10px;
+  letter-spacing: 0.02em;
+}
+.delivery-banner span { font-size: 18px; }
+
+/* ── SECTION TITLES ── */
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 12px;
+}
+h2.section-title {
+  font-family: "DM Serif Display", serif;
+  font-size: 22px; color: var(--navy);
+  margin-bottom: 20px;
+}
+
+/* ── WEEKLY MENU TABLE ── */
+.weekly-menu-wrapper {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 36px;
+}
+.weekly-menu-header {
+  background: var(--navy);
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.weekly-menu-header h3 { color: var(--white); font-size: 15px; font-weight: 600; }
+.weekly-menu-header span { color: rgba(255,255,255,0.5); font-size: 12px; }
+.menu-table-scroll { overflow-x: auto; }
+table.weekly { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.weekly th {
+  background: var(--navy-mid); color: var(--gold-lt);
+  padding: 10px 14px; text-align: left;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  white-space: nowrap;
+}
+table.weekly td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  vertical-align: top; color: var(--navy);
+}
+table.weekly tr:last-child td { border-bottom: none; }
+table.weekly tr:nth-child(even) td { background: var(--warm); }
+table.weekly td:first-child { font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.today-col { background: rgba(201,168,76,0.12) !important; }
+.today-th { background: var(--gold) !important; color: var(--navy) !important; }
+
+/* ── ORDER FORM ── */
+.order-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.order-card-header {
+  background: var(--green);
+  padding: 14px 20px;
+  color: var(--white); font-size: 14px; font-weight: 600;
+}
+.order-card-body { padding: 20px; }
+
+.staff-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.field select, .field textarea, .field input[type="text"] {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: inherit; font-size: 14px; color: var(--navy);
+  background: var(--cream);
+  transition: border-color 0.2s;
+  appearance: none;
+}
+.field select:focus, .field textarea:focus, .field input[type="text"]:focus {
+  outline: none; border-color: var(--gold);
+  background: var(--white);
+}
+.field textarea { resize: vertical; min-height: 80px; }
+
+/* wings/noodle options */
+.daily-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+.option-chip {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 13px; cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  background: var(--cream);
+  user-select: none;
+}
+.option-chip:hover { border-color: var(--gold); }
+.option-chip.selected { border-color: var(--gold); background: rgba(201,168,76,0.12); font-weight: 600; }
+.option-chip input { display: none; }
+
+/* package selector */
+.pkg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.pkg-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer; transition: all 0.15s;
+  background: var(--cream);
+}
+.pkg-card:hover { border-color: var(--gold); }
+.pkg-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+.pkg-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.pkg-card p { font-size: 12px; color: var(--muted); }
+.pkg-card .pkg-price { font-size: 18px; font-weight: 700; color: var(--navy); margin-top: 8px; }
+.pkg-card input { display: none; }
+
+/* submit */
+.submit-bar {
+  position: sticky; bottom: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+}
+.submit-summary { font-size: 13px; color: var(--muted); }
+.submit-summary strong { color: var(--navy); font-size: 15px; display: block; }
+.btn-submit {
+  padding: 14px 32px;
+  background: var(--navy); color: var(--white);
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-submit:hover { background: var(--navy-mid); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* success */
+#success-screen {
+  display: none; min-height: 100vh;
+  background: var(--cream);
+  align-items: center; justify-content: center;
+  padding: 24px; text-align: center;
+}
+.success-card {
+  background: var(--white); border-radius: 16px;
+  padding: 48px 40px; max-width: 460px;
+  border: 1px solid var(--border);
+}
+.success-icon { font-size: 56px; margin-bottom: 20px; }
+.success-card h2 { font-family: "DM Serif Display", serif; font-size: 28px; color: var(--navy); margin-bottom: 10px; }
+.success-card p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+.success-card .delivery-info {
+  background: var(--cream); border-radius: var(--radius);
+  padding: 16px; margin: 20px 0; font-size: 14px; font-weight: 600;
+  color: var(--navy);
+}
+
+@media (max-width: 600px) {
+  .staff-row { grid-template-columns: 1fr; }
+  .daily-options { grid-template-columns: 1fr 1fr; }
+  .pkg-row { grid-template-columns: 1fr; }
+  .submit-bar { flex-direction: column; }
+  .btn-submit { width: 100%; text-align: center; }
+  .lock-card { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOCK SCREEN ── -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">MC</div>
+    <h1>Domino's Lunch Portal</h1>
+    <p>Mark Chong's Cooking Mastery — Daily Lunch Service</p>
+    <label for="access-code">Weekly Access Code</label>
+    <input type="password" id="access-code" placeholder="Enter code" maxlength="20" autocomplete="off">
+    <button class="btn-unlock" onclick="checkCode()">Access Portal</button>
+    <div class="lock-error" id="lock-error">Incorrect code. Please check with your Domino's coordinator.</div>
+  </div>
+</div>
+
+<!-- ── WEEKEND SCREEN ── -->
+<div id="weekend-screen">
+  <div>
+    <div style="font-size:64px;margin-bottom:20px;">🌴</div>
+    <h2>Enjoy your weekend!</h2>
+    <p>The lunch portal is open Monday to Friday.<br>We'll see you back on Monday.</p>
+    <p style="margin-top:16px;color:rgba(255,255,255,0.4);font-size:13px;">Mark Chong's Cooking Mastery</p>
+  </div>
+</div>
+
+<!-- ── AFTER CUTOFF BANNER (shown inside app after 10am) ── -->
+
+
+<!-- ── MAIN APP ── -->
+<div id="app">
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="header-logo">MC</div>
+        <span>MCCM Lunch Portal — Domino's Pizza Jamaica</span>
+      </div>
+      <div class="header-meta">
+        <strong id="header-date"></strong>
+        <span id="header-cutoff">Order by 10:00 AM</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+
+    <!-- After Cutoff Banner -->
+    <div class="after-cutoff-banner" id="after-cutoff-banner">
+      <span>⏰</span>
+      <span id="after-cutoff-msg">Today's orders are closed — you are now ordering for the next delivery day.</span>
+    </div>
+
+    <!-- Delivery Banner -->
+    <div class="delivery-banner">
+      <span>🚚</span>
+      <span id="delivery-notice">Loading delivery info...</span>
+    </div>
+
+    <!-- Weekly Menu Display (read-only) -->
+    <div class="section-label">This Week's Menu</div>
+    <h2 class="section-title">Weekly Rotating Menu</h2>
+    <div class="weekly-menu-wrapper" id="weekly-menu-section">
+      <div class="weekly-menu-header">
+        <h3>Menu at a Glance — Read Only</h3>
+        <span>Plan your week ahead</span>
+      </div>
+      <div class="menu-table-scroll">
+        <table class="weekly" id="weekly-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th id="th-mon" class="day-th">Monday</th>
+              <th id="th-tue" class="day-th">Tuesday</th>
+              <th id="th-wed" class="day-th">Wednesday</th>
+              <th id="th-thu" class="day-th">Thursday</th>
+              <th id="th-fri" class="day-th">Friday</th>
+            </tr>
+          </thead>
+          <tbody id="weekly-body">
+            <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px;">Menu not yet loaded — check back soon.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Order Form -->
+    <div class="section-label">Place Your Order</div>
+    <h2 class="section-title" id="order-title">Order for Tomorrow's Delivery</h2>
+
+    <!-- Staff Info -->
+    <div class="order-card">
+      <div class="order-card-header">👤 Your Details</div>
+      <div class="order-card-body">
+        <div class="staff-row">
+          <div class="field">
+            <label>Your Full Name</label>
+            <input type="text" id="staff-name" placeholder="Enter your full name" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Department</label>
+            <select id="staff-dept">
+              <option value="">Select department...</option>
+              <option>Executive Management</option>
+              <option>Operations</option>
+              <option>Supply Chain & Commissary</option>
+              <option>Marketing & Communications</option>
+              <option>Finance & Accounts</option>
+              <option>Human Resources</option>
+              <option>Information Technology</option>
+              <option>Training & Development</option>
+              <option>Franchise Support</option>
+              <option>Customer Experience</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Package -->
+    <div class="order-card">
+      <div class="order-card-header">📦 Select Package</div>
+      <div class="order-card-body">
+        <div class="pkg-row">
+          <label class="pkg-card selected" id="pkg-standard">
+            <input type="radio" name="package" value="Standard" checked>
+            <h4>Standard Lunch</h4>
+            <p>Full daily spread — proteins, provisions, soups, rice, sides & daily specials</p>
+            <div class="pkg-price">J$1,000</div>
+          </label>
+          <label class="pkg-card" id="pkg-premium">
+            <input type="radio" name="package" value="Premium">
+            <h4>Premium Lunch</h4>
+            <p>Everything in Standard plus a 100% natural MCCM Juice</p>
+            <div class="pkg-price">J$1,200</div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Selection -->
+    <div class="order-card">
+      <div class="order-card-header">🍽️ Main Course</div>
+      <div class="order-card-body">
+        <div class="field">
+          <label>Protein / Main Choice</label>
+          <select id="main-select">
+            <option value="">Choose your main...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sides -->
+    <div class="order-card">
+      <div class="order-card-header">🥗 Sides & Accompaniments</div>
+      <div class="order-card-body">
+        <div class="field">
+          <label>Rice</label>
+          <select id="rice-select">
+            <option value="">Choose rice...</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Soup</label>
+          <select id="soup-select">
+            <option value="">Choose soup...</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Additional Side</label>
+          <select id="side-select">
+            <option value="">Choose a side...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Specials -->
+    <div class="order-card">
+      <div class="order-card-header">⭐ Daily Specials (Available Every Day)</div>
+      <div class="order-card-body">
+        <div class="field">
+          <label>Add a Daily Special? (optional)</label>
+          <div class="daily-options">
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Chicken Noodle Bowl">🍜 Chicken Noodle Bowl
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Pork Noodle Bowl">🍜 Pork Noodle Bowl
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Vegetarian Noodle Bowl">🍜 Veg Noodle Bowl
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Jerk Wings & Wedges">🍗 Jerk Wings
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="BBQ Wings & Wedges">🍗 BBQ Wings
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Buffalo Wings & Wedges">🍗 Buffalo Wings
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Lemon Pepper Wings & Wedges">🍗 Lemon Pepper Wings
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Chicken Alfredo">🍝 Chicken Alfredo
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Vegetarian Alfredo">🍝 Veg Alfredo
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Chicken Salad">🥗 Chicken Salad
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Garden Salad">🥗 Garden Salad
+            </label>
+            <label class="option-chip" onclick="toggleChip(this)">
+              <input type="checkbox" name="special" value="Fish Salad">🥗 Fish Salad
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="order-card">
+      <div class="order-card-header">📝 Special Notes</div>
+      <div class="order-card-body">
+        <div class="field">
+          <label>Dietary Requirements or Notes (optional)</label>
+          <textarea id="notes" placeholder="e.g. No pork, extra vegetables, allergen info..."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- Submit Bar -->
+  <div class="submit-bar">
+    <div class="submit-summary">
+      <strong id="submit-name-preview">Enter your name above</strong>
+      <span id="submit-delivery-preview">Delivery date will show here</span>
+    </div>
+    <button class="btn-submit" id="submit-btn" onclick="submitOrder()">Place Order →</button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ── SUCCESS SCREEN ── -->
+<div id="success-screen">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Order Placed!</h2>
+    <p>Your lunch order has been received by the MCCM kitchen.</p>
+    <div class="delivery-info" id="success-delivery-info">Delivery: Tomorrow</div>
+    <p style="font-size:13px;color:var(--muted);">Questions? Contact Mark Chong's Cooking Mastery<br>876-818-7335</p>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──
+const SCRIPT_URL = "PASTE_DOMINOS_APPS_SCRIPT_WEB_APP_URL_HERE"; // ← replace after deploying apps-script-dominos.js (Step 1 of deploy guide)
+const ADMIN_KEY = "dominos_weekly_code";
+const MENU_KEY = "dominos_weekly_menu";
+
+// Default access code — admin can change via admin panel
+let ACCESS_CODE = localStorage.getItem("dominos_access_code") || "DOMINOS2026";
+
+// ── STAFF NAME ── (free-text entry — no preset list yet; ask MCCM to add a
+// dropdown list once Domino's provides staff names, following the same
+// pattern as the STAFF array used in the JSE reference build)
+
+// ── DAYS ──
+const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const DAY_KEYS = ["mon","tue","wed","thu","fri"];
+const DAY_LABELS = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+
+// ── WEEKLY MENU (loaded from localStorage, set by admin) ──
+const MENU_CATEGORIES = [
+  {key:"protein1", label:"Meat Protein 1"},
+  {key:"protein2", label:"Meat Protein 2"},
+  {key:"protein3", label:"Meat Protein 3"},
+  {key:"fish", label:"Fish Option"},
+  {key:"veg", label:"Vegetarian Main"},
+  {key:"provisions", label:"Boiled Provisions"},
+  {key:"soup", label:"Regular Soup"},
+  {key:"vegsoup", label:"Vegetarian Soup"},
+  {key:"rice1", label:"Rice Option 1"},
+  {key:"rice2", label:"Rice Option 2"},
+  {key:"veg_side", label:"Steamed Vegetables"},
+  {key:"potato", label:"Potato"},
+  {key:"sides", label:"Additional Sides"},
+];
+
+function getWeeklyMenu() {
+  try { return JSON.parse(localStorage.getItem(MENU_KEY)) || {}; } catch(e) { return {}; }
+}
+
+// ── DATE HELPERS ──
+function getJamaicaNow() {
+  return new Date(new Date().toLocaleString("en-US", {timeZone:"America/Jamaica"}));
+}
+function getDeliveryDate(orderDate, afterCutoff) {
+  const d = new Date(orderDate);
+  const dow = d.getDay(); // 0=Sun,1=Mon...6=Sat
+  let addDays = 1;
+
+  if (afterCutoff) {
+    // After 10am — skip today, deliver day after tomorrow
+    addDays = 2;
+    if (dow === 4) addDays = 4; // Thursday after cutoff → Monday
+    if (dow === 5) addDays = 4; // Friday after cutoff → Tuesday
+    if (dow === 3) addDays = 2; // Wednesday → Friday
+  } else {
+    // Before 10am — normal next day delivery
+    if (dow === 5) addDays = 3; // Friday → Monday
+    if (dow === 4) addDays = 3; // Thursday → Friday... wait, Thu→Fri is 1
+  }
+
+  // Recalculate cleanly
+  if (!afterCutoff) {
+    addDays = 1;
+    if (dow === 5) addDays = 3; // Fri → Mon
+  } else {
+    // After cutoff: next order day is tomorrow, delivery is day after that
+    // Find next weekday from tomorrow
+    const tomorrow = new Date(d);
+    tomorrow.setDate(d.getDate() + 1);
+    const tDow = tomorrow.getDay();
+    // Skip weekend to get order day
+    let orderDay = new Date(tomorrow);
+    if (tDow === 6) orderDay.setDate(tomorrow.getDate() + 2); // Sat→Mon
+    if (tDow === 0) orderDay.setDate(tomorrow.getDate() + 1); // Sun→Mon
+    // Delivery is next day after order day
+    const orderDow = orderDay.getDay();
+    const deliveryDay = new Date(orderDay);
+    deliveryDay.setDate(orderDay.getDate() + (orderDow === 5 ? 3 : 1));
+    return deliveryDay;
+  }
+
+  d.setDate(d.getDate() + addDays);
+  return d;
+}
+function formatDate(d) {
+  return d.toLocaleDateString("en-JM", {weekday:"long", year:"numeric", month:"long", day:"numeric"});
+}
+
+// ── INIT ──
+function init() {
+  const now = getJamaicaNow();
+  const dow = now.getDay();
+  const hour = now.getHours();
+  const afterCutoff = hour >= 10;
+
+  // Weekend check
+  if (dow === 0 || dow === 6) {
+    document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("weekend-screen").style.display = "flex";
+    return;
+  }
+
+  // Set header date
+  document.getElementById("header-date").textContent = formatDate(now);
+
+  // Show after-cutoff banner if past 10am
+  if (afterCutoff) {
+    const banner = document.getElementById("after-cutoff-banner");
+    banner.style.display = "flex";
+    document.getElementById("after-cutoff-msg").textContent =
+      "Today's 10:00 AM cutoff has passed — you are now ordering for the next delivery day.";
+    document.getElementById("header-cutoff").textContent = "Next delivery order";
+  }
+
+  // Staff name is now free-text entry (see submit-bar listener below)
+
+  // Calculate correct delivery date
+  const delivery = getDeliveryDate(now, afterCutoff);
+  const deliveryStr = formatDate(delivery);
+
+  document.getElementById("delivery-notice").textContent =
+    `Ordering now for ${deliveryStr} delivery`;
+  document.getElementById("submit-delivery-preview").textContent =
+    `Delivery: ${deliveryStr}`;
+  document.getElementById("success-delivery-info").textContent =
+    `Delivery: ${deliveryStr}`;
+  document.getElementById("order-title").textContent =
+    `Your Order — Delivery ${deliveryStr}`;
+
+  // Load weekly menu table — highlight ordering day
+  // After cutoff, the relevant menu day is tomorrow's
+  const menuDow = afterCutoff
+    ? (dow === 5 ? 1 : dow + 1) // Friday after cutoff → Mon menu; else next day
+    : dow;
+  loadWeeklyTable(dow, menuDow);
+  loadTodayMenu(menuDow);
+
+  // Package toggle
+  document.querySelectorAll(".pkg-card").forEach(card => {
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+    });
+  });
+
+  // Staff name preview
+  document.getElementById("staff-name").addEventListener("input", function() {
+    document.getElementById("submit-name-preview").textContent = this.value || "Enter your name above";
+  });
+}
+
+function loadWeeklyTable(todayDow, menuDow) {
+  const menu = getWeeklyMenu();
+  const tbody = document.getElementById("weekly-body");
+
+  const todayIdx = todayDow - 1;
+  const menuIdx = menuDow - 1;
+
+  DAY_KEYS.forEach((k, i) => {
+    const th = document.getElementById("th-" + k);
+    if (i === todayIdx) th.classList.add("today-th");
+  });
+
+  if (!menu || Object.keys(menu).length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px;">Menu not yet published — check back soon.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  MENU_CATEGORIES.forEach(cat => {
+    const tr = document.createElement("tr");
+    let html = `<td>${cat.label}</td>`;
+    DAY_KEYS.forEach((day, i) => {
+      const val = (menu[day] && menu[day][cat.key]) ? menu[day][cat.key] : "—";
+      html += `<td class="${i === menuIdx ? 'today-col' : ''}">${val}</td>`;
+    });
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+}
+
+function loadTodayMenu(dow) {
+  const menu = getWeeklyMenu();
+  const dayKey = DAY_KEYS[dow - 1];
+  const dayMenu = (menu && menu[dayKey]) ? menu[dayKey] : null;
+
+  // Main options
+  const mainSel = document.getElementById("main-select");
+  mainSel.innerHTML = '<option value="">Choose your main...</option>';
+  const riceSel = document.getElementById("rice-select");
+  riceSel.innerHTML = '<option value="">Choose rice...</option>';
+  const soupSel = document.getElementById("soup-select");
+  soupSel.innerHTML = '<option value="">Choose soup...</option>';
+  const sideSel = document.getElementById("side-select");
+  sideSel.innerHTML = '<option value="">Choose a side...</option>';
+
+  if (dayMenu) {
+    ["protein1","protein2","protein3","fish","veg"].forEach(k => {
+      if (dayMenu[k]) {
+        const o = document.createElement("option");
+        o.value = dayMenu[k]; o.textContent = dayMenu[k];
+        mainSel.appendChild(o);
+      }
+    });
+    ["rice1","rice2"].forEach(k => {
+      if (dayMenu[k]) {
+        const o = document.createElement("option");
+        o.value = dayMenu[k]; o.textContent = dayMenu[k];
+        riceSel.appendChild(o);
+      }
+    });
+    ["soup","vegsoup"].forEach(k => {
+      if (dayMenu[k]) {
+        const o = document.createElement("option");
+        o.value = dayMenu[k]; o.textContent = dayMenu[k];
+        soupSel.appendChild(o);
+      }
+    });
+    if (dayMenu.sides) {
+      dayMenu.sides.split(",").map(s => s.trim()).filter(Boolean).forEach(s => {
+        const o = document.createElement("option");
+        o.value = s; o.textContent = s;
+        sideSel.appendChild(o);
+      });
+    }
+    if (dayMenu.provisions) {
+      const o = document.createElement("option");
+      o.value = dayMenu.provisions; o.textContent = "Boiled Provisions: " + dayMenu.provisions;
+      sideSel.appendChild(o);
+    }
+    if (dayMenu.potato) {
+      const o = document.createElement("option");
+      o.value = dayMenu.potato; o.textContent = dayMenu.potato;
+      sideSel.appendChild(o);
+    }
+    if (dayMenu.veg_side) {
+      const o = document.createElement("option");
+      o.value = dayMenu.veg_side; o.textContent = "Steamed Veg: " + dayMenu.veg_side;
+      sideSel.appendChild(o);
+    }
+  } else {
+    // Fallback generic options
+    ["Brown Stew Chicken","Stewed Beef","Grilled Fish","Vegetarian Curry","Jerk Chicken"].forEach(v => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      mainSel.appendChild(o);
+    });
+    ["White Rice","Rice & Peas"].forEach(v => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      riceSel.appendChild(o);
+    });
+    ["Chicken Soup","Pumpkin Soup","Vegetable Soup"].forEach(v => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      soupSel.appendChild(o);
+    });
+    ["Fried Plantain","Coleslaw","Macaroni Salad","Steamed Cabbage"].forEach(v => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      sideSel.appendChild(o);
+    });
+  }
+}
+
+function toggleChip(el) {
+  el.classList.toggle("selected");
+}
+
+// ── ACCESS CODE CHECK ──
+function checkCode() {
+  const code = document.getElementById("access-code").value.trim();
+  if (code === ACCESS_CODE) {
+    document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    init();
+  } else {
+    document.getElementById("lock-error").style.display = "block";
+    document.getElementById("access-code").value = "";
+  }
+}
+document.getElementById("access-code").addEventListener("keydown", e => {
+  if (e.key === "Enter") checkCode();
+});
+
+// ── SUBMIT ORDER ──
+async function submitOrder() {
+  const name = document.getElementById("staff-name").value;
+  const dept = document.getElementById("staff-dept").value;
+  const pkg = document.querySelector('input[name="package"]:checked')?.value || "Standard";
+  const main = document.getElementById("main-select").value;
+  const rice = document.getElementById("rice-select").value;
+  const soup = document.getElementById("soup-select").value;
+  const side = document.getElementById("side-select").value;
+  const notes = document.getElementById("notes").value;
+  const specials = [...document.querySelectorAll('input[name="special"]:checked')].map(i => i.value).join(", ");
+
+  if (!name) { alert("Please enter your name."); return; }
+  if (!dept) { alert("Please select your department."); return; }
+  if (!main) { alert("Please choose a main course."); return; }
+
+  const now = getJamaicaNow();
+  const afterCutoff = now.getHours() >= 10;
+  const delivery = getDeliveryDate(now, afterCutoff);
+  const deliveryStr = delivery.toLocaleDateString("en-JM", {weekday:"long", year:"numeric", month:"long", day:"numeric"});
+
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.textContent = "Placing order...";
+
+  const payload = {
+    name, department: dept, package: pkg,
+    main, rice, soup,
+    sides: [side, specials].filter(Boolean).join(" | "),
+    notes,
+    deliveryDate: deliveryStr,
+    option: specials
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    document.getElementById("app").style.display = "none";
+    document.getElementById("success-screen").style.display = "flex";
+  } catch(err) {
+    alert("Could not submit order. Please check your connection and try again.");
+    btn.disabled = false;
+    btn.textContent = "Place Order →";
+  }
+}
+
+// Check weekend on load (before login)
+(function() {
+  const now = getJamaicaNow();
+  const dow = now.getDay();
+  if (dow === 0 || dow === 6) {
+    document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("weekend-screen").style.display = "flex";
+  }
+})();
+</script>
+</body>
+</html>
